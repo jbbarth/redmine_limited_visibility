@@ -13,5 +13,11 @@ describe RedmineLimitedVisibility::IssuePatch do
       issue.should_receive(:visible_without_limited_visibility?).with(user)
       issue.visible?(user)
     end
+
+    it "adds additionnal visibility condition" do
+      issue.stub(:visible_without_limited_visibility?).and_return(true)
+      IssueVisibility.any_instance.stubs(:authorized?).returns(:result) #mocha mock
+      issue.visible?(user).should == :result
+    end
   end
 end

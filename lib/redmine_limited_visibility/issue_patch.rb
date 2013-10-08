@@ -13,7 +13,7 @@ module RedmineLimitedVisibility
 
     module InstanceMethods
       def visible_with_limited_visibility?(user = nil)
-        visible_without_limited_visibility?(user)
+        visible_without_limited_visibility?(user) && IssueVisibility.new(user, self).authorized?
       end
     end
   end

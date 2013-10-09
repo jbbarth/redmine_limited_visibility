@@ -4,11 +4,34 @@ require_relative '../../app/services/issue_visibility'
 module RedmineLimitedVisibility
   module IssuePatch
     def self.included(base)
+      base.send(:extend, ClassMethods)
       base.send(:include, InstanceMethods)
 
       base.class_eval do
         unloadable
         alias_method_chain :visible?, :limited_visibility
+
+        class << self
+          alias_method_chain :visible_condition, :limited_visibility
+        end
+      end
+    end
+
+    module ClassMethods
+      def visible_condition_with_limited_visibility(user, options = {})
+        base_condition = visible_condition_without_limited_visibility(user, options)
+        conditions = []
+        conditions << "#{Issue.table_name}.authorized_viewers LIKE '%|user=#{user.id}|%'"
+        conditions << "#{Issue.table_name}.authorized_viewers LIKE '%|organization=#{user.organization_id}|%'" if user.respond_to?(:organization_id) && user.organization_id.present?
+        user.group_ids.each do |gid|
+          conditions << "#{Issue.table_name}.authorized_viewers LIKE '%|group=#{gid}|%'"
+        end
+        limited_condition = "(#{conditions.join(" OR ")})"
+        if base_condition.blank?
+          limited_condition
+        else
+          "(#{base_condition} AND #{limited_condition})"
+        end
       end
     end
 

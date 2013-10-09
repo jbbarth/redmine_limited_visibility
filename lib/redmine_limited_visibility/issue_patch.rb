@@ -20,6 +20,7 @@ module RedmineLimitedVisibility
     module ClassMethods
       def visible_condition_with_limited_visibility(user, options = {})
         base_condition = visible_condition_without_limited_visibility(user, options)
+        return base_condition if user.admin?
         conditions = []
         conditions << "#{Issue.table_name}.authorized_viewers LIKE '%|user=#{user.id}|%'"
         conditions << "#{Issue.table_name}.authorized_viewers LIKE '%|organization=#{user.organization_id}|%'" if user.respond_to?(:organization_id) && user.organization_id.present?

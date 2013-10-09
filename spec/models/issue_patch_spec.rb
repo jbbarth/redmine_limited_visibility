@@ -29,6 +29,14 @@ describe RedmineLimitedVisibility::IssuePatch do
       Issue.method(:visible_condition).to_s.should include ".visible_condition_with_limited_visibility>"
     end
 
+    it "allows admins to view everything" do
+      user.stub(:admin?){ true }
+      #ok that's not obvious but it's the base condition, not modified
+      #as we don't work with a real, db-backed user, condition is falsy
+      #and we can't easily stub everything out cause it's class methods...
+      Issue.visible_condition(user).should == Issue.visible_condition_without_limited_visibility(user)
+    end
+
     it "generates a visible condition based on user_id" do
       user.stub(:id){ 731 }
       Issue.visible_condition(user).should == "(1=0 AND (issues.authorized_viewers LIKE '%|user=731|%'))"

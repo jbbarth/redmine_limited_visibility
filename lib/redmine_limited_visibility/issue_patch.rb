@@ -1,4 +1,5 @@
 require_dependency 'issue'
+require_relative '../../app/services/issue_visibility'
 
 module RedmineLimitedVisibility
   module IssuePatch

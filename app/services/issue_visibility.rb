@@ -31,6 +31,8 @@ class IssueVisibility
     authorizations = issue.authorized_viewers.to_s
     # dummy cases, core tests, and existing tickets
     return true if authorizations == "" || authorizations == "*"
+    # always return true if user is an admin
+    return true if user.admin?
     # else we tokenize with "|" to get authorizations
     authorizations_tokens = authorizations.split("|").reject{|t| t == ""}
     #... we build an array of current users tokens

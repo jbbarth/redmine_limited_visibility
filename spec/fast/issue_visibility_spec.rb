@@ -2,7 +2,7 @@ require_relative '../fast_spec_helper'
 require_relative '../../app/services/issue_visibility'
 
 describe IssueVisibility do
-  let(:user) { stub :user, id: 37, group_ids: [14, 17] }
+  let(:user) { stub :user, :id => 37, :group_ids => [14, 17], :admin? => false }
   let(:issue) { stub :issue }
 
   describe "#new" do
@@ -58,6 +58,12 @@ describe IssueVisibility do
     it "blocks if no criteria match" do
       issue.stub(:authorized_viewers) { "|user=3|group=19|group=45|" }
       IssueVisibility.new(user, issue).should_not be_authorized
+    end
+
+    it "passes if no rule matches but user is admin" do
+      issue.stub(:authorized_viewers) { "||" }
+      user.stub(:admin?) { true }
+      IssueVisibility.new(user, issue).should be_authorized
     end
   end
 end

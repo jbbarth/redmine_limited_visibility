@@ -11,6 +11,11 @@ describe IssueVisibility do
       service.user.should == user
       service.issue.should == issue
     end
+
+    it "defaults user to current user" do
+      service = IssueVisibility.new(nil, issue)
+      service.user.should == User.current
+    end
   end
 
   describe "#authorized?" do

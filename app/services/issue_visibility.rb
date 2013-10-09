@@ -2,7 +2,7 @@ class IssueVisibility
   attr_accessor :user, :issue
 
   def initialize(user, issue)
-    @user = user
+    @user = user || User.current
     @issue = issue
   end
 

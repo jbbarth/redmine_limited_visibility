@@ -39,13 +39,13 @@ describe RedmineLimitedVisibility::IssuePatch do
 
     it "generates a visible condition based on user_id" do
       user.stub(:id){ 731 }
-      Issue.visible_condition(user).should == "(1=0 AND (issues.authorized_viewers LIKE '%|user=731|%'))"
+      Issue.visible_condition(user).should include "issues.authorized_viewers LIKE '%|user=731|%'"
     end
 
     it "generates a visible condition based on users organization_id if present" do
       user.stub(:id){ 731 }
       user.stub(:organization_id){ 36 }
-      Issue.visible_condition(user).should == "(1=0 AND (issues.authorized_viewers LIKE '%|user=731|%' OR issues.authorized_viewers LIKE '%|organization=36|%'))"
+      Issue.visible_condition(user).should include "issues.authorized_viewers LIKE '%|user=731|%' OR issues.authorized_viewers LIKE '%|organization=36|%'"
     end
 
     it "generates a visible condition based on groups if present" do

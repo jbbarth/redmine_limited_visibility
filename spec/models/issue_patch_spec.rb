@@ -37,6 +37,10 @@ describe RedmineLimitedVisibility::IssuePatch do
       Issue.visible_condition(user).should == Issue.visible_condition_without_limited_visibility(user)
     end
 
+    it "allows to see issues with no restriction" do
+      Issue.visible_condition(user).should include "issues.authorized_viewers IN (NULL, '', '*')"
+    end
+
     it "generates a visible condition based on user_id" do
       user.stub(:id){ 731 }
       Issue.visible_condition(user).should include "issues.authorized_viewers LIKE '%|user=731|%'"

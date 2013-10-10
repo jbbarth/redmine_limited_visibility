@@ -38,7 +38,7 @@ describe RedmineLimitedVisibility::IssuePatch do
     end
 
     it "allows to see issues with no restriction" do
-      Issue.visible_condition(user).should include "issues.authorized_viewers IN (NULL, '', '*')"
+      Issue.visible_condition(user).should include "issues.authorized_viewers IS NULL OR issues.authorized_viewers IN ('', '*')"
     end
 
     it "generates a visible condition based on user_id" do

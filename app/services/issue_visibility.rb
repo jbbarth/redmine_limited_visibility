@@ -2,8 +2,12 @@ class IssueVisibility
   attr_accessor :user, :issue
 
   def initialize(user, issue)
-    @user = user || User.current
+    @user = user
     @issue = issue
+  end
+
+  def user
+    @user ||= default_user
   end
 
   # This method looks at the "authorized_viewers" field on the issue (but it could
@@ -41,5 +45,10 @@ class IssueVisibility
     current_user_tokens << "organization=#{user.organization_id}" if user.respond_to?(:organization_id)
     #... and see if something matches
     (authorizations_tokens & current_user_tokens).any?
+  end
+
+  private
+  def default_user
+    User.current
   end
 end

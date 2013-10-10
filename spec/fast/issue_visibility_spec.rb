@@ -12,9 +12,10 @@ describe IssueVisibility do
       service.issue.should == issue
     end
 
-    it "defaults user to current user" do
+    it "provide a default user if user is nil" do
       service = IssueVisibility.new(nil, issue)
-      service.user.should == User.current
+      service.stub(:default_user) { :user }
+      service.user.should == :user
     end
   end
 

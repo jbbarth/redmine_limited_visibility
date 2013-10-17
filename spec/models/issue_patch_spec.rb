@@ -16,7 +16,16 @@ describe RedmineLimitedVisibility::IssuePatch do
 
     it "adds additionnal visibility condition" do
       issue.stub(:visible_without_limited_visibility?).and_return(true)
-      IssueVisibility.any_instance.stubs(:authorized?).returns(:result) #mocha mock
+      # Redmine specs can be run within other plugins, which can themselves configure
+      # rspec in a form or an other. The fact that redmine comes out of the box with
+      # the "mocha" gem for mocking makes it hard to know at 100% if the mocking framework
+      # will be mocha or rspec at this point. So the "#any_instance" call could be from
+      # mocha or rspec, hence this awful trick:
+      if RSpec.configuration.mock_framework.framework_name == :mocha
+        IssueVisibility.any_instance.stubs(:authorized?).returns(:result)    #mocha mock
+      else
+        IssueVisibility.any_instance.stub(:authorized?).and_return(:result)  #rspec mock
+      end
       issue.visible?(user).should == :result
     end
   end

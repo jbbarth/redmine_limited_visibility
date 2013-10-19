@@ -72,5 +72,12 @@ describe RedmineLimitedVisibility::IssuePatch do
     it "has a authorized_viewers column" do
       issue.attributes.should include "authorized_viewers"
     end
+
+    it "is a safe attribute" do
+      #avoid loading too many dependencies
+      issue.stub(:new_statuses_allowed_to) { [true] }
+      issue.safe_attributes = { "authorized_viewers" => "All of them" }
+      issue.authorized_viewers.should == "All of them"
+    end
   end
 end

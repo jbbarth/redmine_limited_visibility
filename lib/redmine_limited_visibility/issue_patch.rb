@@ -10,6 +10,7 @@ module RedmineLimitedVisibility
       base.class_eval do
         unloadable
         alias_method_chain :visible?, :limited_visibility
+        safe_attributes "authorized_viewers"
 
         class << self
           alias_method_chain :visible_condition, :limited_visibility

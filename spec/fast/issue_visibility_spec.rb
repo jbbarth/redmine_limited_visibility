@@ -2,8 +2,8 @@ require_relative '../fast_spec_helper'
 require_relative '../../app/services/issue_visibility'
 
 describe IssueVisibility do
-  let(:user) { stub :user, :id => 37, :group_ids => [14, 17], :admin? => false }
-  let(:issue) { stub :issue }
+  let(:user) { double :user, :id => 37, :group_ids => [14, 17], :admin? => false }
+  let(:issue) { double :issue }
 
   describe "#new" do
     it "sets instance variables" do

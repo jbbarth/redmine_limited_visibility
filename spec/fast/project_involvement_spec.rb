@@ -1,4 +1,4 @@
-require_relative "../fast_spec_helper"
+require_relative "../spec_helper"
 require_relative '../../app/services/project_involvement'
 
 describe ProjectInvolvement do

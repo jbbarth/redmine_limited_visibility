@@ -26,8 +26,8 @@ describe RedmineLimitedVisibility::IssuePatch do
       # I added some "rescue nil" calls because for whatever fucked reason, "sometimes" I
       # don't get mocha loaded when running tests only for this plugin, and in that case
       # it raises an exception I don't ever want to see... Take that haters :)
-      IssueVisibility.any_instance.stubs(:authorized?).returns(:result) rescue nil   #mocha mock
-      IssueVisibility.any_instance.stub(:authorized?).and_return(:result)            #rspec mock
+      IssueUserVisibility.any_instance.stubs(:authorized?).returns(:result) rescue nil   #mocha mock
+      IssueUserVisibility.any_instance.stub(:authorized?).and_return(:result)            #rspec mock
       issue.visible?(user).should == :result
     end
   end

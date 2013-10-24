@@ -1,4 +1,4 @@
-class IssueVisibility
+class IssueUserVisibility
   attr_accessor :user, :issue
 
   def initialize(user, issue)

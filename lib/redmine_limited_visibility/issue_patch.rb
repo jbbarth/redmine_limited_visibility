@@ -1,5 +1,5 @@
 require_dependency 'issue'
-require_relative '../../app/services/issue_visibility'
+require_relative '../../app/services/issue_user_visibility'
 
 module RedmineLimitedVisibility
   module IssuePatch
@@ -41,7 +41,7 @@ module RedmineLimitedVisibility
 
     module InstanceMethods
       def visible_with_limited_visibility?(user = nil)
-        visible_without_limited_visibility?(user) && IssueVisibility.new(user, self).authorized?
+        visible_without_limited_visibility?(user) && IssueUserVisibility.new(user, self).authorized?
       end
     end
   end

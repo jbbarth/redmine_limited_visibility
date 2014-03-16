@@ -31,6 +31,9 @@ class IssueUserVisibility
   #   authorized_viewers = "|user=23|user=34|organization=52|
   #   => ONLY User(23), User(34) and Organization(52) can see
   #
+  #   authorized_viewers = "|role=4|"
+  #   => ONLY users with Role(4) can see
+  #
   def authorized?
     authorizations = issue.authorized_viewers.to_s
     # dummy cases, core tests, and existing tickets
@@ -43,6 +46,7 @@ class IssueUserVisibility
     current_user_tokens = ["user=#{user.id}"]
     current_user_tokens += user.group_ids.map{|gid| "group=#{gid}"}
     current_user_tokens << "organization=#{user.organization_id}" if user.respond_to?(:organization_id)
+    current_user_tokens += role_ids.map{|rid| "role=#{rid}"}
     #... and see if something matches
     (authorizations_tokens & current_user_tokens).any?
   end
@@ -50,5 +54,9 @@ class IssueUserVisibility
   private
   def default_user
     User.current
+  end
+
+  def role_ids
+    user.roles_for_project(issue.project).map(&:id)
   end
 end

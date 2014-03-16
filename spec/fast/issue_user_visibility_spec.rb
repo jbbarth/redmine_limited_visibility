@@ -37,34 +37,58 @@ describe IssueUserVisibility do
 
     it "blocks if authorized_viewers is a list and user is not in the list" do
       issue.stub(:authorized_viewers) { "||" }
-      IssueUserVisibility.new(user, issue).should_not be_authorized
+      service = IssueUserVisibility.new(user, issue)
+      service.stub(:role_ids) { [] } # avoid triggering code tied to Issue/Project
+      service.should_not be_authorized
     end
 
     it "passes if user_id is explicitly in authorizations list" do
       issue.stub(:authorized_viewers) { "|user=37|" }
-      IssueUserVisibility.new(user, issue).should be_authorized
+      service = IssueUserVisibility.new(user, issue)
+      service.stub(:role_ids) { [] } # avoid triggering code tied to Issue/Project
+      service.should be_authorized
     end
 
     it "passes if user's organization_id is in authorizations list" do
       user.stub(:organization_id) { 353 }
       issue.stub(:authorized_viewers) { "|organization=353|" }
-      IssueUserVisibility.new(user, issue).should be_authorized
+      service = IssueUserVisibility.new(user, issue)
+      service.stub(:role_ids) { [] } # avoid triggering code tied to Issue/Project
+      service.should be_authorized
     end
 
     it "passes if user has a group in authorizations" do
       issue.stub(:authorized_viewers) { "|group=17|" }
-      IssueUserVisibility.new(user, issue).should be_authorized
+      service = IssueUserVisibility.new(user, issue)
+      service.stub(:role_ids) { [] } # avoid triggering code tied to Issue/Project
+      service.should be_authorized
     end
 
     it "blocks if no criteria match" do
       issue.stub(:authorized_viewers) { "|user=3|group=19|group=45|" }
-      IssueUserVisibility.new(user, issue).should_not be_authorized
+      service = IssueUserVisibility.new(user, issue)
+      service.stub(:role_ids) { [] } # avoid triggering code tied to Issue/Project
+      service.should_not be_authorized
     end
 
     it "passes if no rule matches but user is admin" do
       issue.stub(:authorized_viewers) { "||" }
       user.stub(:admin?) { true }
       IssueUserVisibility.new(user, issue).should be_authorized
+    end
+
+    it "passes if user has a role on this project in authorizations" do
+      issue.stub(:authorized_viewers) { "|role=1|" }
+      service = IssueUserVisibility.new(user, issue)
+      service.stub(:role_ids) { [1, 2, 3] }
+      service.should be_authorized
+    end
+
+    it "blocks if no role id matches" do
+      issue.stub(:authorized_viewers) { "|role=4|" }
+      service = IssueUserVisibility.new(user, issue)
+      service.stub(:role_ids) { [1, 2, 3] }
+      service.should_not be_authorized
     end
   end
 end

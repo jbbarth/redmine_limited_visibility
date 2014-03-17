@@ -1,3 +1,4 @@
 fr:
   label_involved_members: "Membres impliqués"
   text_visibility_notice: "Les membres du projet peuvent toujours voir cette demande si l'un de leurs rôles le permet et s'ils connaissent le numéro de demande. (/!\\ TODO /!\\)"
+  text_involvement_explanation: "Paramètrage par défaut pour les nouvelles demandes (ces personnes verront la demande et seront notifiées) :"

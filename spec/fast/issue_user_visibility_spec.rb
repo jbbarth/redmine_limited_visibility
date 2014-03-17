@@ -3,7 +3,7 @@ require_relative '../../app/services/issue_user_visibility'
 
 describe IssueUserVisibility do
   let(:user) { double :user, :id => 37, :group_ids => [14, 17], :admin? => false }
-  let(:issue) { double :issue }
+  let(:issue) { double :issue, :project_id => 27 }
 
   describe "#new" do
     it "sets instance variables" do
@@ -74,13 +74,13 @@ describe IssueUserVisibility do
     end
 
     it "passes if user has a role on this project in authorizations" do
-      issue.stub(:authorized_viewers) { "|role=1|" }
+      issue.stub(:authorized_viewers) { "|role=1/project=27|" }
       subject.stub(:role_ids) { [1, 2, 3] }
       subject.should be_authorized
     end
 
     it "blocks if no role id matches" do
-      issue.stub(:authorized_viewers) { "|role=4|" }
+      issue.stub(:authorized_viewers) { "|role=4/project=27|" }
       subject.stub(:role_ids) { [1, 2, 3] }
       subject.should_not be_authorized
     end

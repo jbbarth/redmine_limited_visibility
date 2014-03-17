@@ -5,18 +5,16 @@ class ProjectInvolvement
     @project_id = project_id
   end
 
-  def potential_involved_teams
-    User.where(:id => issuers_user_ids)
-        .pluck(:organization_id)
-        .compact
-        .uniq
-  end
-
-  def issuers_user_ids
+  # Basically it returns role ids that 1/ exist on that specific project,
+  # and 2/ have the right to view issues.
+  #
+  # It's just a first version for now and should be refined later.
+  def potential_involved_roles
     Member.where(:project_id => project_id)
           .joins(:member_roles)
           .where("member_roles.role_id IN (?)", issuers_roles)
-          .map(&:user_id)
+          .pluck(:role_id)
+          .uniq
   end
 
   def issuers_roles

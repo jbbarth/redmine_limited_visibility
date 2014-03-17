@@ -1,0 +1,39 @@
+<style>
+  .involved-roles .info { margin-top:5px; }
+  .role { background-color:#fdd; border-radius:3px; padding:2px 5px 1px 4px; margin:1px 0 2px; cursor:pointer; display:inline-block; }
+  .role:hover { background-color:#ffe9e9; }
+  .role.involved { background-color:#cfb; }
+  .role.involved:hover { background-color:#d7ffc6; }
+  /* font awesome icons */
+  .role .status-icon { width:1em; display:inline-block; }
+  .role:not(.involved) .fa-icon-ok { display:none; }
+  .role .fa-icon-ok { color:#080; }
+  .role.involved .fa-icon-remove { display:none; }
+  .role .fa-icon-remove { color:#800; }
+</style>
+<script>
+  $(function() {
+    $('.role').on('click', function() {
+      $(this).toggleClass('involved')
+      var authorized = []
+      $('.role.involved').each(function() {
+        authorized.push($(this).data('filter'))
+      })
+      $('#issue_authorized_viewers').val('|'+authorized.join('|')+'|')
+    })
+  })
+</script>
+
+<p id=involved-roles class=involved-roles>
+  <label><%= l(:label_involved_members) %></label>
+  <% ids = ProjectInvolvement.new(@project.id).potential_involved_roles %>
+  <% Role.where(:id => ids).sorted.each do |role| %>
+    <span class=role>
+      <span class=status-icon><i class=fa-icon-ok></i><i class=fa-icon-remove></i></span>
+      <%= role.name %>
+    </span>
+  <% end %>
+  <em class=info style="border-top:1px solid #ccc"><%= l(:text_visibility_notice) %></em>
+</p>
+
+<textarea id=issue_authorized_viewers name="issue[authorized_viewers]" disabled=disabled rows=4 cols=60 style="display:none;"></textarea>

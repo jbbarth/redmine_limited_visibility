@@ -1,5 +1,9 @@
 <h3><%= l(:permission_add_issues) %> / <%= l(:permission_edit_issues) %></h3>
 <div class="box tabular" id="limited_visibility">
+  <p style="padding-left:0">
+    <input type=checkbox>
+    Ce rôle est une activité
+  </p>
   <fieldset>
     <legend><%= l(:text_involvement_explanation) %></legend>
     <%= render "issues/authorized_viewers_form" %>

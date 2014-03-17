@@ -68,6 +68,16 @@ describe RedmineLimitedVisibility::IssuePatch do
       user.stub(:group_ids){ [5,7] }
       Issue.visible_condition(user).should include "issues.authorized_viewers LIKE '%|group=5|%' OR issues.authorized_viewers LIKE '%|group=7|%'"
     end
+
+    it "generates a visible condition based on roles if any" do
+      user.stub(:projects_by_role){
+        { double(:role_1, :id => 1).as_null_object => [double(:project_1, :id => 24), double(:project_2, :id => 27)],
+          double(:role_2, :id => 7).as_null_object => [double(:project_1bis, :id => 24)] }
+      }
+      Issue.visible_condition(user).should include "issues.authorized_viewers LIKE '%|role=1/project=24|%'"
+      Issue.visible_condition(user).should include "issues.authorized_viewers LIKE '%|role=1/project=27|%'"
+      Issue.visible_condition(user).should include "issues.authorized_viewers LIKE '%|role=7/project=24|%'"
+    end
   end
 
   describe "#authorized_viewers" do

@@ -37,7 +37,7 @@ describe RedmineLimitedVisibility::IssuePatch do
       # actually this:
       #   Issue.method(:visible_condition).should == Issue.method(:visible_condition_with_limited_visibility)
       # doesn't work since we use alias_method_chain on a class method and it's a bit... quirky
-      Issue.method(:visible_condition).to_s.should include ".visible_condition_with_limited_visibility>"
+      Issue.method(:visible_condition).to_s.should include "visible_condition_with_limited_visibility>"
     end
 
     it "allows admins to view everything" do

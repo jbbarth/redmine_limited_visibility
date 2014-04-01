@@ -1,7 +1,19 @@
-<h3><%= l(:permission_add_issues) %> / <%= l(:permission_edit_issues) %></h3>
-<div class="box tabular" id="limited_visibility">
-  <fieldset>
-    <legend><%= l(:text_involvement_explanation) %></legend>
-    <%= render "issues/authorized_viewers_form" %>
-  </fieldset>
+<div class="visibility_tab">
+  <h3><%= l(:permission_add_issues) %> / <%= l(:permission_edit_issues) %></h3>
+  <div class="box tabular" id="limited_visibility">
+    <fieldset>
+      <legend><%= l(:text_involvement_explanation) %></legend>
+      <%= render "issues/authorized_viewers_form" %>
+    </fieldset>
+  </div>
 </div>
+
+<script>
+ <% if @role.limit_visibility? %>
+   $('.permissions_tab').hide();
+   $('.visibility_tab').show();
+ <% else %>
+   $('.permissions_tab').show();
+   $('.visibility_tab').hide();
+ <% end %>
+</script>

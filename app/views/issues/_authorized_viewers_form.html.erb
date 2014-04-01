@@ -25,13 +25,13 @@
 </script>
 
 <p id=involved-roles class=involved-roles>
-  <label><%= l(:label_involved_members) %></label>
+  <label><%= l(:label_involved_members) %> : </label>
   <% ids = @project.present? ? ProjectInvolvement.new(@project.id).potential_involved_roles : Role.all.map(&:id) %>
-  <% Role.where(:id => ids).sorted.each do |role| %>
+  <% Role.where(:id => ids, :limit_visibility => true).sorted.each do |role| %>
     <span class=role>
       <span class=status-icon><i class=fa-icon-ok></i><i class=fa-icon-remove></i></span>
       <%= role.name %>
-    </span>
+    </span><br/>
   <% end %>
   <em class=info style="border-top:1px solid #ccc"><%= l(:text_visibility_notice) %></em>
 </p>

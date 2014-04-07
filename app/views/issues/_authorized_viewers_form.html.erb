@@ -11,15 +11,22 @@
   .role.involved .fa-icon-remove { display:none; }
   .role .fa-icon-remove { color:#800; }
 </style>
+
+<%  model ||= "issue"
+    value ||= ""
+%>
+
 <script>
   $(function() {
     $('.role').on('click', function() {
-      $(this).toggleClass('involved')
-      var authorized = []
-      $('.role.involved').each(function() {
-        authorized.push($(this).data('filter'))
-      })
-      $('#issue_authorized_viewers').val('|'+authorized.join('|')+'|')
+      if (!$(this).hasClass('disabled')){
+        $(this).toggleClass('involved')
+        var authorized = []
+        $('.role.involved').each(function() {
+          authorized.push($(this).data('filter'))
+        })
+        $('#<%= model %>_authorized_viewers').val('|'+authorized.join('|')+'|')
+      }
     })
   })
 </script>
@@ -28,7 +35,7 @@
   <label><%= l(:label_involved_members) %> : </label>
   <% ids = @project.present? ? ProjectInvolvement.new(@project.id).potential_involved_roles : Role.all.map(&:id) %>
   <% Role.where(:id => ids, :limit_visibility => true).sorted.each do |role| %>
-    <span class=role>
+    <span class="role <%= @role && @role.authorized_viewers && @role.authorized_viewers.split('|').include?(role.id.to_s) ? 'involved' : '' %> <%= @role==role ? "involved disabled" : "" %>" data-filter="<%= role.id %>">
       <span class=status-icon><i class=fa-icon-ok></i><i class=fa-icon-remove></i></span>
       <%= role.name %>
     </span><br/>
@@ -36,4 +43,4 @@
   <em class=info style="border-top:1px solid #ccc"><%= l(:text_visibility_notice) %></em>
 </p>
 
-<textarea id=issue_authorized_viewers name="issue[authorized_viewers]" disabled=disabled rows=4 cols=60 style="display:none;"></textarea>
+<%= hidden_field_tag model + '[authorized_viewers]', "#{value}" %>

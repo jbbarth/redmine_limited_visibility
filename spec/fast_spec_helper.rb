@@ -2,6 +2,7 @@ ENV["RAILS_ENV"] ||= 'test'
 
 #test gems
 require 'rspec'
+require 'rspec/rails'
 require 'rspec/autorun'
 require 'rspec/mocks'
 require 'rspec/mocks/standalone'
@@ -16,4 +17,17 @@ RSpec.configure do |config|
   config.mock_with :rspec
   config.filter_run :focus => true
   config.run_all_when_everything_filtered = true
+  config.fixture_path = File.expand_path('../../../../test/fixtures', __FILE__)
+
+  config.before(:suite) do
+    DatabaseCleaner.strategy = :transaction
+  end
+
+  config.before(:each) do
+    DatabaseCleaner.start
+  end
+
+  config.after(:each) do
+    DatabaseCleaner.clean
+  end
 end

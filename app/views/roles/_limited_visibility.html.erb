@@ -3,7 +3,7 @@
   <div class="box tabular" id="limited_visibility">
     <fieldset>
       <legend><%= l(:text_involvement_explanation) %></legend>
-      <%= render "issues/authorized_viewers_form" %>
+      <%= render "issues/authorized_viewers_form", model: 'role', value: @role.authorized_viewers %>
     </fieldset>
   </div>
 </div>

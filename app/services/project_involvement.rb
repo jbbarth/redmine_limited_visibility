@@ -15,6 +15,8 @@ class ProjectInvolvement
           .where("member_roles.role_id IN (?)", issuers_roles)
           .pluck(:role_id)
           .uniq
+
+    Role.where(:limit_visibility => true).sorted.pluck(:id).uniq
   end
 
   def issuers_roles

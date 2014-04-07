@@ -1,0 +1,74 @@
+<% ids = @project.present? ? ProjectInvolvement.new(@project.id).potential_involved_roles : Role.find_all_visibility_roles.map(&:id) %>
+<% roles = Role.where(:id => ids).sorted  -%>
+
+<div class="box">
+
+  <% if roles.any? %>
+    <table class="list visibility">
+      <thead><tr>
+        <!-- th class="role"><%= l(:label_role_plural) %></th -->
+        <th class="role"><%= l(:label_visibility_by_role) %></th>
+        <th class="members"><%= l(:label_user_plural) %></th>
+        <th class="buttons"> </th>
+      </tr></thead>
+      <tbody>
+      <% roles.each do |r| %>
+        <tr id="role-<%= r.id %>">
+          <%= render :partial => 'projects/role_visibility', :locals => {:role => r, :roles => roles} %>
+        </tr>
+      <% end %>
+      </tbody>
+    </table>
+  <% end %>
+
+</div>
+
+
+<%= error_messages_for 'member' %>
+<% roles = Role.find_all_visibility_roles
+   members = @project.member_principals.includes(:principal).all.sort {|x,y| x.principal.lastname.downcase <=> y.principal.lastname.downcase } %>
+
+<div>
+  <% if members.any? %>
+    <table class="list members">
+      <thead><tr>
+        <th><%= l(:label_user) %> / <%= l(:label_group) %></th>
+        <th><%= l(:label_visibility_by_role) %></th>
+        <th></th>
+      </tr></thead>
+      <tbody>
+      <% members.each do |member| %>
+        <% next if member.new_record? %>
+        <tr id="member-<%= member.id %>" class="<%= cycle 'odd', 'even' %> member">
+          <td class="<%= member.principal.class.name.downcase %>"><%= link_to_user member.principal %></td>
+          <td class="roles">
+            <span id="member-<%= member.id %>-roles"><%=h member.roles.find_all_visibility_roles.sort.collect(&:to_s).join(', ') %></span>
+            <%= form_for(member, {:as => :membership, :remote => true, :url => membership_path(member),
+                                  :method => :put,
+                                  :html => { :id => "member-#{member.id}-roles-form", :class => 'hol' }}
+                ) do |f| %>
+              <p><% roles.each do |role| %>
+                  <label><%= check_box_tag 'membership[role_ids][]', role.id, member.roles.include?(role),
+                                           :disabled => member.member_roles.detect {|mr| mr.role_id == role.id && !mr.inherited_from.nil?} %> <%=h role %></label><br />
+                <% end %></p>
+              <%= hidden_field_tag 'membership[role_ids][]', '' %>
+              <p><%= submit_tag l(:button_change), :class => "small" %>
+                <%= link_to_function l(:button_cancel),
+                                     "$('#member-#{member.id}-roles').show(); $('#member-#{member.id}-roles-form').hide(); return false;"
+                %></p>
+            <% end %>
+          </td>
+          <td class="buttons" style="text-align: right;">
+            <%= link_to_function l(:button_edit),
+                                 "$('#member-#{member.id}-roles').hide(); $('#member-#{member.id}-roles-form').show(); return false;",
+                                 :class => 'icon icon-edit' %>
+          </td>
+          <%= call_hook(:view_projects_settings_members_table_row, { :project => @project, :member => member}) %>
+        </tr>
+      <% end; reset_cycle %>
+      </tbody>
+    </table>
+  <% else %>
+    <p class="nodata"><%= l(:label_no_data) %></p>
+  <% end %>
+</div>

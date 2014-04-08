@@ -14,6 +14,23 @@
 
 <%  model ||= "issue"
     value ||= ""
+
+    if model == "issue"
+      viewers = []
+      if @issue.new_record? # create new issue
+        member = Member.find_by_user_id_and_project_id(User.current.id, @project.id)
+        if member && member.roles.find_all_visibility_roles.present? # current user has at least one visibility role
+          member.roles.find_all_visibility_roles.each do |r|
+            viewers = viewers | r.authorized_viewers.split('|') if r.authorized_viewers
+          end
+        else # current user has no visibility role (can see every issues)
+          viewers = Role.find_all_visibility_roles.collect(&:id)
+        end
+      else # update existing issue
+        # TODO
+      end
+      value = viewers.join('|') + '|'
+    end
 %>
 
 <script>
@@ -35,7 +52,7 @@
   <label><%= l(:label_involved_members) %> : </label>
   <% ids = @project.present? ? ProjectInvolvement.new(@project.id).potential_involved_roles : Role.all.map(&:id) %>
   <% Role.where(:id => ids, :limit_visibility => true).sorted.each do |role| %>
-    <span class="role <%= @role && @role.authorized_viewers && @role.authorized_viewers.split('|').include?(role.id.to_s) ? 'involved' : '' %> <%= @role==role ? "involved disabled" : "" %>" data-filter="<%= role.id %>">
+    <span class="role <%= value.split('|').include?(role.id.to_s) ? 'involved' : '' %> <%= @role==role ? "involved disabled" : "" %>" data-filter="<%= role.id %>">
       <span class=status-icon><i class=fa-icon-ok></i><i class=fa-icon-remove></i></span>
       <%= role.name %>
     </span><br/>

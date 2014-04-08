@@ -22,12 +22,12 @@ describe RolesController do
 
   describe "creating or updating a 'standard' role" do
     it "should allow permissions for this Role" do
-      post :create, role: { name: "NewRole", permissions: ["edit_project", "manage_members", "create_issue_templates", ""], authorized_viewers: "|17|18|" }
+      post :create, role: { name: "NewRole", limit_visibility: "0", permissions: ["edit_project", "manage_members", "create_issue_templates", ""], authorized_viewers: "|17|18|" }
       created_role = Role.find_by_name("NewRole")
       created_role.permissions.should_not eq([])
-
-      put :update, id: created_role.id, role: { name: "UpdatedRole", permissions: ["edit_project", "manage_members", "create_issue_templates", ""], authorized_viewers: "|17|18|" }
+      put :update, {id: created_role.id, role: { name: "UpdatedRole", limit_visibility: "0", permissions: ["edit_project", "manage_members", "create_issue_templates", ""], authorized_viewers: "|17|18|" }}
       updated_role = Role.find_by_name("UpdatedRole")
+      updated_role.should_not be_nil
       updated_role.permissions.should_not eq([])
     end
   end

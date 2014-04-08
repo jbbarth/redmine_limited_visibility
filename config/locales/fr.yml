@@ -5,3 +5,4 @@ fr:
   field_limit_visibility: "Limite la visibilité des demandes"
   label_visibility_roles: "Rôles 'visibilité'"
   label_visibility_by_role: "Visibilité"
+  see_everything: "Toutes les demandes"

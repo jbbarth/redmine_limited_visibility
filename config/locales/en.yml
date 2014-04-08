@@ -5,3 +5,4 @@ en:
   field_limit_visibility: "Limit issues visibility"
   label_visibility_roles: "'Visibility' roles"
   label_visibility_by_role: "Visibility"
+  see_everything: "Everything"

@@ -6,3 +6,5 @@ fr:
   label_visibility_roles: "Rôles 'visibilité'"
   label_visibility_by_role: "Visibilité"
   see_everything: "Toutes les demandes"
+  field_authorized_viewers: "Rôles concernés"
+  label_my_roles: "mes rôles"

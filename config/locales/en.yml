@@ -6,3 +6,5 @@ en:
   label_visibility_roles: "'Visibility' roles"
   label_visibility_by_role: "Visibility"
   see_everything: "Everything"
+  field_authorized_viewers: "Involved members"
+  label_my_roles: "my roles"

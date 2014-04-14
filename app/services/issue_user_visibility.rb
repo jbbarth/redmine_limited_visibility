@@ -41,12 +41,12 @@ class IssueUserVisibility
     # always return true if user is an admin
     return true if user.admin?
     # else we tokenize with "|" to get authorizations
-    authorizations_tokens = authorizations.split("|").reject{|t| t == ""}
+    authorizations_tokens = authorizations.split("|").reject{ |t| t == "" }
     #... we build an array of current users tokens
     current_user_tokens = ["user=#{user.id}"]
-    current_user_tokens += user.group_ids.map{|gid| "group=#{gid}"}
+    current_user_tokens += user.group_ids.map{ |gid| "group=#{gid}" }
     current_user_tokens << "organization=#{user.organization_id}" if user.respond_to?(:organization_id)
-    current_user_tokens += role_ids.map{|rid| "role=#{rid}/project=#{issue.project_id}"}
+    current_user_tokens += role_ids.map{ |rid| "role=#{rid}/project=#{issue.project_id}" }
     #... and see if something matches
     (authorizations_tokens & current_user_tokens).any?
   end

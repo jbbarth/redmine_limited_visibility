@@ -3,11 +3,13 @@
   <h2><%=l(:label_visibility_roles)%></h2>
 
   <table class="list">
-    <thead><tr>
-      <th><%=l(:label_role)%></th>
-      <th><%=l(:button_sort)%></th>
-      <th></th>
-    </tr></thead>
+    <thead>
+      <tr>
+        <th><%=l(:label_role)%></th>
+        <th><%=l(:button_sort)%></th>
+        <th></th>
+      </tr>
+    </thead>
     <tbody>
     <% @visibility_roles.each do |role| %>
       <tr class="<%= cycle("odd", "even") %>">

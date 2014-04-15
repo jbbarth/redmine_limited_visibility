@@ -27,7 +27,7 @@
           viewers = Role.find_all_visibility_roles.collect(&:id)
         end
       else # update existing issue
-        # TODO
+        viewers = @issue.authorized_viewers.split('|').delete_if(&:blank?) if @issue
       end
       value = viewers.join('|') + '|'
     end
@@ -57,7 +57,7 @@
       <%= role.name %>
     </span><br/>
   <% end %>
-  <em class=info style="border-top:1px solid #ccc"><%= l(:text_visibility_notice) %></em>
+  <!-- <em class=info style="border-top:1px solid #ccc">< l(:text_visibility_notice) ></em> -->
 </p>
 
 <%= hidden_field_tag model + '[authorized_viewers]', "#{value}" %>

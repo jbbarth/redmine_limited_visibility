@@ -30,7 +30,7 @@ class IssueQuery < Query
           "(#{Issue.table_name}.#{field} LIKE '%|#{role.id}|%' AND #{Project.table_name}.id = #{project.id}) "
         end.join(" OR ")
       end.join(" OR ")
-      sql = "((#{sql}) OR #{Issue.table_name}.#{field} IS NULL OR #{Issue.table_name}.#{field} = '||' OR #{Issue.table_name}.#{field} = '')"
+      sql = "(#{sql.present? ? '('+sql+') OR ' : ''} #{Issue.table_name}.#{field} IS NULL OR #{Issue.table_name}.#{field} = '||' OR #{Issue.table_name}.#{field} = '')"
       # potentially very long query #TODO Find a way to optimize it
     #when "=", "!"
     # sql = value.map { |role| "#{Issue.table_name}.#{field} #{operator == "!" ? 'NOT' : ''} LIKE '%|#{role}|%' " }.join(" OR ")
@@ -38,6 +38,14 @@ class IssueQuery < Query
       raise "unsupported value for authorized_viewers field: '#{operator}'"
     end
     sql
+  end
+
+  # use standard method to validate filters form,
+  # but ignore "can't be blank" error on authorized_viewers filter because it doesn't require any value
+  def validate_query_filters
+    super
+    m = label_for('authorized_viewers') + " " + l(:blank, :scope => 'activerecord.errors.messages')
+    errors.messages[:base] = errors.messages[:base]-[m] if errors.messages[:base].present? && errors.messages[:base].include?(m)
   end
 
 end

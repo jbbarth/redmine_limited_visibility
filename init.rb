@@ -24,7 +24,6 @@ ActiveSupport::Dependencies.autoload_paths << File.expand_path("../app/services"
 Rails.application.config.to_prepare do
   require_dependency 'redmine_limited_visibility/hooks'
   require_dependency 'redmine_limited_visibility/issue_patch'
-  require_dependency 'redmine_limited_visibility/query_patch'
   require_dependency 'redmine_limited_visibility/queries_helper_patch'
   require_dependency 'redmine_limited_visibility/issue_query_patch'
   require_dependency 'redmine_limited_visibility/issues_helper_patch'

@@ -27,7 +27,7 @@
           viewers = Role.find_all_visibility_roles.collect(&:id)
         end
       else # update existing issue
-        viewers = @issue.authorized_viewers.split('|').delete_if(&:blank?) if @issue
+        viewers = @issue.authorized_viewers.split('|').delete_if(&:blank?) if @issue && @issue.authorized_viewers
       end
       value = viewers.join('|') + '|'
     end

@@ -24,7 +24,7 @@
             viewers = viewers | r.authorized_viewers.split('|') if r.authorized_viewers
           end
         else # current user has no visibility role (can see every issues)
-          viewers = Role.find_all_visibility_roles.collect(&:id)
+          viewers = Role.find_all_visibility_roles.map(&:id)
         end
       else # update existing issue
         viewers = @issue.authorized_viewers.split('|').delete_if(&:blank?) if @issue && @issue.authorized_viewers

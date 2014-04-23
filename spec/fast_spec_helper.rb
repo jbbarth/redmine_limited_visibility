@@ -1,6 +1,6 @@
 ENV['RAILS_ENV'] ||= 'test'
 
-#test gems
+# test gems
 require 'rspec'
 require 'rspec/rails'
 require 'rspec/autorun'
@@ -8,11 +8,11 @@ require 'rspec/mocks'
 require 'rspec/mocks/standalone'
 require 'pry'
 
-#load paths
+# load paths
 $:.<< File.expand_path('../../app/models', __FILE__)
 $:.<< File.expand_path('../../lib', __FILE__)
 
-#rspec base config
+# rspec base config
 RSpec.configure do |config|
   config.mock_with :rspec
   config.filter_run :focus => true

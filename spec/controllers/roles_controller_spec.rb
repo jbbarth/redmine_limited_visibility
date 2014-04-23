@@ -10,12 +10,12 @@ describe RolesController do
   describe "creating a role" do
     it "should increment the Role count" do
       expect do
-        post :create, role: { name: "NewRole"}
+        post :create, role: { name: "NewRole" }
       end.to change(Role, :count).by(1)
     end
 
     it "should redirect to roles index" do
-      post :create, role: { name: "NewRole"}
+      post :create, role: { name: "NewRole" }
       response.should redirect_to(roles_path)
     end
   end
@@ -25,7 +25,7 @@ describe RolesController do
       post :create, role: { name: "NewRole", limit_visibility: "0", permissions: ["edit_project", "manage_members", "create_issue_templates", ""], authorized_viewers: "|17|18|" }
       created_role = Role.find_by_name("NewRole")
       created_role.permissions.should_not eq([])
-      put :update, {id: created_role.id, role: { name: "UpdatedRole", limit_visibility: "0", permissions: ["edit_project", "manage_members", "create_issue_templates", ""], authorized_viewers: "|17|18|" }}
+      put :update, { id: created_role.id, role: { name: "UpdatedRole", limit_visibility: "0", permissions: ["edit_project", "manage_members", "create_issue_templates", ""], authorized_viewers: "|17|18|" } }
       updated_role = Role.find_by_name("UpdatedRole")
       updated_role.should_not be_nil
       updated_role.permissions.should_not eq([])

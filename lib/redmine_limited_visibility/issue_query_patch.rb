@@ -16,7 +16,7 @@ class IssueQuery < Query
 
   def initialize_available_filters
     core_initialize_available_filters
-    add_available_filter "authorized_viewers", :type => :list_visibility, :values => Role.find_all_visibility_roles.collect{ |s| [s.name, s.id.to_s] }
+    add_available_filter "authorized_viewers", :type => :list_visibility, :values => Role.find_all_visibility_roles.map{ |s| [s.name, s.id.to_s] }
   end
 
   def sql_for_authorized_viewers_field(field, operator, value)

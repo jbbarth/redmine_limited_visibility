@@ -7,7 +7,7 @@ class VisibilitiesController < ApplicationController
     @project = @member.project if @member
     if params[:membership]
       # standard roles + updated visibility roles
-      @member.role_ids = @member.role_ids - Role.find_all_visibility_roles.collect(&:id)
+      @member.role_ids = @member.role_ids - Role.find_all_visibility_roles.map(&:id)
       @member.role_ids = @member.role_ids + params[:membership][:role_ids]
     end
     saved = @member.save

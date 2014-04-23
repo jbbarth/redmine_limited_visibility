@@ -18,7 +18,7 @@
           <td class="roles">
             <span id="member-<%= member.id %>-roles">
               <% if member.roles.find_all_visibility_roles.present? %>
-                <%= h member.roles.find_all_visibility_roles.sort.collect(&:to_s).join(', ') %>
+                <%= h member.roles.find_all_visibility_roles.sort.map(&:to_s).join(', ') %>
               <% else %>
                 <span class="see_everything"><%= l('see_everything') %></span>
               <% end %>

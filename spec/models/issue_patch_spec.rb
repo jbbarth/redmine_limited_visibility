@@ -1,7 +1,6 @@
 require_relative '../spec_helper'
 
 describe RedmineLimitedVisibility::IssuePatch do
-
   let(:issue) { Issue.new }
 
   describe "#authorized_viewers" do
@@ -18,7 +17,6 @@ describe RedmineLimitedVisibility::IssuePatch do
   end
 
   describe 'notified_users' do
-
     before(:all) do
       Role.create(name: "Contractors", limit_visibility: true)
       Role.create(name: "Project Office", limit_visibility: true)
@@ -72,5 +70,4 @@ describe RedmineLimitedVisibility::IssuePatch do
       notified.should_not include User.find(8) # member of project 2 but mail_notification = false
     end
   end
-
 end

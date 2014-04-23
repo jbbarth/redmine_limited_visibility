@@ -42,7 +42,7 @@
         $('.role.involved').each(function() {
           authorized.push($(this).data('filter'))
         })
-        $('#<%= model %>_authorized_viewers').val('|'+authorized.join('|')+'|')
+        $('#<%= model %>_authorized_viewers').val('|' + authorized.join('|') + '|')
       }
     })
   })

@@ -2,7 +2,6 @@ require_relative '../spec_helper'
 require 'redmine_limited_visibility/roles_controller_patch'
 
 describe RolesController do
-
   fixtures :users
 
   before { @request.session[:user_id] = 1 }
@@ -43,5 +42,4 @@ describe RolesController do
       updated_role.permissions.should eq([])
     end
   end
-
 end

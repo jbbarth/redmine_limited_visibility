@@ -23,5 +23,4 @@ class VisibilitiesController < ApplicationController
       end
     end
   end
-
 end

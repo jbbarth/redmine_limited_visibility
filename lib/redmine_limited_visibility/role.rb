@@ -1,7 +1,6 @@
 require_dependency 'role'
 
 class Role < ActiveRecord::Base
-
   after_create :set_own_visibility
 
   # Find all roles that can be used to limit the visibility of issues
@@ -17,5 +16,4 @@ class Role < ActiveRecord::Base
         update_attribute(:authorized_viewers, "#{authorized_viewers}#{self.id}|")
       end
     end
-
 end

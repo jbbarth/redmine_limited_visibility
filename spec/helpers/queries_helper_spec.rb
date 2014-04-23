@@ -14,5 +14,4 @@ describe QueriesHelper do
       value.should include "Contractors, Project Office"
     end
   end
-
 end

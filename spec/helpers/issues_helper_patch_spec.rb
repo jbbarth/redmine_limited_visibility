@@ -1,9 +1,7 @@
 require_relative '../spec_helper'
 
 describe IssuesHelper do
-
   describe 'show_detail' do
-
     before(:all) do
       Role.create(name: "Contractors", limit_visibility: true)
       Role.create(name: "Project Office", limit_visibility: true)
@@ -35,7 +33,5 @@ describe IssuesHelper do
     it 'should display deleted roles without html' do
       show_detail(@detail_delete, true).should include "Involved members deleted (Contractors)"
     end
-
   end
-
 end

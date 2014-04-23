@@ -1,7 +1,6 @@
 require_dependency 'roles_controller'
 
 class RolesController < ApplicationController
-
   before_filter :no_permissions_if_visibility_role, :only => [:create, :update]
 
   def index
@@ -20,7 +19,6 @@ class RolesController < ApplicationController
   private
 
     def no_permissions_if_visibility_role
-      params[:role][:permissions] = [] if params[:role][:limit_visibility]=='1'
+      params[:role][:permissions] = [] if params[:role][:limit_visibility] == '1'
     end
-
 end

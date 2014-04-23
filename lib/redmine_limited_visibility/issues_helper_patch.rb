@@ -1,12 +1,11 @@
 require_dependency 'issues_helper'
 
 module IssuesHelper
-
   alias_method :plugin_visibility_core_show_detail, :show_detail
 
   # Returns the textual representation of a single journal detail
   # Core properties are 'attr', 'attachment' or 'cf' : this patch specify how to display 'attr' journal details when the updated field is 'authorized_viewers'
-  def show_detail(detail, no_html=false, options={})
+  def show_detail(detail, no_html = false, options = {})
 
     if detail.property == 'attr' && detail.prop_key == 'authorized_viewers'
 
@@ -41,5 +40,4 @@ module IssuesHelper
   def involved_roles(authorized_viewers)
     Role.find(authorized_viewers.split('|').delete_if(&:blank?)) if authorized_viewers
   end
-
 end

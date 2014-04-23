@@ -1,7 +1,6 @@
 require_dependency 'queries_helper'
 
 module QueriesHelper
-
   include IssuesHelper
 
   alias_method :plugin_limited_visibility_core_column_value, :column_value
@@ -13,5 +12,4 @@ module QueriesHelper
       plugin_limited_visibility_core_column_value(column, issue, value)
     end
   end
-
 end

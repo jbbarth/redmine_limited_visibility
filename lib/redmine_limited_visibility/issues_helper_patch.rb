@@ -11,8 +11,8 @@ module IssuesHelper
     if detail.property == 'attr' && detail.prop_key == 'authorized_viewers'
 
       label = l(:field_authorized_viewers)
-      value = Issue.involved_roles(detail.value).join(", ")
-      old_value = Issue.involved_roles(detail.old_value).join(", ")
+      value = involved_roles(detail.value).join(", ")
+      old_value = involved_roles(detail.old_value).join(", ")
 
       unless no_html
         label = content_tag('strong', label)
@@ -36,6 +36,10 @@ module IssuesHelper
       plugin_visibility_core_show_detail(detail, no_html, options)
     end
 
+  end
+
+  def involved_roles(authorized_viewers)
+    Role.find(authorized_viewers.split('|').delete_if(&:blank?))
   end
 
 end

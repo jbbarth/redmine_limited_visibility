@@ -32,11 +32,6 @@ module RedmineLimitedVisibility
           authorized_viewers.split('|').delete_if(&:blank?)
         end
 
-        class << self
-          def involved_roles(authorized_viewers)
-            Role.find(authorized_viewers.split('|').delete_if(&:blank?))
-          end
-        end
       end
     end
   end

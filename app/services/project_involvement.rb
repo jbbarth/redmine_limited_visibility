@@ -20,7 +20,7 @@ class ProjectInvolvement
   end
 
   def issuers_roles
-    allowed_roles = Role.all.select do |role|
+    Role.all.select do |role|
       role.allowed_to?(:view_issues)
     end
   end

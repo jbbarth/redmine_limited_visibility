@@ -6,7 +6,7 @@ module QueriesHelper
 
   def column_value(column, issue, value)
     if column.name == :authorized_viewers && value.class == String
-      roles = Role.find(value.split('|').delete_if(&:blank?)).join(", ")
+      roles = Issue.involved_roles(value).join(", ")
     else
       core_column_value(column, issue, value)
     end

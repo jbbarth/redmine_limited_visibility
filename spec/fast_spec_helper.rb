@@ -1,4 +1,4 @@
-ENV["RAILS_ENV"] ||= 'test'
+ENV['RAILS_ENV'] ||= 'test'
 
 #test gems
 require 'rspec'
@@ -17,6 +17,8 @@ RSpec.configure do |config|
   config.mock_with :rspec
   config.filter_run :focus => true
   config.run_all_when_everything_filtered = true
+  config.include ApplicationHelper
+  config.include ERB::Util
   config.fixture_path = "#{::Rails.root}/test/fixtures"
   config.use_transactional_fixtures = true
 end

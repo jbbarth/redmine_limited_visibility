@@ -11,14 +11,14 @@ module IssuesHelper
     if detail.property == 'attr' && detail.prop_key == 'authorized_viewers'
 
       label = l(:field_authorized_viewers)
-      value = involved_roles(detail.value).join(", ")
-      old_value = involved_roles(detail.old_value).join(", ")
+      value = involved_roles(detail.value).join(", ") if detail.value.present?
+      old_value = involved_roles(detail.old_value).join(", ") if detail.old_value.present?
 
       unless no_html
         label = content_tag('strong', label)
         old_value = content_tag("i", h(old_value)) if detail.old_value
         old_value = content_tag("del", old_value) if detail.old_value and detail.value.blank?
-        value = content_tag("i", h(value)) if value
+        value = content_tag("i", html_escape(value)) if value
       end
 
       if detail.value.present?
@@ -39,7 +39,7 @@ module IssuesHelper
   end
 
   def involved_roles(authorized_viewers)
-    Role.find(authorized_viewers.split('|').delete_if(&:blank?))
+    Role.find(authorized_viewers.split('|').delete_if(&:blank?)) if authorized_viewers
   end
 
 end

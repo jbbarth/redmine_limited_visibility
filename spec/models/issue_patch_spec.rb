@@ -17,7 +17,6 @@ describe RedmineLimitedVisibility::IssuePatch do
     end
   end
 
-
   describe 'notified_users' do
 
     before(:all) do

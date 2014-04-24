@@ -1,20 +1,20 @@
 require_dependency 'issue_query'
 
 class IssueQuery < Query
-  alias_method :core_initialize, :initialize
-  alias_method :core_initialize_available_filters, :initialize_available_filters
+  alias_method :plugin_limited_visibility_core_initialize, :initialize
+  alias_method :plugin_limited_visibility_core_initialize_available_filters, :initialize_available_filters
 
   self.operators.merge!({ "mine" => :label_my_roles })
   self.operators_by_filter_type.merge!({ :list_visibility => ["mine", "*"] })
   self.available_columns << QueryColumn.new(:authorized_viewers, :sortable => "#{Issue.table_name}.authorized_viewers", :groupable => true)
 
   def initialize(attributes = nil, *args)
-    core_initialize(attributes, args)
+    plugin_limited_visibility_core_initialize(attributes, args)
     self.filters.merge!({ 'authorized_viewers' => { :operator => "mine", :values => [""] } })
   end
 
   def initialize_available_filters
-    core_initialize_available_filters
+    plugin_limited_visibility_core_initialize_available_filters
     add_available_filter "authorized_viewers", :type => :list_visibility, :values => Role.find_all_visibility_roles.map { |s| [s.name, s.id.to_s] }
   end
 

@@ -29,7 +29,7 @@ module RedmineLimitedVisibility
         end
 
         def involved_roles_ids
-          authorized_viewers.split('|').delete_if(&:blank?)
+          authorized_viewers.split('|').delete_if(&:blank?) if authorized_viewers
         end
 
       end

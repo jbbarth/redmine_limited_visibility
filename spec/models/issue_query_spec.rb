@@ -20,14 +20,9 @@ describe IssueQuery do
       query = IssueQuery.new
       query.available_filters.should include 'authorized_viewers'
     end
-  end
 
-  describe 'initialize' do
-    it 'should set two default filters' do
-      query = IssueQuery.new
-      query.filters.should include 'status_id'
-      query.filters.should include 'authorized_viewers'
-    end
+    it 'adds an "authorized viewers filter" to existing requests'
+
   end
 
 end

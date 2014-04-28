@@ -20,4 +20,17 @@ $(function() {
       $('.visibility_tab').hide();
     }
   });
+
+  var query_form_has_been_submitted = false;
+  $('#filters-table').bind("DOMSubtreeModified propertychange",function(){
+    // On load, disable the checkbox
+    if (query_form_has_been_submitted == false) {
+      $('#cb_authorized_viewers').attr("disabled", true);
+    }
+  });
+  $('#query_form').submit(function() {
+    // On form submit, enable 'authorized_viewers' field so it is take into account
+    query_form_has_been_submitted = true;
+    $("#cb_authorized_viewers").removeAttr("disabled");
+  });
 });

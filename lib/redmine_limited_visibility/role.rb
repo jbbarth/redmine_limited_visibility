@@ -12,8 +12,8 @@ class Role < ActiveRecord::Base
 
     def set_own_visibility
       reload
-      if authorized_viewers.present? && !authorized_viewers.split('|').include?(self.id)
-        update_attribute(:authorized_viewers, "#{authorized_viewers}#{self.id}|")
+      if !authorized_viewers.present? || !authorized_viewers.split('|').include?(self.id)
+        update_attribute(:authorized_viewers, "#{authorized_viewers.present? ? authorized_viewers : "|"}#{self.id}|")
       end
     end
 end

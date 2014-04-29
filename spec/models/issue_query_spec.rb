@@ -2,7 +2,6 @@ require_relative '../spec_helper'
 require 'redmine_limited_visibility/issue_query_patch'
 
 describe IssueQuery do
-
   describe 'filters and columns' do
     it 'contains a new "mine" operator' do
       IssueQuery.operators.should include 'mine'
@@ -20,9 +19,5 @@ describe IssueQuery do
       query = IssueQuery.new
       query.available_filters.should include 'authorized_viewers'
     end
-
-    it 'adds an "authorized viewers filter" to existing requests'
-
   end
-
 end

@@ -22,12 +22,12 @@ module IssuesHelper
 
       if detail.value.present?
         if detail.old_value.present?
-          l(:text_journal_changed, :label => label, :old => old_value, :new => value).html_safe
+          l(:text_journal_changed, label: label, old: old_value, new: value).html_safe
         else
-          l(:text_journal_set_to, :label => label, :value => value).html_safe
+          l(:text_journal_set_to, label: label, value: value).html_safe
         end
       else
-        l(:text_journal_deleted, :label => label, :old => old_value).html_safe
+        l(:text_journal_deleted, label: label, old: old_value).html_safe
       end
 
     else

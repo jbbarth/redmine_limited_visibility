@@ -44,7 +44,7 @@
                                  "$('#member-#{member.id}-roles').toggle(); $('#member-#{member.id}-roles-form').toggle(); return false;",
                                  :class => 'icon icon-edit' %>
           </td>
-          <%= call_hook(:view_projects_settings_members_table_row, { :project => @project, :member => member}) %>
+          <%= call_hook(:view_projects_settings_members_table_row, { project: @project, member: member}) %>
         </tr>
       <% end; reset_cycle %>
       </tbody>

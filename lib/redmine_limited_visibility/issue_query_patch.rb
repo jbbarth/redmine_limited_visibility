@@ -5,11 +5,11 @@ class IssueQuery < Query
 
   self.operators.merge!({ "mine" => :label_my_roles })
   self.operators_by_filter_type.merge!({ :list_visibility => ["mine", "*"] })
-  self.available_columns << QueryColumn.new(:authorized_viewers, :sortable => "#{Issue.table_name}.authorized_viewers", :groupable => true)
+  self.available_columns << QueryColumn.new(:authorized_viewers, sortable: "#{Issue.table_name}.authorized_viewers", groupable: true)
 
   def initialize_available_filters
     plugin_limited_visibility_core_initialize_available_filters
-    add_available_filter "authorized_viewers", :type => :list_visibility, :values => Role.find_all_visibility_roles.map { |s| [s.name, s.id.to_s] }
+    add_available_filter "authorized_viewers", type: :list_visibility, values: Role.find_all_visibility_roles.map { |s| [s.name, s.id.to_s] }
   end
 
   def sql_for_authorized_viewers_field(field, operator, value)
@@ -37,7 +37,7 @@ class IssueQuery < Query
   # but ignore "can't be blank" error on authorized_viewers filter because it doesn't require any value
   def validate_query_filters
     super
-    m = label_for('authorized_viewers') + " " + l(:blank, :scope => 'activerecord.errors.messages')
+    m = label_for('authorized_viewers') + " " + l(:blank, scope: 'activerecord.errors.messages')
     errors.messages[:base] = errors.messages[:base] - [m] if errors.messages[:base].present? && errors.messages[:base].include?(m)
   end
 end

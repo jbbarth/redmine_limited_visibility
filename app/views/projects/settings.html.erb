@@ -1,6 +1,6 @@
 <h2><%=l(:label_settings)%></h2>
 
-<% visibility = {:name => 'visibility', :action => :visibility, :partial => 'projects/visibility', :label => :label_visibility_by_role}
+<% visibility = {name: 'visibility', action: :visibility, partial: 'projects/visibility', label: :label_visibility_by_role}
    tabs = project_settings_tabs << visibility %>
 <%= render_tabs tabs %>
 

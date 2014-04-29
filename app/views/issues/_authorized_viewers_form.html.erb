@@ -51,7 +51,7 @@
 <p id=involved-roles class=involved-roles>
   <label><%= l(:label_involved_members) %> : </label>
   <% ids = @project.present? ? ProjectInvolvement.new(@project.id).potential_involved_roles : Role.all.map(&:id) %>
-  <% Role.where(:id => ids, :limit_visibility => true).sorted.each do |role| %>
+  <% Role.where(id: ids, limit_visibility: true).sorted.each do |role| %>
     <span class="role <%= value.split('|').include?(role.id.to_s) ? 'involved' : '' %> <%= @role==role ? "involved disabled" : "" %>" data-filter="<%= role.id %>">
       <span class=status-icon><i class=fa-icon-ok></i><i class=fa-icon-remove></i></span>
       <%= role.name %>

@@ -1,4 +1,5 @@
 require_relative '../spec_helper'
+require 'redmine_limited_visibility/queries_helper_patch'
 
 describe QueriesHelper do
 

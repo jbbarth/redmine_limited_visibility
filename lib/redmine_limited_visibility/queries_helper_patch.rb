@@ -17,6 +17,6 @@ module QueriesHelper
   # Add 'authorized_viewers' filter if not present
   def retrieve_query
     plugin_limited_visibility_core_retrieve_query
-    @query.filters.merge!({ 'authorized_viewers' => { :operator => "mine", :values => [""] } }) unless @query.filters.include?('authorized_viewers')
+    @query.filters.merge!({ 'authorized_viewers' => { :operator => "mine", :values => [""] } }) if @query.is_a?IssueQuery && !@query.filters.include?('authorized_viewers')
   end
 end

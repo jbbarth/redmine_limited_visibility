@@ -18,8 +18,8 @@ describe RedmineLimitedVisibility::IssuePatch do
 
   describe 'notified_users' do
     before(:all) do
-      Role.create(name: "Contractors", limit_visibility: true)
-      Role.create(name: "Project Office", limit_visibility: true)
+      find_or_create(:role, name: "Contractors", limit_visibility: true)
+      find_or_create(:role, name: "Project Office", limit_visibility: true)
       issue_with_authorized_viewers = Issue.find(4)
       issue_with_authorized_viewers.safe_attributes = { "authorized_viewers" => "|#{Role.find_by_name('Contractors').id}|" }
       issue_with_authorized_viewers.save!

@@ -3,8 +3,8 @@ require_relative '../spec_helper'
 describe IssuesHelper do
   describe 'show_detail' do
     before(:all) do
-      Role.create(name: "Contractors", limit_visibility: true)
-      Role.create(name: "Project Office", limit_visibility: true)
+      find_or_create(:role, name: "Contractors", limit_visibility: true)
+      find_or_create(:role, name: "Project Office", limit_visibility: true)
       @detail_add = JournalDetail.new(:property => 'attr', :old_value => nil, :value => "|#{Role.find_by_name('Contractors').id}|", :prop_key => 'authorized_viewers')
       @detail_change = JournalDetail.new(:property => 'attr', :old_value => "|#{Role.find_by_name('Contractors').id}|", :value => "|#{Role.find_by_name('Project Office').id}|", :prop_key => 'authorized_viewers')
       @detail_delete = JournalDetail.new(:property => 'attr', :old_value => "|#{Role.find_by_name('Contractors').id}|", :value => "", :prop_key => 'authorized_viewers')

@@ -6,6 +6,15 @@ describe RolesController do
 
   before { @request.session[:user_id] = 1 }
 
+  describe "GET 'index'" do
+    it "should be successful" do
+      get 'index'
+      response.should be_success
+      assigns(:visibility_roles).should_not be_nil
+      assigns(:roles).should_not be_nil
+    end
+  end
+
   describe "creating a role" do
     it "should increment the Role count" do
       expect do

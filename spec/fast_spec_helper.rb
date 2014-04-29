@@ -12,6 +12,8 @@ require 'pry'
 $:.<< File.expand_path('../../app/models', __FILE__)
 $:.<< File.expand_path('../../lib', __FILE__)
 
+require File.expand_path('../factory_girl_helper', __FILE__)
+
 # rspec base config
 RSpec.configure do |config|
   config.mock_with :rspec
@@ -21,4 +23,5 @@ RSpec.configure do |config|
   config.include ERB::Util
   config.fixture_path = "#{::Rails.root}/test/fixtures"
   config.use_transactional_fixtures = true
+  config.include FactoryGirlHelper
 end

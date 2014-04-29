@@ -3,8 +3,8 @@ require_relative '../spec_helper'
 describe QueriesHelper do
 
   before(:all) do
-    Role.create(name: "Contractors", limit_visibility: true)
-    Role.create(name: "Project Office", limit_visibility: true)
+    find_or_create(:role, name: "Contractors", limit_visibility: true)
+    find_or_create(:role, name: "Project Office", limit_visibility: true)
   end
 
   describe 'column_value' do

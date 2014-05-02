@@ -12,10 +12,10 @@
   .role .fa-icon-remove { color:#800; }
 </style>
 
-<%  model ||= "issue"
+<%  model ||= Issue
     value ||= ""
 
-    if model == "issue"
+    if model == Issue
       viewers = []
       if @issue.new_record? # create new issue
         member = Member.find_by_user_id_and_project_id(User.current.id, @project.id)
@@ -23,11 +23,21 @@
           member.roles.find_all_visibility_roles.each do |r|
             viewers = viewers | r.authorized_viewers.split('|') if r.authorized_viewers
           end
+          # member cannot remove his current role
+          if member.roles.find_all_visibility_roles.size==1 && @role.nil?
+            @role = member.roles.find_all_visibility_roles
+          else
+            # TODO Can the user remove all or none of his roles ?
+          end
         else # current user has no visibility role (can see every issues)
           viewers = Role.find_all_visibility_roles.map(&:id)
         end
       else # update existing issue
-        viewers = @issue.authorized_viewers.split('|').delete_if(&:blank?) if @issue && @issue.authorized_viewers
+        if @issue && @issue.authorized_viewers.present?
+          viewers = @issue.authorized_viewers.split('|').delete_if(&:blank?)
+        else
+          viewers = Role.find_all_visibility_roles.map(&:id)
+        end
       end
       value = viewers.join('|') + '|'
     end
@@ -42,7 +52,7 @@
         $('.role.involved').each(function() {
           authorized.push($(this).data('filter'))
         })
-        $('#<%= model %>_authorized_viewers').val('|' + authorized.join('|') + '|')
+        $('#<%= model.name.downcase %>_authorized_viewers').val('|' + authorized.join('|') + '|')
       }
     })
   })
@@ -60,4 +70,4 @@
   <!-- <em class=info style="border-top:1px solid #ccc">< l(:text_visibility_notice) ></em> -->
 </p>
 
-<%= hidden_field_tag model + '[authorized_viewers]', "#{value}" %>
+<%= hidden_field_tag "#{model.name.downcase}[authorized_viewers]", "#{value}" %>

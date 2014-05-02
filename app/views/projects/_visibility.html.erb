@@ -28,9 +28,12 @@
                                   :html => { :id => "member-#{member.id}-roles-form", :class => 'hol' }}
                 ) do |f| %>
               <p><% roles.each do |role| %>
-                  <label><%= check_box_tag 'membership[role_ids][]', role.id, member.roles.include?(role),
-                                           :disabled => member.member_roles.detect { |mr| mr.role_id == role.id && !mr.inherited_from.nil?} %> <%=h role %></label><br />
-                <% end %></p>
+                  <label>
+                    <%= check_box_tag 'membership[role_ids][]', role.id, member.roles.include?(role) || (member.roles & roles).empty?,
+                                           :disabled => member.member_roles.detect { |mr| mr.role_id == role.id && !mr.inherited_from.nil?} %> <%=h role %>
+                  </label><br />
+                <% end %>
+              </p>
               <%= hidden_field_tag 'id', member.id %>
               <%= hidden_field_tag 'membership[role_ids][]', '' %>
               <p><%= submit_tag l(:button_change), :class => "small" %>

@@ -2,3 +2,20 @@
     color: #d3d3d3;
     font-style: italic;
 }
+#label_involved_roles{
+    width: 22%;
+    font-weight: bold;
+    display: inline-block;
+    margin-top: 4px;
+}
+.involved-roles .info { margin-top:5px; }
+.role { background-color:#fdd; border: 1px solid #d3d3d3; border-radius:3px; padding:2px 5px 1px 4px; margin:1px 0 2px; cursor:pointer; display:inline-block; }
+.role:hover { background-color:#ffe9e9; }
+.role.involved { background-color:#cfb; }
+.role.involved:hover { background-color:#d7ffc6; }
+/* font awesome icons */
+.role .status-icon { width:1em; display:inline-block; }
+.role:not(.involved) .fa-icon-ok { display:none; }
+.role .fa-icon-ok { color:#080; }
+.role.involved .fa-icon-remove { display:none; }
+.role .fa-icon-remove { color:#800; }

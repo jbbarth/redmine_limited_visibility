@@ -1,17 +1,3 @@
-<style>
-  .involved-roles .info { margin-top:5px; }
-  .role { background-color:#fdd; border-radius:3px; padding:2px 5px 1px 4px; margin:1px 0 2px; cursor:pointer; display:inline-block; }
-  .role:hover { background-color:#ffe9e9; }
-  .role.involved { background-color:#cfb; }
-  .role.involved:hover { background-color:#d7ffc6; }
-  /* font awesome icons */
-  .role .status-icon { width:1em; display:inline-block; }
-  .role:not(.involved) .fa-icon-ok { display:none; }
-  .role .fa-icon-ok { color:#080; }
-  .role.involved .fa-icon-remove { display:none; }
-  .role .fa-icon-remove { color:#800; }
-</style>
-
 <%  model ||= Issue
     value ||= ""
 
@@ -60,8 +46,7 @@
 
 <p id=involved-roles class=involved-roles>
   <label><%= l(:label_involved_members) %> : </label>
-  <% ids = @project.present? ? ProjectInvolvement.new(@project.id).potential_involved_roles : Role.all.map(&:id) %>
-  <% Role.where(id: ids, limit_visibility: true).sorted.each do |role| %>
+  <% Role.find_all_visibility_roles.each do |role| %>
     <span class="role <%= value.split('|').include?(role.id.to_s) ? 'involved' : '' %> <%= @role==role ? "involved disabled" : "" %>" data-filter="<%= role.id %>">
       <span class=status-icon><i class=fa-icon-ok></i><i class=fa-icon-remove></i></span>
       <%= role.name %>

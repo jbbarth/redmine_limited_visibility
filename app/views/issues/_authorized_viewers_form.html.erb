@@ -11,7 +11,7 @@
           end
           # member cannot remove his current role
           if member.roles.find_all_visibility_roles.size==1 && @role.nil?
-            @role = member.roles.find_all_visibility_roles
+            # @role = member.roles.find_all_visibility_roles #TODO
           else
             # TODO Can the user remove all or none of his roles ?
           end
@@ -41,6 +41,16 @@
         $('#<%= model.name.downcase %>_authorized_viewers').val('|' + authorized.join('|') + '|')
       }
     })
+    $('#issue-form').submit(function(e) {
+      e.preventDefault();
+      var form = this;
+      if ($('.role.involved').not('.disabled').length == 0) {
+        alert('<%= l('alert_cant_remove_all_visibility_roles') %>');
+        return false;
+      }else{
+        form.submit(); // submit bypassing the jQuery bound event
+      }
+    });
   })
 </script>
 

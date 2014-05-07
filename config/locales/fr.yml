@@ -8,3 +8,4 @@ fr:
   see_everything: "Toutes les demandes"
   field_authorized_viewers: "Rôles concernés"
   label_my_roles: "mes rôles"
+  alert_cant_remove_all_visibility_roles: "Veuillez sélectionner au moins un rôle concerné"

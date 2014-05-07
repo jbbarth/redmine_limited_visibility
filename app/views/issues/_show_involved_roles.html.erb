@@ -6,18 +6,15 @@
   end
 %>
 
-
-<% if @issue.authorized_viewers.present? %>
-  <hr>
-  <div id='current_involved_roles_list' class='involved-roles' style='display: flex;'>
-    <label id="label_involved_roles"><%= l("field_authorized_viewers") %></label>
-    <span id="list_of_involved_roles_per_issue">
-    <% Role.find_all_visibility_roles.each do |role| %>
-      <span class="role <%= viewers.include?(role.id.to_s) ? 'involved disabled' : 'disabled' %>" >
-        <span class=status-icon><i class=fa-icon-ok></i><i class=fa-icon-remove></i></span>
-        <%= role.name %>
-      </span>
-    <% end %>
+<hr/>
+<div id='current_involved_roles_list' class='involved-roles' style='display: flex;'>
+  <label id="label_involved_roles"><%= l("field_authorized_viewers") %></label>
+  <span id="list_of_involved_roles_per_issue">
+  <% Role.find_all_visibility_roles.each do |role| %>
+    <span class="role <%= (viewers.include?(role.id.to_s) || @issue.authorized_viewers.blank?) ? 'involved disabled' : 'disabled' %>" >
+      <span class=status-icon><i class=fa-icon-ok></i><i class=fa-icon-remove></i></span>
+      <%= role.name %>
     </span>
-  </div>
-<% end %>
+  <% end %>
+  </span>
+</div>

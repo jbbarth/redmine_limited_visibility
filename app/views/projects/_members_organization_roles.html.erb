@@ -1,0 +1,21 @@
+<% roles = Role.find_all_permission_roles %>
+
+<td class='roles'>
+  <span id="orga-<%= m.id %>-roles">
+    <% if m.roles.find_all_permission_roles.any? %>
+      <%= h m.roles.find_all_permission_roles.map(&:name).join(", ") %>
+    <% else %>
+      <span class="see_everything"><%= l('see_everything') %></span>
+    <% end %>
+  </span>
+  <%= form_for(m.organization, :as => :membership, :remote => true, :method => :put,
+               :url => { :controller => 'visibilities', :action => 'update_permissions_roles_by_organization', :project_id => @project, :id => m },
+               :html => { :id => "orga-#{m.id}-roles-form", :class => 'hol' }) do |f| -%>
+    <p><% roles.sort_by(&:name).each do |role| %>
+        <label><%= check_box_tag 'membership[role_ids][]', role.id, m.roles.include?(role) %> <%=h role %></label><br />
+      <% end %></p>
+    <%= hidden_field_tag 'membership[role_ids][]', '' %>
+    <p><%= submit_tag l(:button_change), :class => "small" %>
+      <%= link_to_function l(:button_cancel), "toggleOrgaForms(#{m.id}); return false;" %></p>
+  <% end -%>
+</td>

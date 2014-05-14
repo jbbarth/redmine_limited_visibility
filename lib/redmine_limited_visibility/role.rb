@@ -8,6 +8,10 @@ class Role < ActiveRecord::Base
     Role.where(limit_visibility: true).givable.all
   end
 
+  def self.find_all_permission_roles
+    Role.where("limit_visibility = ? OR limit_visibility IS NULL", false).givable.all
+  end
+
   private
 
     def set_own_visibility

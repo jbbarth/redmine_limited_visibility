@@ -23,4 +23,36 @@ class VisibilitiesController < ApplicationController
       end
     end
   end
+
+  # Update 'permissions' roles and do NOT modify 'visibility' roles
+  def update_permissions_roles_by_organization
+    @membership = OrganizationMembership.find(params[:id])
+    if params[:membership]
+      # visibility roles + updated visibility roles
+      @membership.role_ids = @membership.role_ids - Role.find_all_permission_roles.map(&:id)
+      @membership.role_ids = @membership.role_ids + params[:membership][:role_ids]
+    end
+    @membership.save
+    # @membership.update_attributes(params[:membership])
+    @organization = @membership.organization
+    @project = @membership.project
+    render 'organization_memberships/update_roles'
+  end
+
+  # Update 'visibility' roles and do NOT modify 'permissions' roles
+  def update_visibility_roles_by_organization
+    @membership = OrganizationMembership.find(params[:id])
+    if params[:membership]
+      # standard roles + updated visibility roles
+      @membership.role_ids = @membership.role_ids - Role.find_all_visibility_roles.map(&:id)
+      @membership.role_ids = @membership.role_ids + params[:membership][:role_ids]
+    end
+    @membership.save
+    # @membership.update_attributes(params[:membership])
+    @organization = @membership.organization
+    @project = @membership.project
+    render 'organization_memberships/update_roles'
+  end
+
+
 end

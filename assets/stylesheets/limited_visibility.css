@@ -1,7 +1,8 @@
-.roles .see_everything{
+td.visibility_roles .see_everything, .roles .see_everything{
     color: #d3d3d3;
     font-style: italic;
 }
+td.visibility_roles{ width: 180px;}
 #label_involved_roles{
     width: 22%;
     font-weight: bold;

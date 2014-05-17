@@ -1,7 +1,8 @@
 <h2><%=l(:label_settings)%></h2>
 
 <% visibility = {name: 'visibility', action: :visibility, partial: 'projects/visibility', label: :label_visibility_by_role}
-   tabs = project_settings_tabs << visibility %>
+   tabs = project_settings_tabs
+   tabs << visibility unless Redmine::Plugin.installed?(:redmine_organizations) %>
 <%= render_tabs tabs %>
 
 <% html_title(l(:label_settings)) -%>

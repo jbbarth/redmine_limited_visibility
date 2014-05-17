@@ -17,12 +17,23 @@ class IssueQuery < Query
     when "*" # display all roles
       sql = "" # no filter
     when "mine" # only my visibility roles
-      projects_by_role = User.current.projects_by_role
-      sql = projects_by_role.map do |role, projects|
-        projects.map do |project|
-          "(#{Issue.table_name}.#{field} LIKE '%|#{role.id}|%' AND #{Project.table_name}.id = #{project.id}) "
+      if Redmine::Plugin.installed?(:redmine_organizations)
+        conditions = []
+        User.current.organization_involvements.each do |involvement|
+          roles_by_orga = involvement.organization_membership.roles.find_all_visibility_roles if involvement.organization_membership
+          roles_by_orga.each do |role|
+            conditions << "(#{Issue.table_name}.#{field} LIKE '%|#{role.id}|%' AND #{Project.table_name}.id = #{involvement.organization_membership.project.id}) "  if involvement.organization_membership.project.present?
+          end if involvement.organization_membership.present?
+        end
+        sql = conditions.join(" OR ")
+      else
+        projects_by_role = User.current.projects_by_role
+        sql = projects_by_role.map do |role, projects|
+          projects.map do |project|
+            "(#{Issue.table_name}.#{field} LIKE '%|#{role.id}|%' AND #{Project.table_name}.id = #{project.id}) "
+          end.join(" OR ")
         end.join(" OR ")
-      end.join(" OR ")
+      end
       sql = "(#{sql.present? ? '(' + sql + ') OR ' : ''} #{Issue.table_name}.#{field} IS NULL OR #{Issue.table_name}.#{field} = '||' OR #{Issue.table_name}.#{field} = '')"
       # potentially very long query #TODO Find a way to optimize it
     # when "=", "!"

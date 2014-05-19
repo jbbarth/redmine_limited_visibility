@@ -1,7 +1,10 @@
 require_relative '../spec_helper'
-require 'redmine_limited_visibility/roles_controller_patch'
+require 'redmine_limited_visibility/queries_helper_patch'
 
 describe IssuesController do
+
+  before { @request.session[:user_id] = 1 }
+
   it 'adds an "authorized viewers filter" to existing requests' do
     q = IssueQuery.create!(name: "new-query", user: User.find(2), visibility: 2, project: nil)
     expect(q.filters).to_not include 'authorized_viewers'

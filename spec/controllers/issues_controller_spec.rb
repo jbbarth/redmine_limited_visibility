@@ -3,7 +3,7 @@ require 'redmine_limited_visibility/roles_controller_patch'
 
 describe IssuesController do
   it 'adds an "authorized viewers filter" to existing requests' do
-    q = IssueQuery.create!(name: "new-query", user: User.find(2), is_public: true, project: nil)
+    q = IssueQuery.create!(name: "new-query", user: User.find(2), visibility: 2, project: nil)
     expect(q.filters).to_not include 'authorized_viewers'
     get :index, query_id: q.id
     response.should be_success

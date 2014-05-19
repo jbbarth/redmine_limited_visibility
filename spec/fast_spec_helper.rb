@@ -1,7 +1,6 @@
 ENV['RAILS_ENV'] ||= 'test'
 
 # test gems
-require 'rspec'
 require 'rspec/rails'
 require 'rspec/autorun'
 require 'rspec/mocks'

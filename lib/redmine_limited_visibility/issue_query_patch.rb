@@ -20,10 +20,17 @@ class IssueQuery < Query
       if Redmine::Plugin.installed?(:redmine_organizations)
         conditions = []
         User.current.organization_involvements.each do |involvement|
-          roles_by_orga = involvement.organization_membership.roles.find_all_visibility_roles if involvement.organization_membership
-          roles_by_orga.each do |role|
-            conditions << "(#{Issue.table_name}.#{field} LIKE '%|#{role.id}|%' AND #{Project.table_name}.id = #{involvement.organization_membership.project.id}) "  if involvement.organization_membership.project.present?
-          end if involvement.organization_membership.present?
+
+          if involvement.organization_membership.present? && involvement.organization_membership.project.present?
+            visibility_roles_by_orga = involvement.organization_membership.roles.find_all_visibility_roles
+            if visibility_roles_by_orga.present?
+              visibility_roles_by_orga.each do |role|
+                conditions << "(#{Issue.table_name}.#{field} LIKE '%|#{role.id}|%' AND #{Project.table_name}.id = #{involvement.organization_membership.project.id}) "
+              end
+            else
+              conditions << "(#{Project.table_name}.id = #{involvement.organization_membership.project.id}) "
+            end
+          end
         end
         sql = conditions.join(" OR ")
       else

@@ -14,6 +14,7 @@
     <span class="role <%= (viewers.include?(role.id.to_s) || @issue.authorized_viewers.blank?) ? 'involved disabled' : 'disabled' %>" >
       <span class=status-icon><i class=fa-icon-ok></i><i class=fa-icon-remove></i></span>
       <%= role.name %>
+      <i class=fa-icon-lock></i>
     </span>
   <% end %>
   </span>

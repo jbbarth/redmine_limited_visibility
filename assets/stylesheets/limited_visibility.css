@@ -16,8 +16,10 @@ td.visibility_roles{ width: 180px;}
 .involved-roles .role.disabled { cursor:default; }
 .involved-roles .role.involved:hover { background-color:#d7ffc6; }
 /* font awesome icons */
-.involved-roles .role .status-icon { width:1em; display:inline-block; }
+.involved-roles .role .status-icon { min-width:1em; display:inline-block; }
 .involved-roles .role:not(.involved) .fa-icon-ok { display:none; }
 .involved-roles .role .fa-icon-ok { color:#080; }
 .involved-roles .role.involved .fa-icon-remove { display:none; }
 .involved-roles .role .fa-icon-remove { color:#800; }
+.involved-roles .role .fa-icon-lock { color:#080; }
+.involved-roles .role:not(.disabled) .fa-icon-lock { display:none; }

@@ -58,7 +58,7 @@
   <label><%= l(:label_involved_members) %> : </label>
   <% Role.find_all_visibility_roles.each do |role| %>
     <span class="role <%= value.split('|').include?(role.id.to_s) ? 'involved' : '' %> <%= @role==role ? "involved disabled" : "" %>" data-filter="<%= role.id %>">
-      <span class=status-icon><i class=fa-icon-ok></i><i class=fa-icon-remove></i></span>
+      <span class=status-icon><i class=fa-icon-ok></i><i class=fa-icon-remove></i><i class=fa-icon-lock></i></span>
       <%= role.name %>
     </span>
   <% end %>

@@ -1,46 +1,28 @@
-<%  model ||= Issue
-    value ||= ""
+<%  member = Member.find_by_user_id_and_project_id(User.current.id, @project.id)
+    # member cannot remove his current roles
+    @current_roles = member.roles.find_all_visibility_roles
 
-    if model == Issue
-      viewers = []
-      if @issue.new_record? # create new issue
-        member = Member.find_by_user_id_and_project_id(User.current.id, @project.id)
-        if member && member.roles.find_all_visibility_roles.present? # current user has at least one visibility role
-          member.roles.find_all_visibility_roles.each do |r|
-            viewers = viewers | r.authorized_viewers.split('|') if r.authorized_viewers
-          end
-          # member cannot remove his current role
-          if member.roles.find_all_visibility_roles.size==1 && @role.nil?
-            # @role = member.roles.find_all_visibility_roles #TODO
-          else
-            # TODO Can the user remove all or none of his roles ?
-          end
-        else # current user has no visibility role (can see every issues)
-          viewers = Role.find_all_visibility_roles.map(&:id)
+    viewers = []
+    if @issue.new_record? # create new issue
+      if member && member.roles.find_all_visibility_roles.present? # current user has at least one visibility role
+        member.roles.find_all_visibility_roles.each do |r|
+          viewers = viewers | r.authorized_viewers.split('|') if r.authorized_viewers
         end
-      else # update existing issue
-        if @issue && @issue.authorized_viewers.present?
-          viewers = @issue.authorized_viewers.split('|').delete_if(&:blank?)
-        else
-          viewers = Role.find_all_visibility_roles.map(&:id)
-        end
+      else # current user has no visibility role (can see every issues)
+        viewers = Role.find_all_visibility_roles.map(&:id)
       end
-      value = viewers.join('|') + '|'
+    else # update existing issue
+      if @issue && @issue.authorized_viewers.present?
+        viewers = @issue.authorized_viewers.split('|').delete_if(&:blank?)
+      else
+        viewers = Role.find_all_visibility_roles.map(&:id)
+      end
     end
+    value = viewers.join('|') + '|'
 %>
 
 <script>
   $(function() {
-    $('.role').on('click', function() {
-      if (!$(this).hasClass('disabled')){
-        $(this).toggleClass('involved')
-        var authorized = []
-        $('.role.involved').each(function() {
-          authorized.push($(this).data('filter'))
-        })
-        $('#<%= model.name.downcase %>_authorized_viewers').val('|' + authorized.join('|') + '|')
-      }
-    })
     $('#issue-form').submit(function(e) {
       e.preventDefault();
       var form = this;
@@ -54,16 +36,4 @@
   })
 </script>
 
-<p id=involved-roles class=involved-roles>
-  <label><%= l(:label_involved_members) %> : </label>
-  <% Role.find_all_visibility_roles.each do |role| %>
-    <span class="role <%= value.split('|').include?(role.id.to_s) ? 'involved' : '' %> <%= @role==role ? "involved disabled" : "" %>" data-filter="<%= role.id %>">
-      <span class=status-icon><i class=fa-icon-ok></i><i class=fa-icon-remove></i></span>
-      <%= role.name %>
-      <i class=fa-icon-lock></i>
-    </span>
-  <% end %>
-  <!-- <em class=info style="border-top:1px solid #ccc">< l(:text_visibility_notice) ></em> -->
-</p>
-
-<%= hidden_field_tag "#{model.name.downcase}[authorized_viewers]", "#{value}" %>
+<%= render "roles/select_involved_roles", viewers: value %>

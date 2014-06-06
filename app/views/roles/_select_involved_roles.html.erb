@@ -10,7 +10,7 @@
         $('#role_authorized_viewers').val('|' + authorized.join('|') + '|');
         $('#issue_authorized_viewers').val('|' + authorized.join('|') + '|');
 
-        // Update disability TODO Valider ce comportement...
+        // Update disable class TODO this behaviour should be double-checked
         if($('#involved-roles .role.involved.mine').length!==1){
           $('#involved-roles .role').removeClass('disabled');
         }else{

@@ -1,6 +1,6 @@
 <%  member = Member.find_by_user_id_and_project_id(User.current.id, @project.id)
     # member cannot remove his current roles
-    @current_roles = member.roles.find_all_visibility_roles
+    @current_roles = member.roles.find_all_visibility_roles if member.present?
 
     viewers = []
     if @issue.new_record? # create new issue
@@ -26,7 +26,7 @@
     $('#issue-form').submit(function(e) {
       e.preventDefault();
       var form = this;
-      if ($('.role.involved').not('.disabled').length == 0) {
+      if ($('#issue-form .role.involved').length === 0) {
         alert('<%= l('alert_cant_remove_all_visibility_roles') %>');
         return false;
       }else{

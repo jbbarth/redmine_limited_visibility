@@ -1,14 +1,23 @@
-<%  member = Member.find_by_user_id_and_project_id(User.current.id, @project.id)
-    # member cannot remove his current roles
-    @current_roles = member.roles.find_all_visibility_roles if member.present?
+<%
+   if Redmine::Plugin.installed?(:redmine_organizations)
+     @current_visibility_roles = Role.joins(:organization_roles)
+                       .joins('LEFT OUTER JOIN organization_memberships ON organization_memberships.id = organization_roles.organization_membership_id')
+                       .joins('LEFT OUTER JOIN organization_involvements ON organization_involvements.organization_membership_id = organization_memberships.id')
+                       .where("#{OrganizationMembership.table_name}.project_id = ? AND #{OrganizationInvolvement.table_name}.user_id IN (?)", project_id, User.current.id)
+                       .find_all_visibility_roles
+   else
+     member = Member.find_by_user_id_and_project_id(User.current.id, @project.id)
+     # member cannot remove his current roles
+     @current_visibility_roles = member.roles.find_all_visibility_roles if member.present?
+   end
 
     viewers = []
     if @issue.new_record? # create new issue
-      if member && member.roles.find_all_visibility_roles.present? # current user has at least one visibility role
-        member.roles.find_all_visibility_roles.each do |r|
+      if @current_visibility_roles.present? # current user has at least one visibility role
+        @current_visibility_roles.each do |r|
           viewers = viewers | r.authorized_viewers.split('|') if r.authorized_viewers
         end
-      else # current user has no visibility role (can see every issues)
+      else # current user has no visibility role (can see all issues)
         viewers = Role.find_all_visibility_roles.map(&:id)
       end
     else # update existing issue

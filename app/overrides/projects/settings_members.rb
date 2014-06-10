@@ -20,6 +20,6 @@ if Redmine::Plugin.installed?(:redmine_organizations)
                                           <BR><%= l('label_visibility_by_role') %>:
                                           <% visibility_roles.each do |role| %>
                                             <label><%= check_box_tag "membership[role_ids][]", role.id %> <%=h role %></label>
-                                          <% end %>'
+                                          <% end %>
                                           eos
 end

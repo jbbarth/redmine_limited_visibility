@@ -27,12 +27,18 @@ describe RedmineLimitedVisibility::IssuePatch do
 
     it 'should notified users if there roles are involved' do
       issue = Issue.find(4)
-      members = Member.where(user_id: 2, project_id: issue.project_id)
       role = Role.find_by_name('Contractors')
-      MemberRole.create(member_id: members.first.id, role_id: role.id) if members && role
+
+      if Redmine::Plugin.installed?(:redmine_organizations)
+        orga = Organization.find(1)
+        membership = orga.memberships.where(project_id: issue.project_id).first
+        membership.roles << role
+      else
+        members = Member.where(user_id: 2, project_id: issue.project_id)
+        MemberRole.create(member_id: members.first.id, role_id: role.id) if members && role
+      end
 
       notified = issue.notified_users
-
       notified.should_not be_nil
       notified.size.should eq 1
       notified.should_not include User.anonymous
@@ -43,11 +49,18 @@ describe RedmineLimitedVisibility::IssuePatch do
 
     it 'should NOT notified users if there roles are not involved' do
       issue = Issue.find(4)
-      member = Member.where(user_id: 2, project_id: issue.project_id).first
-      MemberRole.create(member_id: member.id, role_id: Role.find_by_name('Project Office').id)
+      not_involved_role = Role.find_by_name('Project Office')
+
+      if Redmine::Plugin.installed?(:redmine_organizations)
+        orga = Organization.find(1)
+        membership = orga.memberships.where(project_id: issue.project_id).first
+        membership.roles << not_involved_role
+      else
+        member = Member.where(user_id: 2, project_id: issue.project_id).first
+        MemberRole.create(member_id: member.id, role_id: not_involved_role.id)
+      end
 
       notified = issue.notified_users
-
       notified.should_not be_nil
       notified.size.should eq 0
       notified.should_not include User.anonymous

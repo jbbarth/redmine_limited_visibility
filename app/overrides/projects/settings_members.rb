@@ -8,8 +8,8 @@ if Redmine::Plugin.installed?(:redmine_organizations)
   Deface::Override.new :virtual_path  => 'projects/settings/_members',
                        :original      => 'd1b4a2c2eb5c61a65fad04c1fe810bd8006c2736',
                        :name          => 're_organise-roles-for-orga',
-                       :insert_after  => 'erb[silent]:contains("roles = Role.find_all_givable")',
-                       :text          => '<% roles = Role.find_all_permission_roles %>'
+                       :insert_before  => 'erb[silent]:contains("roles.each")',
+                       :text          => '<% roles = Role.find_all_permission_roles %><BR><%= l("label_role_plural") %>:'
 
   Deface::Override.new :virtual_path  => 'projects/settings/_members',
                        :original      => 'd1b4a2c2eb5c61a65fad04c1fe810bd8006c2736',
@@ -17,7 +17,7 @@ if Redmine::Plugin.installed?(:redmine_organizations)
                        :insert_before => 'erb[loud]:contains("submit_tag")',
                        :text          => <<-eos
                                           <% visibility_roles = Role.find_all_visibility_roles %>
-                                          <BR>Visibility roles:
+                                          <BR><%= l('label_visibility_by_role') %>:
                                           <% visibility_roles.each do |role| %>
                                             <label><%= check_box_tag "membership[role_ids][]", role.id %> <%=h role %></label>
                                           <% end %>'

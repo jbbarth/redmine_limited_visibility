@@ -1,7 +1,7 @@
 fr:
   label_involved_members: "Rôles concernés"
   text_visibility_notice: "Les membres du projet peuvent toujours voir cette demande si l'un de leurs rôles le permet et s'ils connaissent le numéro de demande. (/!\\ TODO /!\\)"
-  text_involvement_explanation: "Paramètrage par défaut pour les nouvelles demandes (ces personnes verront la demande et seront notifiées) :"
+  text_involvement_explanation: "Paramètrage par défaut pour les nouvelles demandes (les personnes ayant ces rôles verront la demande et seront notifiées) :"
   field_limit_visibility: "Limite la visibilité des demandes"
   label_visibility_roles: "Rôles 'visibilité'"
   label_visibility_by_role: "Visibilité des demandes"

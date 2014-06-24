@@ -17,38 +17,41 @@ class IssueQuery < Query
     when "*" # display all roles
       sql = "" # no filter
     when "mine" # only my visibility roles
-      if Redmine::Plugin.installed?(:redmine_organizations)
-        conditions = []
-        User.current.organization_involvements.each do |involvement|
-
-          if involvement.organization_membership.present? && involvement.organization_membership.project.present?
-            visibility_roles_by_orga = involvement.organization_membership.roles.find_all_visibility_roles
-            if visibility_roles_by_orga.present?
-              visibility_roles_by_orga.each do |role|
-                conditions << "(#{Issue.table_name}.#{field} LIKE '%|#{role.id}|%' AND #{Project.table_name}.id = #{involvement.organization_membership.project.id}) "
-              end
-            else
-              conditions << "(#{Project.table_name}.id = #{involvement.organization_membership.project.id}) "
-            end
-          end
-        end
-        sql = conditions.join(" OR ")
-      else
-        projects_by_role = User.current.projects_by_role
-        sql = projects_by_role.map do |role, projects|
-          projects.map do |project|
-            "(#{Issue.table_name}.#{field} LIKE '%|#{role.id}|%' AND #{Project.table_name}.id = #{project.id}) "
-          end.join(" OR ")
-        end.join(" OR ")
-      end
-      sql = "(#{sql.present? ? '(' + sql + ') OR ' : ''} #{Issue.table_name}.#{field} IS NULL OR #{Issue.table_name}.#{field} = '||' OR #{Issue.table_name}.#{field} = '')"
-      # potentially very long query #TODO Find a way to optimize it
+      sql = sql_conditions_for_roles_per_projects(field)
     # when "=", "!"
     #  sql = value.map { |role| "#{Issue.table_name}.#{field} #{operator == "!" ? 'NOT' : ''} LIKE '%|#{role}|%' " }.join(" OR ")
     else
       raise "unsupported value for authorized_viewers field: '#{operator}'"
     end
     sql
+  end
+
+  def sql_conditions_for_roles_per_projects(field)
+    if Redmine::Plugin.installed?(:redmine_organizations)
+      conditions = []
+      User.current.organization_involvements.each do |involvement|
+        if involvement.organization_membership.present? && involvement.organization_membership.project.present?
+          visibility_roles_by_orga = involvement.organization_membership.roles.find_all_visibility_roles
+          if visibility_roles_by_orga.present?
+            visibility_roles_by_orga.each do |role|
+              conditions << "(#{Issue.table_name}.#{field} LIKE '%|#{role.id}|%' AND #{Project.table_name}.id = #{involvement.organization_membership.project.id}) "
+            end
+          else
+            conditions << "(#{Project.table_name}.id = #{involvement.organization_membership.project.id}) "
+          end
+        end
+      end
+      sql = conditions.join(" OR ")
+    else
+      projects_by_role = User.current.projects_by_role
+      sql = projects_by_role.map do |role, projects|
+        projects.map do |project|
+          "(#{Issue.table_name}.#{field} LIKE '%|#{role.id}|%' AND #{Project.table_name}.id = #{project.id}) "
+        end.join(" OR ")
+      end.join(" OR ")
+    end
+    # potentially very long query #TODO Find a way to optimize it
+    sql = "(#{sql.present? ? '(' + sql + ') OR ' : ''} #{Issue.table_name}.#{field} IS NULL OR #{Issue.table_name}.#{field} = '||' OR #{Issue.table_name}.#{field} = '' OR #{Issue.table_name}.assigned_to_id = #{User.current.id} OR #{Issue.table_name}.author_id = #{User.current.id})"
   end
 
   # use standard method to validate filters form,

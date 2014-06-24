@@ -23,3 +23,6 @@ td.visibility_roles{ width: 180px;}
 .involved-roles .role .fa-icon-remove { color:#800; }
 .involved-roles .role .fa-icon-lock { color:#080; }
 .involved-roles .role:not(.disabled) .fa-icon-lock { display:none; }
+
+/* my page */
+a.icon-roles  { background-image: url(../images/magnify.png); margin-right:6px; margin-left: 8px;}

@@ -1,9 +1,9 @@
-<% roles = Role.find_all_visibility_roles %>
+<% roles = Role.visibility_roles.all %>
 
 <td class='visibility_roles'>
   <span id="orga-<%= m.id %>-roles">
-    <% if m.roles.find_all_visibility_roles.any? %>
-      <%= h m.roles.find_all_visibility_roles.map(&:name).join(", ") %>
+    <% if m.roles.visibility_roles.all.any? %>
+      <%= h m.roles.visibility_roles.pluck(:name).join(", ") %>
     <% else %>
       <span class="see_everything"><%= l('see_everything') %></span>
     <% end %>

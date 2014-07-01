@@ -24,7 +24,7 @@
 
 <p id=involved-roles class=involved-roles>
   <label><%= l(:label_involved_members) %> : </label>
-  <% Role.find_all_visibility_roles.each do |role| %>
+  <% Role.visibility_roles.each do |role| %>
     <% role_is_involved = viewers.split('|').include?(role.id.to_s) if viewers %>
     <% role_is_mine = @current_visibility_roles && @current_visibility_roles.include?(role) %>
     <% role_is_disabled = @role==role || (role_is_mine && viewers.split('|').reject!(&:blank?).try(:size)==1 && role_is_involved) %>

@@ -8,7 +8,7 @@ describe Role do
   end
 
   it 'can return all visibility roles' do
-    roles = Role.find_all_visibility_roles
+    roles = Role.visibility_roles.all
     roles.size.should be >= 2
     roles.find { |role| role.name == 'Contractors' }.should_not be_nil
     roles.find { |role| role.limit_visibility == false }.should be_nil

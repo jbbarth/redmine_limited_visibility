@@ -7,7 +7,7 @@ class VisibilitiesController < ApplicationController
     @project = @member.project if @member
     if params[:membership]
       # standard roles + updated visibility roles
-      @member.role_ids = @member.role_ids - Role.find_all_visibility_roles.map(&:id)
+      @member.role_ids = @member.role_ids - Role.visibility_roles.pluck(:id)
       @member.role_ids = @member.role_ids + params[:membership][:role_ids]
     end
     saved = @member.save
@@ -29,7 +29,7 @@ class VisibilitiesController < ApplicationController
     @membership = OrganizationMembership.find(params[:id])
     if params[:membership]
       # visibility roles + updated visibility roles
-      @membership.role_ids = @membership.role_ids - Role.find_all_permission_roles.map(&:id)
+      @membership.role_ids = @membership.role_ids - Role.permission_roles.pluck(:id)
       @membership.role_ids = @membership.role_ids + params[:membership][:role_ids]
     end
     @membership.save
@@ -44,7 +44,7 @@ class VisibilitiesController < ApplicationController
     @membership = OrganizationMembership.find(params[:id])
     if params[:membership]
       # standard roles + updated visibility roles
-      @membership.role_ids = @membership.role_ids - Role.find_all_visibility_roles.map(&:id)
+      @membership.role_ids = @membership.role_ids - Role.visibility_roles.pluck(:id)
       @membership.role_ids = @membership.role_ids + params[:membership][:role_ids]
     end
     @membership.save

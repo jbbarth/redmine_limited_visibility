@@ -6,8 +6,8 @@ class RolesController < ApplicationController
   def index
     respond_to do |format|
       format.html {
-        @visibility_roles = Role.where(limit_visibility: true).sorted
-        @role_pages, @roles = paginate Role.where('limit_visibility IS NULL OR limit_visibility != ?', true).sorted, per_page: 25
+        @visibility_roles = Role.visibility_roles.sorted
+        @role_pages, @roles = paginate Role.permission_roles.sorted, per_page: 25
         render action: "index", layout: false if request.xhr?
       }
       format.api {

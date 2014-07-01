@@ -1,9 +1,9 @@
-<% roles = Role.find_all_permission_roles %>
+<% roles = Role.permission_roles.all %>
 
 <td class='roles'>
   <span id="orga-<%= m.id %>-roles">
-    <% if m.roles.find_all_permission_roles.any? %>
-      <%= h m.roles.find_all_permission_roles.map(&:name).join(", ") %>
+    <% if m.roles.permission_roles.all.any? %>
+      <%= h m.roles.permission_roles.pluck(:name).join(", ") %>
     <% else %>
       <span class="see_everything"><%= l('see_everything') %></span>
     <% end %>

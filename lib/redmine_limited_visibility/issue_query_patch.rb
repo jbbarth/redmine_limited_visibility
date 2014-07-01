@@ -9,7 +9,7 @@ class IssueQuery < Query
   unless instance_methods.include?(:initialize_available_filters_with_authorized_viewers)
     def initialize_available_filters_with_authorized_viewers
       initialize_available_filters_without_authorized_viewers
-      add_available_filter "authorized_viewers", type: :list_visibility, values: Role.find_all_visibility_roles.map { |s| [s.name, s.id.to_s] }
+      add_available_filter "authorized_viewers", type: :list_visibility, values: Role.visibility_roles.all.map { |s| [s.name, s.id.to_s] }
     end
     alias_method_chain :initialize_available_filters, :authorized_viewers
   end
@@ -33,7 +33,7 @@ class IssueQuery < Query
       conditions = []
       User.current.organization_involvements.each do |involvement|
         if involvement.organization_membership.present? && involvement.organization_membership.project.present?
-          visibility_roles_by_orga = involvement.organization_membership.roles.find_all_visibility_roles
+          visibility_roles_by_orga = involvement.organization_membership.roles.visibility_roles.all
           if visibility_roles_by_orga.present?
             visibility_roles_by_orga.each do |role|
               conditions << "(#{Issue.table_name}.#{field} LIKE '%|#{role.id}|%' AND #{Project.table_name}.id = #{involvement.organization_membership.project.id}) "

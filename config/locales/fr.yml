@@ -11,3 +11,4 @@ fr:
   alert_cant_remove_all_visibility_roles: "Veuillez sélectionner au moins un rôle concerné"
   label_my_page_all_roles: "Voir les demandes de tous les rôles"
   label_my_page_my_roles: "Voir uniquement les demandes impliquant mes rôles"
+  label_visibilities_report: "Synthèse des visibilités"

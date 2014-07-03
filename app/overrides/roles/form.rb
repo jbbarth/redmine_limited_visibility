@@ -10,7 +10,7 @@ Deface::Override.new :virtual_path  => 'roles/_form',
 Deface::Override.new :virtual_path  => 'roles/_form',
                      :name          => 'add_checkbox_to_set_limit_visibility_role',
                      :insert_bottom => '.box.tabular:not([id*=permissions])',
-                     :text          => '<p><%= f.check_box :limit_visibility %></p>'
+                     :text          => '<p><%= f.check_box :limit_visibility, :checked => (@role.limit_visibility || params[:type]=="visibility") %></p>'
 
 Deface::Override.new :virtual_path  => 'roles/_form',
                      :name          => 'add-role-default-behaviour-regarding-issue-visibility',

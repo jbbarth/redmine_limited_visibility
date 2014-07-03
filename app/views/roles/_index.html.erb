@@ -1,4 +1,9 @@
-<div style="margin-top: 25px;">
+<div style="margin-top: 25px;padding-top: 6px;">
+
+  <div class="contextual">
+    <%= link_to l(:label_role_new), new_role_path(:type=>'visibility'), :class => 'icon icon-add' %>
+    <%= link_to l(:label_visibilities_report), roles_visibilities_report_path, :class => 'icon icon-summary' %>
+  </div>
 
   <h2><%=l(:label_visibility_roles)%></h2>
 

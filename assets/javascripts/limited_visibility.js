@@ -11,6 +11,10 @@ function toggleVisibilityForms(id) {
 }
 
 $(function() {
+  if($('input#role_limit_visibility').is(":checked")){
+    $('.permissions_tab').hide();
+    $('.visibility_tab').show();
+  }
   $('input#role_limit_visibility').on("change", function() {
     if($(this)[0].checked){
       $('.permissions_tab').hide();

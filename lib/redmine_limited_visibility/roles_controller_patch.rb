@@ -16,6 +16,19 @@ class RolesController < ApplicationController
     end
   end
 
+  def visibilities
+    @roles = Role.visibility_roles.sorted.all
+    if request.post?
+      @roles.each do |role|
+        viewers = '|'
+        viewers = "#{viewers}#{params[:visibilities][role.id.to_s].join('|')}|" if params[:visibilities][role.id.to_s].present?
+        role.update_attribute(:authorized_viewers, "#{viewers}#{role.id}|")
+      end
+      flash[:notice] = l(:notice_successful_update)
+      redirect_to roles_path
+    end
+  end
+
   private
 
     def no_permissions_if_visibility_role

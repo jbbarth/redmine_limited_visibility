@@ -1,7 +1,7 @@
 ENV["RAILS_ENV"] ||= 'test'
 
 #test gems
-require 'rspec'
+require 'rspec/core'
 require 'rspec/autorun'
 require 'rspec/mocks'
 require 'rspec/mocks/standalone'

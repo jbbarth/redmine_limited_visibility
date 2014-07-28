@@ -28,6 +28,6 @@ Rails.application.config.to_prepare do
   require_dependency 'redmine_limited_visibility/issue_query_patch' unless Rails.env.test?
   require_dependency 'redmine_limited_visibility/issues_helper_patch'
   require_dependency 'redmine_limited_visibility/roles_controller_patch'
-  require_dependency 'redmine_limited_visibility/role'
+  require_dependency 'redmine_limited_visibility/role_patch'
   require_dependency 'redmine_limited_visibility/my_controller_patch'
 end

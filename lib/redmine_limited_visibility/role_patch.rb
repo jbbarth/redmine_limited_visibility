@@ -1,6 +1,6 @@
 require_dependency 'role'
 
-class Role < ActiveRecord::Base
+class Role
   after_create :set_own_visibility
 
   scope :visibility_roles, where(limit_visibility: true)  # Find all roles used to limit the visibility of issues

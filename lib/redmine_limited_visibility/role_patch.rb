@@ -39,7 +39,8 @@ class Role
     alias_method_chain :reset_column_information, :safe_schema_clear
   end
 
-  after_create :set_own_visibility
+  after_create :set_own_visibility,
+    :if => Proc.new { |_| Role.column_names.include?("authorized_viewers") }
 
   scope :visibility_roles, where(limit_visibility: true)  # Find all roles used to limit the visibility of issues
   scope :permission_roles, where("limit_visibility = ? OR limit_visibility IS NULL", false)

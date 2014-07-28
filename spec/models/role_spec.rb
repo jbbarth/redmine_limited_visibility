@@ -1,5 +1,4 @@
 require_relative '../spec_helper'
-require 'redmine_limited_visibility/role'
 
 describe Role do
   before(:all) do

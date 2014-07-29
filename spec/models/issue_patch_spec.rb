@@ -32,7 +32,7 @@ describe RedmineLimitedVisibility::IssuePatch do
       issue_with_authorized_viewers.save!
     end
 
-    it 'should notified users if there roles are involved' do
+    it 'should notify users if their roles are involved' do
       issue = Issue.find(4)
       role = Role.find_by_name('Contractors')
 
@@ -54,7 +54,7 @@ describe RedmineLimitedVisibility::IssuePatch do
       notified.should_not include User.find(8) # member of project 2 but mail_notification = false
     end
 
-    it 'should NOT notified users if there roles are not involved' do
+    it 'should NOT notify users if their roles are not involved' do
       issue = Issue.find(4)
       not_involved_role = Role.find_by_name('Project Office')
 
@@ -74,7 +74,7 @@ describe RedmineLimitedVisibility::IssuePatch do
       notified.should_not include User.find(2) # member with different role
     end
 
-    it 'should notified users if issue has no specific roles' do
+    it 'should notify users if issue has no specific roles' do
       issue = Issue.find(4)
       issue.safe_attributes = { "authorized_viewers" => "||" }
       issue.save!

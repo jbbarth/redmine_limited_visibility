@@ -9,6 +9,11 @@ describe RedmineLimitedVisibility::IssuePatch do
   end
 
   let(:issue) { Issue.new }
+  let(:issue_4) { Issue.find(4) }
+  let(:issue_with_authorized_viewers) { issue_4.update_attributes!(:authorized_viewers => "|#{contractor_role.id}|"); issue_4 }
+  let(:issue_without_authorized_viewers) { issue_4.update_attributes!(:authorized_viewers => "||"); issue_4 }
+  let(:project_office_role) { find_or_create(:role, name: "Contractors", limit_visibility: true) }
+  let(:contractor_role) { find_or_create(:role, name: "Project Office", limit_visibility: true) }
 
   describe "#authorized_viewers" do
     it "has a authorized_viewers column" do
@@ -24,25 +29,16 @@ describe RedmineLimitedVisibility::IssuePatch do
   end
 
   describe 'notified_users' do
-    before(:all) do
-      find_or_create(:role, name: "Contractors", limit_visibility: true)
-      find_or_create(:role, name: "Project Office", limit_visibility: true)
-      issue_with_authorized_viewers = Issue.find(4)
-      issue_with_authorized_viewers.safe_attributes = { "authorized_viewers" => "|#{Role.find_by_name('Contractors').id}|" }
-      issue_with_authorized_viewers.save!
-    end
-
     it 'should notify users if their roles are involved' do
-      issue = Issue.find(4)
-      role = Role.find_by_name('Contractors')
+      issue = issue_with_authorized_viewers
 
       if Redmine::Plugin.installed?(:redmine_organizations)
         orga = Organization.find(1)
         membership = orga.memberships.where(project_id: issue.project_id).first
-        membership.roles << role
+        membership.roles << contractor_role
       else
         members = Member.where(user_id: 2, project_id: issue.project_id)
-        MemberRole.create(member_id: members.first.id, role_id: role.id) if members && role
+        MemberRole.create(member_id: members.first.id, role_id: contractor_role.id) if members && contractor_role
       end
 
       notified = issue.notified_users
@@ -55,8 +51,8 @@ describe RedmineLimitedVisibility::IssuePatch do
     end
 
     it 'should NOT notify users if their roles are not involved' do
-      issue = Issue.find(4)
-      not_involved_role = Role.find_by_name('Project Office')
+      issue = issue_with_authorized_viewers
+      not_involved_role = project_office_role
 
       if Redmine::Plugin.installed?(:redmine_organizations)
         orga = Organization.find(1)
@@ -75,10 +71,7 @@ describe RedmineLimitedVisibility::IssuePatch do
     end
 
     it 'should notify users if issue has no specific roles' do
-      issue = Issue.find(4)
-      issue.safe_attributes = { "authorized_viewers" => "||" }
-      issue.save!
-      issue.reload
+      issue = issue_without_authorized_viewers
 
       notified = issue.notified_users
 

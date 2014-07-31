@@ -1,3 +1,6 @@
+require File.dirname(__FILE__) + '/../../app/helpers/limited_visibility_helper'
+include LimitedVisibilityHelper
+
 module RedmineLimitedVisibility
   class Hooks < Redmine::Hook::ViewListener
 

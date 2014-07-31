@@ -8,15 +8,15 @@ module RedmineLimitedVisibility
 
         safe_attributes "authorized_viewers"
 
-        alias_method :all_notified_users, :notified_users
-
-        # Returns the users that should be notified
-        def notified_users
-          if involved_roles_ids.present?
-            all_notified_users & involved_users
-          else
-            all_notified_users
+        unless instance_methods.include?(:notified_users_with_limited_visibility)
+          def notified_users_with_limited_visibility
+            if involved_roles_ids.present?
+              notified_users_without_limited_visibility & involved_users
+            else
+              notified_users_without_limited_visibility
+            end
           end
+          alias_method_chain :notified_users, :limited_visibility
         end
 
         def involved_users

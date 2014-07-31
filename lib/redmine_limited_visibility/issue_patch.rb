@@ -29,9 +29,7 @@ module RedmineLimitedVisibility
                         .uniq
           else
             members = Member.joins(:member_roles).where("#{Member.table_name}.project_id = ? AND #{MemberRole.table_name}.role_id IN (?)", project_id, involved_roles_ids)
-            members.each do |m|
-              users << m.user
-            end
+            users << members.map(&:user)
           end
           return users
         end

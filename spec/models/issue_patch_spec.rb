@@ -1,11 +1,10 @@
 require_relative '../spec_helper'
 
 describe RedmineLimitedVisibility::IssuePatch do
+
+  fixtures :users, :roles, :projects, :members, :member_roles, :issues, :issue_statuses, :trackers, :enumerations, :custom_fields, :enabled_modules
   if Redmine::Plugin.installed?(:redmine_organizations)
-    fixtures :organizations, :organization_memberships, :organization_involvements, :organization_roles,
-             :users, :roles, :projects, :members, :member_roles, :issues, :issue_statuses, :trackers, :enumerations, :custom_fields, :enabled_modules
-  else
-    fixtures :users, :roles, :projects, :members, :member_roles, :issues, :issue_statuses, :trackers, :enumerations, :custom_fields, :enabled_modules
+    fixtures :organizations, :organization_memberships, :organization_involvements, :organization_roles
   end
 
   let(:issue) { Issue.new }

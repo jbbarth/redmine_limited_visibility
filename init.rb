@@ -6,7 +6,7 @@ Redmine::Plugin.register :redmine_limited_visibility do
   version '0.0.1'
   url 'https://github.com/jbbarth/redmine_limited_visibility'
   author_url 'jeanbaptiste.barth@gmail.com'
-  requires_redmine_plugin :redmine_base_rspec, :version_or_higher => '0.0.1'
+  requires_redmine_plugin :redmine_base_rspec, :version_or_higher => '0.0.1' if Rails.env.test?
 end
 
 # Little hack for using the 'deface' gem in redmine:

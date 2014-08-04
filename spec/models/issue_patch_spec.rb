@@ -9,10 +9,10 @@ describe RedmineLimitedVisibility::IssuePatch do
 
   let(:issue) { Issue.new }
   let(:issue_4) { Issue.find(4) }
+  let(:contractor_role) { find_or_create(:role, name: "Contractors", limit_visibility: true) }
+  let(:project_office_role) { find_or_create(:role, name: "Project Office", limit_visibility: true) }
   let(:issue_with_authorized_viewers) { issue_4.update_attributes!(:authorized_viewers => "|#{contractor_role.id}|"); issue_4 }
   let(:issue_without_authorized_viewers) { issue_4.update_attributes!(:authorized_viewers => "||"); issue_4 }
-  let(:project_office_role) { find_or_create(:role, name: "Contractors", limit_visibility: true) }
-  let(:contractor_role) { find_or_create(:role, name: "Project Office", limit_visibility: true) }
 
   describe "#authorized_viewers" do
     it "has a authorized_viewers column" do
@@ -35,14 +35,19 @@ describe RedmineLimitedVisibility::IssuePatch do
         orga = Organization.find(1)
         membership = orga.memberships.where(project_id: issue.project_id).first
         membership.roles << contractor_role
+        membership.save!
       else
-        members = Member.where(user_id: 2, project_id: issue.project_id)
-        MemberRole.create(member_id: members.first.id, role_id: contractor_role.id) if members && contractor_role
+        member = Member.where(user_id: 2, project_id: issue.project_id).first
+        unless member
+          member = Member.new(user_id: 2, project_id: issue.project_id)
+        end
+        member.roles << contractor_role
+        member.save!
       end
 
       notified = issue.notified_users
       notified.should_not be_nil
-      notified.size.should eq 1
+      notified.size.should > 0
       notified.should_not include User.anonymous
       notified.should include User.find(2) # member with right role
       notified.should_not include User.find(3) # not a member of the project
@@ -57,6 +62,7 @@ describe RedmineLimitedVisibility::IssuePatch do
         orga = Organization.find(1)
         membership = orga.memberships.where(project_id: issue.project_id).first
         membership.roles << not_involved_role
+        membership.save!
       else
         member = Member.where(user_id: 2, project_id: issue.project_id).first
         MemberRole.create(member_id: member.id, role_id: not_involved_role.id)

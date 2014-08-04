@@ -20,18 +20,8 @@ module RedmineLimitedVisibility
         end
 
         def involved_users
-          users = []
-          if Redmine::Plugin.installed?(:redmine_organizations)
-            users = User.joins(:organization_involvements)
-                        .joins('LEFT OUTER JOIN organization_memberships ON organization_memberships.id = organization_involvements.organization_membership_id')
-                        .joins('LEFT OUTER JOIN organization_roles ON organization_roles.organization_membership_id = organization_memberships.id')
-                        .where("#{OrganizationMembership.table_name}.project_id = ? AND #{OrganizationRole.table_name}.role_id IN (?)", project_id, involved_roles_ids)
-                        .uniq
-          else
-            members = Member.joins(:member_roles).where("#{Member.table_name}.project_id = ? AND #{MemberRole.table_name}.role_id IN (?)", project_id, involved_roles_ids)
-            users << members.map(&:user)
-          end
-          return users
+          members = Member.joins(:member_roles).where("#{Member.table_name}.project_id = ? AND #{MemberRole.table_name}.role_id IN (?)", project_id, involved_roles_ids)
+          members.map(&:user)
         end
 
         def involved_roles_ids

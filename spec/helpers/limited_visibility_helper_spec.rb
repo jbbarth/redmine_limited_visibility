@@ -3,9 +3,6 @@ require_relative '../spec_helper'
 describe LimitedVisibilityHelper do
 
   fixtures :users, :roles, :projects, :members, :member_roles, :enabled_modules
-  if Redmine::Plugin.installed?(:redmine_organizations)
-    fixtures :organizations
-  end
 
   describe 'visibility_roles_for_current_user' do
 

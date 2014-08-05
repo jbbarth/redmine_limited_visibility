@@ -36,7 +36,7 @@ class IssueQuery < Query
       end.join(" OR ")
     end.join(" OR ")
     # potentially very long query #TODO Find a way to optimize it
-    sql = "(#{sql.present? ? '(' + sql + ') OR ' : ''} #{Issue.table_name}.#{field} IS NULL OR #{Issue.table_name}.#{field} = '||' OR #{Issue.table_name}.#{field} = '' OR #{Issue.table_name}.assigned_to_id = #{User.current.id} OR #{Issue.table_name}.author_id = #{User.current.id})"
+    "(#{sql.present? ? '(' + sql + ') OR ' : ''} #{Issue.table_name}.#{field} IS NULL OR #{Issue.table_name}.#{field} = '||' OR #{Issue.table_name}.#{field} = '' OR #{Issue.table_name}.assigned_to_id = #{User.current.id} OR #{Issue.table_name}.author_id = #{User.current.id})"
   end
 
   # use standard method to validate filters form,

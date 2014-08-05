@@ -4,8 +4,8 @@ describe VisibilitiesController do
 
   fixtures :roles, :members, :member_roles
 
-  let(:project_office_role) { find_or_create(:role, name: "Contractors", limit_visibility: true) }
-  let(:contractor_role) { find_or_create(:role, name: "Project Office", limit_visibility: true) }
+  let(:contractor_role) { find_or_create(:role, name: "Contractors", limit_visibility: true) }
+  let(:project_office_role) { find_or_create(:role, name: "Project Office", limit_visibility: true) }
 
   describe "update_visibility_roles" do
     it "should update 'visibility' roles and do NOT modify 'standard' roles" do

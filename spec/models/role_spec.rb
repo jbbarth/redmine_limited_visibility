@@ -1,15 +1,12 @@
 require_relative '../spec_helper'
 
 describe Role do
-  before(:all) do
-    find_or_create(:role, name: "Contractors", limit_visibility: true)
-    find_or_create(:role, name: "Project Office", limit_visibility: true)
-  end
-
   it 'can return all visibility roles' do
+    contractor_role = find_or_create(:role, name: "Contractors", limit_visibility: true)
+    find_or_create(:role, name: "Project Office", limit_visibility: true)
     roles = Role.visibility_roles.all
     roles.size.should be >= 2
-    roles.find { |role| role.name == 'Contractors' }.should_not be_nil
+    roles.find { |role| role.name == contractor_role.name }.should_not be_nil
     roles.find { |role| role.limit_visibility == false }.should be_nil
   end
 

@@ -8,7 +8,12 @@ describe IssuesController do
 
   before do
     @request.session[:user_id] = 1
-    populate_membership
+    User.current = User.find(1)
+    @project = Project.first
+    @membership = Member.new(user_id: User.current.id, project_id: @project.id)
+    @membership.roles << contractor_role
+    @membership.save!
+    User.current.member_of?(@project).should be true
   end
 
   it 'adds an "authorized viewers filter" to existing requests' do

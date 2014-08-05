@@ -1,4 +1,11 @@
 <script>
+  function disable_role_which_cant_be_removed() {
+    if ($('#involved-roles .role.involved.mine').length !== 1) {
+      $('#involved-roles .role.mine').removeClass('disabled');
+    } else {
+      $('#involved-roles .role.involved.mine').addClass('disabled');
+    }
+  }
   $(function() {
     $('.role').on('click', function() {
       if (!$(this).hasClass('disabled')){
@@ -11,11 +18,7 @@
         $('#issue_authorized_viewers').val('|' + authorized.join('|') + '|');
 
         // Update disable class TODO this behaviour should be double-checked
-        if($('#involved-roles .role.involved.mine').length!==1){
-          $('#involved-roles .role.mine').removeClass('disabled');
-        }else{
-          $('#involved-roles .role.involved.mine').addClass('disabled');
-        }
+        disable_role_which_cant_be_removed();
       }
     })
   });
@@ -27,7 +30,7 @@
       role_is_involved = viewers.split('|').include?(role.id.to_s) if viewers
       current_user_visibility_roles ||= []
       role_is_mine = current_user_visibility_roles.include?(role)
-      role_is_disabled = @role==role || (role_is_mine && viewers.split('|').reject!(&:blank?).try(:size)==1 && role_is_involved)
+      role_is_disabled = @role==role || (role_is_mine && role_is_involved && (viewers.split('|').select{ |r| current_user_visibility_roles.include?(Role.find(r))}.try(:size)==1)) #disable role if it's the only one currently selected (it can only be removed after selecting another one)
     %>
     <span class="role <%= role_is_disabled ? "involved disabled" : (role_is_involved ? 'involved' : '') %> <%= role_is_mine ? 'mine' : '' %>" data-filter="<%= role.id %>">
       <span class=status-icon><i class=fa-icon-ok></i><i class=fa-icon-remove></i></span>

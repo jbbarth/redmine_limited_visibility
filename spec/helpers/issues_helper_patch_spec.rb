@@ -10,7 +10,12 @@ describe IssuesHelper do
 
   describe 'show_detail' do
 
+    it 'should display new role with html if old_value is just "||"' do
+      show_detail(detail_add, false).should include "<strong>Involved members</strong> set to <i>#{contractor_role.name}</i>"
+    end
+
     it 'should display new role with html' do
+      detail_add.stub(:old_value).and_return("||")
       show_detail(detail_add, false).should include "<strong>Involved members</strong> set to <i>#{contractor_role.name}</i>"
     end
 

@@ -20,7 +20,8 @@ module IssuesHelper
         end
 
         if detail.value.present?
-          if detail.old_value.present?
+          # authorized_viewers == "||" is considered as blank (= no roles authorized)
+          if detail.old_value.present? && detail.old_value != "||"
             l(:text_journal_changed, label: label, old: old_value, new: value).html_safe
           else
             l(:text_journal_set_to, label: label, value: value).html_safe

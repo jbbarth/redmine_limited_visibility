@@ -2,7 +2,7 @@ require_relative '../spec_helper'
 
 describe VisibilitiesController do
 
-  fixtures :roles, :members, :member_roles
+  fixtures :projects, :roles, :members, :member_roles
 
   let(:contractor_role) { find_or_create(:role, name: "Contractors", limit_visibility: true) }
   let(:project_office_role) { find_or_create(:role, name: "Project Office", limit_visibility: true) }

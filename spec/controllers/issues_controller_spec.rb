@@ -2,6 +2,7 @@ require_relative '../spec_helper'
 require 'redmine_limited_visibility/queries_helper_patch'
 
 describe IssuesController do
+  fixtures :users, :roles, :projects, :members, :member_roles, :issues, :issue_statuses, :trackers, :enumerations, :custom_fields, :enabled_modules
 
   let(:contractor_role) { find_or_create(:role, name: "Contractors", limit_visibility: true) }
   let(:project_office_role) { find_or_create(:role, name: "Project Office", limit_visibility: true) }

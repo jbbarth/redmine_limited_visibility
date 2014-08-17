@@ -71,4 +71,6 @@ $(function() {
       disable_role_which_cant_be_removed();
     }
   })
+  //disable eventual last remaining role
+  disable_role_which_cant_be_removed()
 })

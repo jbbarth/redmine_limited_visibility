@@ -24,6 +24,10 @@ describe LimitedVisibilityHelper do
       visibility_roles_for_current_user(@project).should_not include project_office_role
     end
 
+    it "should return an empty array if current user doesn't have any membership on current project" do
+      User.current = User.find(6) #not member of @project
+      visibility_roles_for_current_user(@project).should == []
+    end
   end
 
   describe "#role_ids_for_current_viewers" do

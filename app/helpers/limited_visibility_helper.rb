@@ -21,8 +21,10 @@ module LimitedVisibilityHelper
   end
 
   def visibility_roles_for_current_user(project)
-    member = Member.find_by_user_id_and_project_id(User.current.id, project.id)
-    roles = member.roles.visibility_roles.all if member.present?
-    roles
+    if member = Member.find_by_user_id_and_project_id(User.current.id, project.id)
+      member.roles.visibility_roles.all
+    else
+      []
+    end
   end
 end

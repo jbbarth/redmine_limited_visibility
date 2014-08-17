@@ -8,7 +8,9 @@ class VisibilitiesController < ApplicationController
     member.role_ids = ((member.role_ids - Role.visibility_roles.pluck(:id)) + params[:membership][:role_ids]) if params[:membership]
     saved = member.save
     respond_to do |format|
-      format.html { redirect_to_settings_in_projects }
+      format.html do
+        redirect_to settings_project_path(@project, :tab => 'visibility')
+      end
       format.js
       format.api do
         if saved
@@ -43,9 +45,4 @@ class VisibilitiesController < ApplicationController
     @project = membership.project
     render 'organization_memberships/update_roles'
   end
-
-  private
-    def redirect_to_settings_in_projects
-      redirect_to settings_project_path(@project, :tab => 'visibility')
-    end
 end

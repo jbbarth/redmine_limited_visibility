@@ -47,10 +47,10 @@ $(function() {
 
 //disable last role so user cannot cut visibility to himself
 function disable_role_which_cant_be_removed() {
-  if ($('#involved-roles .role.involved.mine').length !== 1) {
-    $('#involved-roles .role.mine').removeClass('disabled');
+  if ($('#involved-roles-form .role.involved.mine').length !== 1) {
+    $('#involved-roles-form .role.mine').removeClass('disabled');
   } else {
-    $('#involved-roles .role.involved.mine').addClass('disabled');
+    $('#involved-roles-form .role.involved.mine').addClass('disabled');
   }
 }
 
@@ -58,11 +58,11 @@ function disable_role_which_cant_be_removed() {
 //the "#authorized_viewers" hidden field => |1|4|5|...
 $(function() {
   //bubble up to 'p#involve-roles' to avoid perf issues (not measured, but let's be careful)
-  $('#involved-roles').on('click', '.role', function() {
+  $('#involved-roles-form').on('click', '.role', function() {
     if (!$(this).hasClass('disabled')){
       $(this).toggleClass('involved');
       var authorized = [];
-      $('#involved-roles .role.involved').each(function() {
+      $('#involved-roles-form .role.involved').each(function() {
         authorized.push($(this).data('role-id'))
       });
       $('#authorized_viewers').val('|' + authorized.join('|') + '|');

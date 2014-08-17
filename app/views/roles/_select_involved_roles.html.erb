@@ -1,4 +1,4 @@
-<p id=involved-roles class=involved-roles>
+<p id=involved-roles-form class=involved-roles>
   <label><%= l(:label_involved_members) %></label>
   <% Role.visibility_roles.sorted.each do |role|
       role_is_involved = viewers.include?(role.id)

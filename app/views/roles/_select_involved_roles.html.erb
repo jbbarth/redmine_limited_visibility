@@ -3,7 +3,7 @@
   <% Role.visibility_roles.sorted.each do |role|
       role_is_involved = viewers.include?(role.id)
       role_is_mine = current_user_visibility_roles.include?(role)
-      role_is_disabled = @role==role || (role_is_mine && role_is_involved && (viewers.select{ |r| current_user_visibility_roles.include?(Role.find(r))}.try(:size)==1)) #disable role if it's the only one currently selected (it can only be removed after selecting another one)
+      role_is_disabled = @role==role || (role_is_mine && role_is_involved && (viewers.select{ |r| current_user_visibility_roles.map(&:id).include?(r)}.try(:size)==1)) #disable role if it's the only one currently selected (it can only be removed after selecting another one)
     %>
     <% styles = (role_is_disabled ? "involved disabled" : (role_is_involved ? 'involved' : '')) %>
     <% styles << (role_is_mine ? ' mine' : '') %>

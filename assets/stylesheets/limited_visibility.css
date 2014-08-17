@@ -10,7 +10,7 @@ td.visibility_roles{ width: 180px;}
     margin-top: 4px;
 }
 .involved-roles .info { margin-top:5px; }
-.involved-roles .role { background-color:#fdd; border: 1px solid #d3d3d3; border-radius:3px; padding:2px 5px 1px 4px; margin:1px 0 2px; cursor:pointer; display:inline-block; }
+.involved-roles .role { background-color:#fdd; border: 1px solid #d3d3d3; border-radius:3px; padding:2px 5px 1px 4px; margin:1px 0 2px; cursor:pointer; display:inline-block; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; }
 .involved-roles .role:hover { background-color:#ffe9e9; }
 .involved-roles .role.involved { background-color:#cfb; }
 .involved-roles .role.disabled { cursor:default; }

@@ -1,6 +1,6 @@
 <%= error_messages_for 'member' %>
 <% roles = Role.visibility_roles.all
-   members = @project.member_principals.includes(:principal).all.sort { |x,y| x.principal.lastname.downcase <=> y.principal.lastname.downcase } %>
+   members = @project.member_principals.sort_by{ |x| x.principal.lastname.downcase } %>
 
 <div>
   <% if members.any? %>

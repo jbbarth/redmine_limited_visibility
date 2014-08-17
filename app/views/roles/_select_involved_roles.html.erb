@@ -25,7 +25,7 @@
 </script>
 
 <p id=involved-roles class=involved-roles>
-  <label><%= l(:label_involved_members) %> : </label>
+  <label><%= l(:label_involved_members) %></label>
   <% Role.visibility_roles.sorted.each do |role|
       role_is_involved = viewers.include?(role.id)
       role_is_mine = current_user_visibility_roles.include?(role)

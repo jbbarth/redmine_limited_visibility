@@ -4,6 +4,7 @@
     <fieldset>
       <legend><%= l(:text_involvement_explanation) %></legend>
       <%= render "roles/select_involved_roles", viewers: @role.authorized_viewer_ids, current_user_visibility_roles: [] %>
+      <%= hidden_field_tag "role[authorized_viewers]", @role.authorized_viewers, :id => "authorized_viewers" %>
     </fieldset>
   </div>
 </div>

@@ -13,4 +13,6 @@
   })
 </script>
 
-<%= render "roles/select_involved_roles", viewers: role_ids_for_current_viewers(@issue), current_user_visibility_roles: visibility_roles_for_current_user(@issue.project) %>
+<% viewers = role_ids_for_current_viewers(@issue) %>
+<%= render "roles/select_involved_roles", viewers: viewers, current_user_visibility_roles: visibility_roles_for_current_user(@issue.project) %>
+<%= hidden_field_tag "issue[authorized_viewers]", "|#{viewers.join("|")}|", :id => "authorized_viewers" %>

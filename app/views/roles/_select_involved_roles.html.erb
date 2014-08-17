@@ -14,8 +14,7 @@
         $('#involved-roles .role.involved').each(function() {
           authorized.push($(this).data('role-id'))
         });
-        $('#role_authorized_viewers').val('|' + authorized.join('|') + '|');
-        $('#issue_authorized_viewers').val('|' + authorized.join('|') + '|');
+        $('#authorized_viewers').val('|' + authorized.join('|') + '|');
 
         // Update disable class TODO this behaviour should be double-checked
         disable_role_which_cant_be_removed();
@@ -36,6 +35,3 @@
     <%= render "roles/visibility_role", :role => role, :styles => styles %>
   <% end %>
 </p>
-
-<%= hidden_field_tag "role[authorized_viewers]", "|#{viewers.join("|")}|" %>
-<%= hidden_field_tag "issue[authorized_viewers]", "|#{viewers.join("|")}|" %>

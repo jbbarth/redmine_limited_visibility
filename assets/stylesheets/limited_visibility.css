@@ -21,7 +21,8 @@ td.visibility_roles{ width: 180px;}
 .involved-roles .role .fa-icon-ok { color:#080; }
 .involved-roles .role.involved .fa-icon-remove { display:none; }
 .involved-roles .role .fa-icon-remove { color:#800; }
-.involved-roles .role .fa-icon-lock { color:#080; }
+.involved-roles .role .fa-icon-lock { color:#080; display:none; /* hide icon when not in a form */ }
+form .involved-roles .role .fa-icon-lock { display:inline; }
 .involved-roles .role:not(.disabled) .fa-icon-lock { display:none; }
 
 /* my page */

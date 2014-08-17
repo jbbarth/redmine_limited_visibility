@@ -31,11 +31,9 @@
       role_is_mine = current_user_visibility_roles.include?(role)
       role_is_disabled = @role==role || (role_is_mine && role_is_involved && (viewers.select{ |r| current_user_visibility_roles.include?(Role.find(r))}.try(:size)==1)) #disable role if it's the only one currently selected (it can only be removed after selecting another one)
     %>
-    <span class="role <%= role_is_disabled ? "involved disabled" : (role_is_involved ? 'involved' : '') %> <%= role_is_mine ? 'mine' : '' %>" data-role-id="<%= role.id %>">
-      <span class=status-icon><i class=fa-icon-ok></i><i class=fa-icon-remove></i></span>
-      <%= role.name %>
-      <i class=fa-icon-lock></i>
-    </span>
+    <% styles = (role_is_disabled ? "involved disabled" : (role_is_involved ? 'involved' : '')) %>
+    <% styles << (role_is_mine ? ' mine' : '') %>
+    <%= render "roles/visibility_role", :role => role, :styles => styles %>
   <% end %>
 </p>
 

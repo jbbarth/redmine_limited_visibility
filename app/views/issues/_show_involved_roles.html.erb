@@ -5,10 +5,8 @@
   <label id="label_involved_roles"><%= l("field_authorized_viewers") %></label>
   <span id="list_of_involved_roles_per_issue">
   <% Role.visibility_roles.all.each do |role| %>
-    <span class="role disabled <%= (viewers.include?(role.id) || @issue.authorized_viewers.blank?) ? 'involved' : '' %>" >
-      <span class=status-icon><i class=fa-icon-ok></i><i class=fa-icon-remove></i></span>
-      <%= role.name %>
-    </span>
+    <% styles = "disabled" + (viewers.include?(role.id) || @issue.authorized_viewers.blank? ? " involved" : "") %>
+    <%= render "roles/visibility_role", :role => role, :styles => styles %>
   <% end %>
   </span>
 </div>

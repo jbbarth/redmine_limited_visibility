@@ -45,6 +45,10 @@ class Role
   scope :visibility_roles, where(limit_visibility: true)  # Find all roles used to limit the visibility of issues
   scope :permission_roles, where("limit_visibility = ? OR limit_visibility IS NULL", false)
 
+  def authorized_viewer_ids
+    "#{authorized_viewers}".split("|").reject(&:blank?).map(&:to_i)
+  end
+
   private
     def set_own_visibility
       reload

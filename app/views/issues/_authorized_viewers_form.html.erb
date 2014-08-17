@@ -13,4 +13,4 @@
   })
 </script>
 
-<%= render "roles/select_involved_roles", viewers: (role_ids_for_current_viewers(@issue).join('|') + '|'), current_user_visibility_roles: visibility_roles_for_current_user(@issue.project) %>
+<%= render "roles/select_involved_roles", viewers: role_ids_for_current_viewers(@issue), current_user_visibility_roles: visibility_roles_for_current_user(@issue.project) %>

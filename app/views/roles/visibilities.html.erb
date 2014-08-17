@@ -22,7 +22,7 @@
     </td>
     <% @roles.each do |column| %>
       <td>
-        <%= check_box_tag "visibilities[#{role.id}][]", column.id, (role.authorized_viewers.include?("|#{column.id}|")), :id => nil, :class => "role-#{role.id}", disabled: role==column %>
+        <%= check_box_tag "visibilities[#{role.id}][]", column.id, (role.authorized_viewer_ids.include?(column.id)), :id => nil, :class => "role-#{role.id}", disabled: role==column %>
       </td>
     <% end %>
   </tr>

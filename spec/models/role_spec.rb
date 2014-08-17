@@ -14,4 +14,16 @@ describe Role do
     role = Role.create(name: "New role", limit_visibility: true, authorized_viewers: "")
     expect(role.authorized_viewers).to include role.id.to_s
   end
+
+  describe "#authorized_viewer_ids" do
+    it "returns authorized viewer role ids as an array of integers" do
+      role = stub_model(Role, :authorized_viewers => "|3|45|")
+      role.authorized_viewer_ids.should == [3,45]
+    end
+
+    it "doesn't break if column is blank" do
+      role = stub_model(Role, :authorized_viewers => nil)
+      role.authorized_viewer_ids.should == []
+    end
+  end
 end

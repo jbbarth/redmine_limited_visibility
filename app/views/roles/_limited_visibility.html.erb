@@ -3,7 +3,7 @@
   <div class="box tabular" id="limited_visibility">
     <fieldset>
       <legend><%= l(:text_involvement_explanation) %></legend>
-      <%= render "roles/select_involved_roles", viewers: @role.authorized_viewers %>
+      <%= render "roles/select_involved_roles", viewers: @role.authorized_viewer_ids %>
     </fieldset>
   </div>
 </div>

@@ -27,10 +27,10 @@
 <p id=involved-roles class=involved-roles>
   <label><%= l(:label_involved_members) %> : </label>
   <% Role.visibility_roles.sorted.each do |role|
-      role_is_involved = viewers.split('|').include?(role.id.to_s) if viewers
+      role_is_involved = viewers.include?(role.id) if viewers
       current_user_visibility_roles ||= []
       role_is_mine = current_user_visibility_roles.include?(role)
-      role_is_disabled = @role==role || (role_is_mine && role_is_involved && (viewers.split('|').select{ |r| current_user_visibility_roles.include?(Role.find(r))}.try(:size)==1)) #disable role if it's the only one currently selected (it can only be removed after selecting another one)
+      role_is_disabled = @role==role || (role_is_mine && role_is_involved && (viewers.select{ |r| current_user_visibility_roles.include?(Role.find(r))}.try(:size)==1)) #disable role if it's the only one currently selected (it can only be removed after selecting another one)
     %>
     <span class="role <%= role_is_disabled ? "involved disabled" : (role_is_involved ? 'involved' : '') %> <%= role_is_mine ? 'mine' : '' %>" data-filter="<%= role.id %>">
       <span class=status-icon><i class=fa-icon-ok></i><i class=fa-icon-remove></i></span>
@@ -40,5 +40,5 @@
   <% end %>
 </p>
 
-<%= hidden_field_tag "role[authorized_viewers]", "#{viewers}" %>
-<%= hidden_field_tag "issue[authorized_viewers]", "#{viewers}" %>
+<%= hidden_field_tag "role[authorized_viewers]", "|#{viewers.join("|")}|" %>
+<%= hidden_field_tag "issue[authorized_viewers]", "|#{viewers.join("|")}|" %>

@@ -22,7 +22,7 @@ module LimitedVisibilityHelper
 
   def visibility_roles_for_current_user(project)
     if member = Member.find_by_user_id_and_project_id(User.current.id, project.id)
-      member.roles.visibility_roles.all
+      member.roles.visibility_roles
     else
       []
     end

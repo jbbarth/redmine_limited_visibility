@@ -44,3 +44,31 @@ $(function() {
     showAndScrollTo("update", "issue_notes")
   })
 });
+
+//disable last role so user cannot cut visibility to himself
+function disable_role_which_cant_be_removed() {
+  if ($('#involved-roles .role.involved.mine').length !== 1) {
+    $('#involved-roles .role.mine').removeClass('disabled');
+  } else {
+    $('#involved-roles .role.involved.mine').addClass('disabled');
+  }
+}
+
+//add a mirroring between selected visibility roles and
+//the "#authorized_viewers" hidden field => |1|4|5|...
+$(function() {
+  //bubble up to 'p#involve-roles' to avoid perf issues (not measured, but let's be careful)
+  $('#involved-roles').on('click', '.role', function() {
+    if (!$(this).hasClass('disabled')){
+      $(this).toggleClass('involved');
+      var authorized = [];
+      $('#involved-roles .role.involved').each(function() {
+        authorized.push($(this).data('role-id'))
+      });
+      $('#authorized_viewers').val('|' + authorized.join('|') + '|');
+
+      // Update disable class
+      disable_role_which_cant_be_removed();
+    }
+  })
+})

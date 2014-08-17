@@ -1,28 +1,3 @@
-<script>
-  function disable_role_which_cant_be_removed() {
-    if ($('#involved-roles .role.involved.mine').length !== 1) {
-      $('#involved-roles .role.mine').removeClass('disabled');
-    } else {
-      $('#involved-roles .role.involved.mine').addClass('disabled');
-    }
-  }
-  $(function() {
-    $('.role').on('click', function() {
-      if (!$(this).hasClass('disabled')){
-        $(this).toggleClass('involved');
-        var authorized = [];
-        $('#involved-roles .role.involved').each(function() {
-          authorized.push($(this).data('role-id'))
-        });
-        $('#authorized_viewers').val('|' + authorized.join('|') + '|');
-
-        // Update disable class TODO this behaviour should be double-checked
-        disable_role_which_cant_be_removed();
-      }
-    })
-  });
-</script>
-
 <p id=involved-roles class=involved-roles>
   <label><%= l(:label_involved_members) %></label>
   <% Role.visibility_roles.sorted.each do |role|

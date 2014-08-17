@@ -47,10 +47,15 @@ $(function() {
 
 //disable last role so user cannot cut visibility to himself
 function disable_role_which_cant_be_removed() {
+  //disable last remaining role
   if ($('#involved-roles-form .role.involved.mine').length !== 1) {
     $('#involved-roles-form .role.mine').removeClass('disabled');
   } else {
     $('#involved-roles-form .role.involved.mine').addClass('disabled');
+  }
+  //disable current role if any
+  if ($('#current-role').length == 1) {
+    $('[data-role-id='+$('#current-role').val()+']').addClass('disabled')
   }
 }
 

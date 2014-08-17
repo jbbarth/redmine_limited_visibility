@@ -3,9 +3,8 @@
   <% Role.visibility_roles.sorted.each do |role|
       role_is_involved = viewers.include?(role.id)
       role_is_mine = current_user_visibility_roles.include?(role)
-      role_is_disabled = @role==role
     %>
-    <% styles = (role_is_disabled ? "involved disabled" : (role_is_involved ? 'involved' : '')) %>
+    <% styles = role_is_involved ? 'involved' : '' %>
     <% styles << (role_is_mine ? ' mine' : '') %>
     <%= render "roles/visibility_role", :role => role, :styles => styles %>
   <% end %>

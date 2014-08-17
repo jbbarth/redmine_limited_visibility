@@ -12,12 +12,12 @@ module LimitedVisibilityHelper
       end
     else # update existing issue
       if issue && issue.authorized_viewers.present?
-        viewers = issue.authorized_viewers.split('|').delete_if(&:blank?)
+        viewers = issue.authorized_viewers.split('|')
       else
         viewers = Role.visibility_roles.pluck(:id)
       end
     end
-    viewers
+    viewers.reject(&:blank?).map(&:to_i)
   end
 
   def visibility_roles_for_current_user(project)

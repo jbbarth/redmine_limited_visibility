@@ -32,13 +32,13 @@ describe LimitedVisibilityHelper do
 
       it "returns all visibility roles if current user cannot see anything" do
         allow(self).to receive(:visibility_roles_for_current_user).and_return([])
-        role_ids_for_current_viewers(issue).should == [contractor_role.id, project_office_role.id]
+        role_ids_for_current_viewers(issue).should == [6,7]
       end
 
       it "returns visibility roles for current user if any" do
         dummy_role = stub_model(Role, :authorized_viewers => "|88|")
         allow(self).to receive(:visibility_roles_for_current_user).and_return([dummy_role])
-        role_ids_for_current_viewers(issue).should == ["", "88"]
+        role_ids_for_current_viewers(issue).should == [88]
       end
     end
 
@@ -47,7 +47,7 @@ describe LimitedVisibilityHelper do
 
       it "returns authorized viewers if any" do
         allow(issue).to receive(:authorized_viewers).and_return("|9|")
-        role_ids_for_current_viewers(issue).should == ["9"]
+        role_ids_for_current_viewers(issue).should == [9]
       end
 
       it "returns all visibility roles if none" do

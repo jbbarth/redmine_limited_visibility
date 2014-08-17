@@ -21,10 +21,6 @@ module LimitedVisibilityHelper
   end
 
   def visibility_roles_for_current_user(project)
-    if member = Member.where(:user_id => User.current.id, :project_id => project.id).first
-      member.roles.visibility_roles
-    else
-      []
-    end
+    Role.visibility_roles.joins(:members).where(:members => { :user_id => User.current.id, :project_id => @project.id })
   end
 end

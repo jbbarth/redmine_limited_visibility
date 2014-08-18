@@ -46,5 +46,18 @@ describe IssuesHelper do
       roles.map(&:class).uniq.should == [Role]
       roles.map(&:id).should == [1,2,3]
     end
+
+    it "returns an empty array if no authorized_viewer given" do
+      roles_from_authorized_viewers("").should == []
+      roles_from_authorized_viewers(nil).should == []
+    end
+
+    it "doesn't break if role doesn't exist anymore" do
+      roles_from_authorized_viewers("99999").should == []
+    end
+
+    it "doesn't break if data is completely invalid" do
+      roles_from_authorized_viewers("   |foo|bar=1||").should == []
+    end
   end
 end

@@ -39,6 +39,6 @@ module IssuesHelper
   end
 
   def roles_from_authorized_viewers(authorized_viewers)
-    Role.find(authorized_viewers.split('|').delete_if(&:blank?)) if authorized_viewers
+    Role.where(:id => "#{authorized_viewers}".split("|"))
   end
 end

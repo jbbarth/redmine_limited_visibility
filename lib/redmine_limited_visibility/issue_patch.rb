@@ -20,8 +20,9 @@ module RedmineLimitedVisibility
         end
 
         def involved_users
-          members = Member.joins(:member_roles).where("#{Member.table_name}.project_id = ? AND #{MemberRole.table_name}.role_id IN (?)", project_id, authorized_viewer_ids)
-          members.map(&:user)
+          User.joins(:members => :member_roles)
+              .where(:members => { :project_id => project_id },
+                     :member_roles => { :role_id => authorized_viewer_ids })
         end
 
         def authorized_viewer_ids

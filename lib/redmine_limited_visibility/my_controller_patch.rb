@@ -7,6 +7,6 @@ class MyController < ApplicationController
   def page
     @user = User.current
     @blocks = @user.pref[:my_page_layout] || DEFAULT_LAYOUT
-    @visibility_condition = IssueQuery.new.sql_conditions_for_roles_per_projects('authorized_viewers') unless params[:limited_visibility].present? && params[:limited_visibility] == 'false'
+    @visibility_condition = IssueQuery.new.sql_conditions_for_roles_per_projects('authorized_viewers') unless params[:limited_visibility] == 'false'
   end
 end

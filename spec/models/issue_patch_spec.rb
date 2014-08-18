@@ -84,17 +84,17 @@ describe RedmineLimitedVisibility::IssuePatch do
 
     it "transforms the #authorized_viewers string into an array of ids" do
       allow(issue).to receive(:authorized_viewers).and_return("|3|5|99|")
-      issue.authorized_viewer_ids.should == ["3","5","99"]
+      issue.authorized_viewer_ids.should == [3, 5, 99]
     end
 
     it "returns nil if #authorized_viewers is nil" do
       allow(issue).to receive(:authorized_viewers).and_return(nil)
-      issue.authorized_viewer_ids.should == nil
+      issue.authorized_viewer_ids.should == []
     end
 
     it "removes blank values from the return value" do
       allow(issue).to receive(:authorized_viewers).and_return("||1| |")
-      issue.authorized_viewer_ids.should == ["1"]
+      issue.authorized_viewer_ids.should == [1]
     end
   end
 end

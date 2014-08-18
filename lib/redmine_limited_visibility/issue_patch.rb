@@ -25,9 +25,8 @@ module RedmineLimitedVisibility
         end
 
         def authorized_viewer_ids
-          authorized_viewers.split('|').delete_if(&:blank?) if authorized_viewers
+          "#{authorized_viewers}".split('|').reject(&:blank?).map(&:to_i)
         end
-
       end
     end
   end

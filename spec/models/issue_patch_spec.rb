@@ -74,4 +74,27 @@ describe RedmineLimitedVisibility::IssuePatch do
       notified.should_not include User.find(8) # member of project 2 but mail_notification = false
     end
   end
+
+  describe "#involved_users" do
+    it "should be tested"
+  end
+
+  describe "#authorized_viewer_ids" do
+    let(:issue) { stub_model(Issue) }
+
+    it "transforms the #authorized_viewers string into an array of ids" do
+      allow(issue).to receive(:authorized_viewers).and_return("|3|5|99|")
+      issue.authorized_viewer_ids.should == ["3","5","99"]
+    end
+
+    it "returns nil if #authorized_viewers is nil" do
+      allow(issue).to receive(:authorized_viewers).and_return(nil)
+      issue.authorized_viewer_ids.should == nil
+    end
+
+    it "removes blank values from the return value" do
+      allow(issue).to receive(:authorized_viewers).and_return("||1| |")
+      issue.authorized_viewer_ids.should == ["1"]
+    end
+  end
 end

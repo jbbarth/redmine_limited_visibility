@@ -41,6 +41,10 @@ describe IssuesHelper do
   end
 
   describe "roles_from_authorized_viewers" do
-
+    it "returns a list of roles from an authorized_viewers string" do
+      roles = roles_from_authorized_viewers("|1|2|3|")
+      roles.map(&:class).uniq.should == [Role]
+      roles.map(&:id).should == [1,2,3]
+    end
   end
 end

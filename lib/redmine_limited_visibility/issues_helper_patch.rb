@@ -9,8 +9,8 @@ module IssuesHelper
       if detail.property == 'attr' && detail.prop_key == 'authorized_viewers'
 
         label = l(:field_authorized_viewers)
-        value = roles_from_authorized_viewers(detail.value).join(", ") if detail.value.present?
-        old_value = roles_from_authorized_viewers(detail.old_value).join(", ") if detail.old_value.present?
+        value = roles_from_authorized_viewers(detail.value).join(", ")
+        old_value = roles_from_authorized_viewers(detail.old_value).join(", ")
 
         unless no_html
           label = content_tag('strong', label)

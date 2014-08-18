@@ -6,7 +6,7 @@ module QueriesHelper
   unless instance_methods.include?(:column_value_with_limited_visibility)
     def column_value_with_limited_visibility(column, issue, value)
       if column.name == :authorized_viewers && value.class == String
-        involved_roles(value).join(", ")
+        roles_from_authorized_viewers(value).join(", ")
       else
         column_value_without_limited_visibility(column, issue, value)
       end

@@ -9,8 +9,8 @@ module IssuesHelper
       if detail.property == 'attr' && detail.prop_key == 'authorized_viewers'
 
         label = l(:field_authorized_viewers)
-        value = involved_roles(detail.value).join(", ") if detail.value.present?
-        old_value = involved_roles(detail.old_value).join(", ") if detail.old_value.present?
+        value = roles_from_authorized_viewers(detail.value).join(", ") if detail.value.present?
+        old_value = roles_from_authorized_viewers(detail.old_value).join(", ") if detail.old_value.present?
 
         unless no_html
           label = content_tag('strong', label)
@@ -38,7 +38,7 @@ module IssuesHelper
     alias_method_chain :show_detail, :limited_visibility
   end
 
-  def involved_roles(authorized_viewers)
+  def roles_from_authorized_viewers(authorized_viewers)
     Role.find(authorized_viewers.split('|').delete_if(&:blank?)) if authorized_viewers
   end
 end

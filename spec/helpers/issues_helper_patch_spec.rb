@@ -39,4 +39,8 @@ describe IssuesHelper do
       show_detail(detail_delete, true).should include "Involved members deleted (#{contractor_role.name})"
     end
   end
+
+  describe "roles_from_authorized_viewers" do
+
+  end
 end

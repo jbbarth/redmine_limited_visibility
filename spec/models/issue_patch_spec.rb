@@ -76,7 +76,18 @@ describe RedmineLimitedVisibility::IssuePatch do
   end
 
   describe "#involved_users" do
-    it "should be tested"
+    let(:issue) { stub_model(Issue) }
+    let(:project) { Project.find(1) }
+
+    it "returns users 'involved' in this issue, who have at least one role in the authorized_viewer_ids roles" do
+      #it doesn't make any sense functionnally but we don't care...
+      #at least we have predictable ids because we rely on core fixtures
+      allow(issue).to receive(:authorized_viewer_ids).and_return([1, 2, 3])
+      allow(issue).to receive(:project_id).and_return(1)
+      users = issue.involved_users
+      users.map(&:class).uniq.should == [User]
+      users.map(&:id).should == [2,3,5]
+    end
   end
 
   describe "#authorized_viewer_ids" do

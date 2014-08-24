@@ -17,10 +17,7 @@ end
 Rails.application.paths["app/overrides"] ||= []
 Rails.application.paths["app/overrides"] << File.expand_path("../app/overrides", __FILE__)
 
-# Add app/services directory to AS autoload paths
-ActiveSupport::Dependencies.autoload_paths << File.expand_path("../app/services", __FILE__)
-
-# Custom patches
+# Custom patches
 require_dependency 'redmine_limited_visibility/hooks'
 Rails.application.config.to_prepare do
   require_dependency 'redmine_limited_visibility/issue_patch'

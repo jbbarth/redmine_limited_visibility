@@ -21,8 +21,8 @@ Rails.application.paths["app/overrides"] << File.expand_path("../app/overrides",
 ActiveSupport::Dependencies.autoload_paths << File.expand_path("../app/services", __FILE__)
 
 # Custom patches
+require_dependency 'redmine_limited_visibility/hooks'
 Rails.application.config.to_prepare do
-  require_dependency 'redmine_limited_visibility/hooks'
   require_dependency 'redmine_limited_visibility/issue_patch'
   require_dependency 'redmine_limited_visibility/queries_helper_patch' unless Rails.env.test?
   require_dependency 'redmine_limited_visibility/issue_query_patch' unless Rails.env.test?

@@ -7,15 +7,8 @@ Redmine::Plugin.register :redmine_limited_visibility do
   url 'https://github.com/jbbarth/redmine_limited_visibility'
   author_url 'jeanbaptiste.barth@gmail.com'
   requires_redmine_plugin :redmine_base_rspec, :version_or_higher => '0.0.1' if Rails.env.test?
+  requires_redmine_plugin :redmine_base_deface, :version_or_higher => '0.0.1'
 end
-
-# Little hack for using the 'deface' gem in redmine:
-# - redmine plugins are not railties nor engines, so deface overrides in app/overrides/ are not detected automatically
-# - deface doesn't support direct loading anymore ; it unloads everything at boot so that reload in dev works
-# - hack consists in adding "app/overrides" path of the plugin in Redmine's main #paths
-# TODO: see if it's complicated to turn a plugin into a Railtie or find something a bit cleaner
-Rails.application.paths["app/overrides"] ||= []
-Rails.application.paths["app/overrides"] << File.expand_path("../app/overrides", __FILE__)
 
 # Custom patches
 require_dependency 'redmine_limited_visibility/hooks'

@@ -11,4 +11,8 @@ if Redmine::Plugin.installed?(:redmine_organizations)
                        :name          => 'add-roles-to-orga',
                        :replace       => 'span.role',
                        :partial       => 'projects/members_organization_roles'
+  Deface::Override.new :virtual_path  => 'projects/settings/_members_organization',
+                       :name          => 'refactor_list_of_roles_in_form',
+                       :replace       => 'span.roles_checkboxes',
+                       :partial       => 'projects/form_members_roles'
 end

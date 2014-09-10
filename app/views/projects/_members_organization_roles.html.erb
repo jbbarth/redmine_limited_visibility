@@ -3,7 +3,7 @@
     <% if o.roles_by_project(@project).permission_roles.all.any? %>
       <%= h o.roles_by_project(@project).permission_roles.pluck(:name).join(", ") %>
     <% else %>
-      <span class="see_everything"><%= l('see_everything') %></span>
+      <span class="see_everything">&nbsp;</span>
     <% end %>
   </span>
 </span>

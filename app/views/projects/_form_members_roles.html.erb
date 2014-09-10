@@ -1,0 +1,15 @@
+<span class='roles_checkboxes' style="float: left;">
+  <p>
+    <% Role.givable.permission_roles.sort_by(&:name).each do |role| %>
+      <label><%= check_box_tag 'membership[role_ids][]', role.id, selected_roles.include?(role) %> <%=h role %></label><br />
+    <% end %>
+  </p>
+</span>
+<span class='roles_checkboxes' style="float: left;">
+  <p>
+    <% Role.givable.visibility_roles.sort_by(&:name).each do |role| %>
+      <label><%= check_box_tag 'membership[role_ids][]', role.id, selected_roles.include?(role) %> <%=h role %></label><br />
+    <% end %>
+  </p>
+</span>
+<%= hidden_field_tag 'membership[role_ids][]', '' %>

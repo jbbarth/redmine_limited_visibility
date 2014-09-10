@@ -27,3 +27,7 @@ form .involved-roles .role .fa-icon-lock { display:inline; }
 
 /* my page */
 a.icon-roles  { background-image: url(../images/magnify.png); margin-right:6px; margin-left: 8px;}
+
+.organizations .role { width:170px; }
+.organizations .permission_roles { width:190px; }
+.organizations .visibility_roles { width:190px; }

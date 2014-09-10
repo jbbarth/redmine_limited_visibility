@@ -1,21 +1,9 @@
-<% roles = Role.visibility_roles.all %>
-
-<td class='visibility_roles'>
-  <span id="orga-<%= m.id %>-roles">
-    <% if m.roles.visibility_roles.all.any? %>
-      <%= h m.roles.visibility_roles.pluck(:name).join(", ") %>
+<span class='visibility_roles' style="float: left;">
+  <span id="orga-<%= o.id %>-roles">
+    <% if o.roles_by_project(@project).visibility_roles.all.any? %>
+      <%= h o.roles_by_project(@project).visibility_roles.pluck(:name).join(", ") %>
     <% else %>
       <span class="see_everything"><%= l('see_everything') %></span>
     <% end %>
   </span>
-  <%= form_for(m.organization, :as => :membership, :remote => true, :method => :put,
-               :url => { :controller => 'visibilities', :action => 'update_visibility_roles_by_organization', :project_id => @project, :id => m },
-               :html => { :id => "orga-#{m.id}-roles-form", :class => 'hol' }) do |f| -%>
-    <p><% roles.sort_by(&:name).each do |role| %>
-        <label><%= check_box_tag 'membership[role_ids][]', role.id, m.roles.include?(role) %> <%=h role %></label><br />
-      <% end %></p>
-    <%= hidden_field_tag 'membership[role_ids][]', '' %>
-    <p><%= submit_tag l(:button_change), :class => "small" %>
-      <%= link_to_function l(:button_cancel), "toggleOrgaForms(#{m.id}); return false;" %></p>
-  <% end -%>
-</td>
+</span>

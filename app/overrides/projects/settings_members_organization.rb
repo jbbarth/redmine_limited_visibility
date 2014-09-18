@@ -5,14 +5,14 @@ if Redmine::Plugin.installed?(:redmine_organizations)
                        :attributes      => {:colspan => '3'}
   Deface::Override.new :virtual_path  => 'projects/settings/_members_organization',
                        :name          => 'add-visibility-roles-to-orga',
-                       :insert_after  => 'span.role',
+                       :insert_after  => 'div.role',
                        :partial       => 'projects/members_organization_visibility_roles'
   Deface::Override.new :virtual_path  => 'projects/settings/_members_organization',
                        :name          => 'add-roles-to-orga',
-                       :replace       => 'span.role',
+                       :replace       => 'div.role',
                        :partial       => 'projects/members_organization_roles'
   Deface::Override.new :virtual_path  => 'projects/settings/_members_organization',
                        :name          => 'refactor_list_of_roles_in_form',
-                       :replace       => 'span.roles_checkboxes',
+                       :replace       => 'div.roles_checkboxes',
                        :partial       => 'projects/form_members_roles'
 end

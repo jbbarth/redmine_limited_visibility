@@ -4,7 +4,7 @@ fr:
   text_involvement_explanation: "Paramètrage par défaut pour les nouvelles demandes (les personnes ayant ces rôles verront la demande et seront notifiées) :"
   field_limit_visibility: "Limite la visibilité des demandes"
   label_visibility_roles: "Rôles fonctionnels"
-  see_everything: "Toutes les demandes"
+  see_everything: "Indéterminé"
   field_authorized_viewers: "Visibilité"
   label_my_roles: "uniquement mes rôles"
   alert_cant_remove_all_visibility_roles: "Veuillez sélectionner au moins un rôle concerné"

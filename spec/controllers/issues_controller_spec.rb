@@ -1,18 +1,20 @@
-require_relative '../spec_helper'
+# require_relative File.expand_path('../../fast_spec_helper', __FILE__)
+require "spec_helper"
 require 'redmine_limited_visibility/queries_helper_patch'
 
 describe IssuesController do
   fixtures :users, :roles, :projects, :members, :member_roles, :issues, :issue_statuses, :trackers, :enumerations, :custom_fields, :enabled_modules
 
-  let(:contractor_role) { find_or_create(:role, name: "Contractors", limit_visibility: true) }
-  let(:project_office_role) { find_or_create(:role, name: "Project Office", limit_visibility: true) }
+  let(:contractor_role) { Function.where(name: "Contractors").first_or_create }
+  let(:project_office_role) { Function.where(name: "Project Office").first_or_create }
 
   before do
     @request.session[:user_id] = 1
     User.current = User.find(1)
     @project = Project.first
     @membership = Member.new(user_id: User.current.id, project_id: @project.id)
-    @membership.roles << contractor_role
+    @membership.roles << Role.first
+    @membership.functions << contractor_role
     @membership.save!
     User.current.member_of?(@project).should be true
   end
@@ -26,7 +28,7 @@ describe IssuesController do
     expect(assigns(:query).filters).to include 'authorized_viewers'
   end
 
-  it 'displays issues according to current visibility roles' do
+  it 'displays issues according to current functional roles' do
     q = IssueQuery.create!(name: "new-query", user: User.current, visibility: 2, project: nil)
 
     # No authorized_viewers on issues

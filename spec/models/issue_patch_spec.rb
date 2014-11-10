@@ -1,4 +1,4 @@
-require_relative '../spec_helper'
+require 'spec_helper'
 
 describe RedmineLimitedVisibility::IssuePatch do
 
@@ -6,8 +6,8 @@ describe RedmineLimitedVisibility::IssuePatch do
 
   let(:issue) { Issue.new }
   let(:issue_4) { Issue.find(4) }
-  let(:contractor_role) { find_or_create(:role, name: "Contractors", limit_visibility: true) }
-  let(:project_office_role) { find_or_create(:role, name: "Project Office", limit_visibility: true) }
+  let(:contractor_role) { Function.where(name: "Contractors").first_or_create }
+  let(:project_office_role) { Function.where(name: "Project Office").first_or_create }
   let(:issue_with_authorized_viewers) { issue_4.update_attributes!(:authorized_viewers => "|#{contractor_role.id}|"); issue_4 }
   let(:issue_without_authorized_viewers) { issue_4.update_attributes!(:authorized_viewers => "||"); issue_4 }
 
@@ -25,43 +25,43 @@ describe RedmineLimitedVisibility::IssuePatch do
   end
 
   describe 'notified_users' do
-    it 'should notify users if their roles are involved' do
+    it 'should notify users if their functions are involved' do
       issue = issue_with_authorized_viewers
       member = Member.where(user_id: 2, project_id: issue.project_id).first
       unless member
         member = Member.new(user_id: 2, project_id: issue.project_id)
       end
-      member.roles << contractor_role
+      member.functions << contractor_role
       member.save!
 
       notified = issue.notified_users
       notified.should_not be_nil
       notified.size.should > 0
       notified.should_not include User.anonymous
-      notified.should include User.find(2) # member with right role
+      notified.should include User.find(2) # member with right function
       notified.should_not include User.find(3) # not a member of the project
       notified.should_not include User.find(8) # member of project 2 but mail_notification = false
     end
 
-    it 'should NOT notify users if their roles are not involved' do
+    it 'should NOT notify users if their functions are not involved' do
       issue = issue_with_authorized_viewers
-      not_involved_role = project_office_role
+      not_involved_function = project_office_role
 
       member = Member.where(user_id: 2, project_id: issue.project_id).first
       unless member
         member = Member.new(user_id: 2, project_id: issue.project_id)
       end
-      member.roles << not_involved_role
+      member.functions << not_involved_function
       member.save!
 
       notified = issue.notified_users
       notified.should_not be_nil
       notified.size.should eq 0
       notified.should_not include User.anonymous
-      notified.should_not include User.find(2) # member with different role
+      notified.should_not include User.find(2) # member with different function
     end
 
-    it 'should notify users if issue has no specific roles' do
+    it 'should notify users if issue has no specific function' do
       issue = issue_without_authorized_viewers
 
       notified = issue.notified_users
@@ -69,7 +69,7 @@ describe RedmineLimitedVisibility::IssuePatch do
       notified.should_not be_nil
       notified.size.should eq 1
       notified.should_not include User.anonymous
-      notified.should include User.find(2) # member without any visibility role
+      notified.should include User.find(2) # member without any functional role
       notified.should_not include User.find(3) # not a member of the project
       notified.should_not include User.find(8) # member of project 2 but mail_notification = false
     end
@@ -78,11 +78,13 @@ describe RedmineLimitedVisibility::IssuePatch do
   describe "#involved_users" do
     let(:issue) { stub_model(Issue) }
     let(:project) { Project.find(1) }
+    member = Member.where(project_id:1, user_id: 2)
+    let(:member_functions) { MemberFunction.where(member_id:member.id, name:"newFunction", authorized_viewers:"|#{contractor_role.id}|")}
 
-    it "returns users 'involved' in this issue, who have at least one role in the authorized_viewer_ids roles" do
-      #it doesn't make any sense functionnally but we don't care...
+    it "returns users 'involved' in this issue, who have at least one function in the authorized_viewer_ids functions" do
+      #it doesn't make any sense functionnally but we don't care...                      # NOT TRUE SINCE WE SWITCH TO FUNCTIONS TODO MODIFY THIS TEST
       #at least we have predictable ids because we rely on core fixtures
-      allow(issue).to receive(:authorized_viewer_ids).and_return([1, 2, 3])
+      allow(issue).to receive(:authorized_viewer_ids).and_return([contractor_role.id, project_office_role.id])
       allow(issue).to receive(:project_id).and_return(1)
       users = issue.involved_users
       users.map(&:class).uniq.should == [User]

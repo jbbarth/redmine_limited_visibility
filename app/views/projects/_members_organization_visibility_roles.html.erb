@@ -1,7 +1,7 @@
 <span class='visibility_roles' style="float: left;">
   <span id="orga-<%= o.id %>-roles">
-    <% if o.roles_by_project(@project).visibility_roles.all.any? %>
-      <%= h o.roles_by_project(@project).visibility_roles.pluck(:name).join(", ") %>
+    <% if o.functions_by_project(@project).all.any? %>
+      <%= h o.functions_by_project(@project).pluck(:name).join(", ") %>
     <% else %>
       <span class="see_everything"><%= l('see_everything') %></span>
     <% end %>

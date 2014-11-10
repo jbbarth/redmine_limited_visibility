@@ -1,11 +1,12 @@
-require_relative '../spec_helper'
+require "spec_helper"
 
+=begin     UPDATE WHEN MAKING THE PLUGIN WORK WITHOUT THE ORGANIZATIONS PLUGIN
 describe VisibilitiesController do
 
   fixtures :projects, :roles, :members, :member_roles
 
-  let(:contractor_role) { find_or_create(:role, name: "Contractors", limit_visibility: true) }
-  let(:project_office_role) { find_or_create(:role, name: "Project Office", limit_visibility: true) }
+  let(:contractor_role) { Function.where(name: "Contractors").first_or_create }
+  let(:project_office_role) { Function.where(name: "Project Office").first_or_create }
 
   describe "update_visibility_roles" do
     it "should update 'visibility' roles and do NOT modify 'standard' roles" do
@@ -21,3 +22,4 @@ describe VisibilitiesController do
     end
   end
 end
+=end

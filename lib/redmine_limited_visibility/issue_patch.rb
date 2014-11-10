@@ -20,9 +20,9 @@ module RedmineLimitedVisibility
         end
 
         def involved_users
-          User.joins(:members => :member_roles)
+          User.joins(:members => :member_functions)
               .where(:members => { :project_id => project_id },
-                     :member_roles => { :role_id => authorized_viewer_ids })
+                     :member_functions => { :function_id => authorized_viewer_ids })
         end
 
         def authorized_viewer_ids

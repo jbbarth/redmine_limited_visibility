@@ -1,28 +1,28 @@
 <%= title [l(:label_role_plural), roles_path], l(:label_visibilities_report) %>
 
-<%= form_tag(roles_visibilities_report_path, :id => 'visibilities_form') do %>
+<%= form_tag(visibilities_functions_path, :id => 'visibilities_form') do %>
 <%= hidden_field_tag 'visibilities[0]', '', :id => nil %>
 <div class="autoscroll">
 <table class="list visibilities">
 <thead>
     <tr>
       <th style="width: 200px;white-space: pre-line;vertical-align: middle;"><span>Rôle de l'auteur</span></th>
-      <% @roles.each do |role| %>
+      <% @functional_roles.each do |function| %>
         <th style="width: 100px;white-space:pre-line;vertical-align: middle;">
-          <%= content_tag(role.builtin? ? 'em' : 'span', h(role.name)) %>
+          <%= content_tag('span', h(function.name)) %>
         </th>
       <% end %>
     </tr>
 </thead>
 <tbody>
-<% @roles.each do |role| %>
-  <tr class="<%= cycle('odd', 'even') %> visibility-<%= role.name.parameterize %>">
+<% @functional_roles.each do |function| %>
+  <tr class="<%= cycle('odd', 'even') %> visibility-<%= function.name.parameterize %>">
     <td class="name">
-      <%= content_tag(role.builtin? ? 'em' : 'span', h(role.name)) %>
+      <%= content_tag('span', h(function.name)) %>
     </td>
-    <% @roles.each do |column| %>
+    <% @functional_roles.each do |column| %>
       <td>
-        <%= check_box_tag "visibilities[#{role.id}][]", column.id, (role.authorized_viewer_ids.include?(column.id)), :id => nil, :class => "role-#{role.id}", disabled: role==column %>
+        <%= check_box_tag "visibilities[#{role.id}][]", column.id, (role.authorized_viewer_ids.include?(column.id)), :id => nil, :class => "role-#{function.id}", disabled: role==column %>
       </td>
     <% end %>
   </tr>

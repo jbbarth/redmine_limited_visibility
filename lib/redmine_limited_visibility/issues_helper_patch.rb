@@ -1,4 +1,5 @@
 require_dependency 'issues_helper'
+include ERB::Util
 
 module IssuesHelper
 
@@ -9,8 +10,8 @@ module IssuesHelper
       if detail.property == 'attr' && detail.prop_key == 'authorized_viewers'
 
         label = l(:field_authorized_viewers)
-        value = roles_from_authorized_viewers(detail.value).join(", ")
-        old_value = roles_from_authorized_viewers(detail.old_value).join(", ")
+        value = functions_from_authorized_viewers(detail.value).join(", ")
+        old_value = functions_from_authorized_viewers(detail.old_value).join(", ")
 
         unless no_html
           label = content_tag('strong', label)
@@ -20,7 +21,7 @@ module IssuesHelper
         end
 
         if detail.value.present?
-          # authorized_viewers == "||" is considered as blank (= no roles authorized)
+          # authorized_viewers == "||" is considered as blank (= no functions authorized)
           if detail.old_value.present? && detail.old_value != "||"
             l(:text_journal_changed, label: label, old: old_value, new: value).html_safe
           else
@@ -38,7 +39,7 @@ module IssuesHelper
     alias_method_chain :show_detail, :limited_visibility
   end
 
-  def roles_from_authorized_viewers(authorized_viewers)
-    Role.where(:id => "#{authorized_viewers}".split("|"))
+  def functions_from_authorized_viewers(authorized_viewers)
+    Function.where(:id => "#{authorized_viewers}".split("|"))
   end
 end

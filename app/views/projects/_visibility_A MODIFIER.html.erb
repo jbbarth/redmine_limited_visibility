@@ -1,5 +1,5 @@
 <%= error_messages_for 'member' %>
-<% roles = Role.visibility_roles.all
+<% functions = Function.all
    members = @project.member_principals.sort_by{ |x| x.principal.lastname.downcase } %>
 
 <div>
@@ -17,20 +17,20 @@
           <td class="<%= member.principal.class.name.downcase %>"><%= link_to_user member.principal %></td>
           <td class="roles">
             <span id="member-<%= member.id %>-roles">
-              <% if member.roles.visibility_roles.all.present? %>
-                <%= h member.roles.visibility_roles.sorted.pluck(:name).join(', ') %>
+              <% if member.functions.all.present? %>
+                <%= h member.functions.sorted.pluck(:name).join(', ') %>
               <% else %>
                 <span class="see_everything"><%= l('see_everything') %></span>
               <% end %>
             </span>
-            <%= form_for(member, {:as => :membership, :remote => true, :url => update_visibility_roles_path,
+            <%= form_for(member, {:as => :membership, :remote => true, :url => update_functions_path,
                                   :method => :put,
                                   :html => { :id => "member-#{member.id}-roles-form", :class => 'hol' }}
                 ) do |f| %>
-              <p><% roles.each do |role| %>
+              <p><% functions.each do |function| %>
                   <label>
-                    <%= check_box_tag 'membership[role_ids][]', role.id, member.roles.include?(role) || (member.roles & roles).empty?,
-                                           :disabled => member.member_roles.detect { |mr| mr.role_id == role.id && !mr.inherited_from.nil?} %> <%=h role %>
+                    <%= check_box_tag 'membership[role_ids][]', function.id, member.functions.include?(function) || (member.functions & functions).empty?,
+                                           :disabled => member.member_functions.detect { |mr| mr.functions_id == function.id && !mr.inherited_from.nil?} %> <%=h function %>
                   </label><br />
                 <% end %>
               </p>

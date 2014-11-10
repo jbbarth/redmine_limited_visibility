@@ -1,4 +1,4 @@
-require_relative '../spec_helper'
+require 'spec_helper'
 require 'redmine_limited_visibility/roles_controller_patch'
 
 describe RolesController do
@@ -10,7 +10,7 @@ describe RolesController do
     it "should be successful" do
       get 'index'
       response.should be_success
-      assigns(:visibility_roles).should_not be_nil
+      assigns(:functional_roles).should_not be_nil
       assigns(:roles).should_not be_nil
     end
   end
@@ -28,27 +28,16 @@ describe RolesController do
     end
   end
 
-  describe "creating or updating a 'standard' role" do
+  describe "creating or updating a role" do
     it "should allow permissions for this Role" do
-      post :create, role: { name: "NewRole", limit_visibility: "0", permissions: ["edit_project", "manage_members", "create_issue_templates", ""], authorized_viewers: "|17|18|" }
+      post :create, role: { name: "NewRole", permissions: ["edit_project", "manage_members", "create_issue_templates", ""] }
       created_role = Role.find_by_name("NewRole")
       created_role.permissions.should_not eq([])
-      put :update, { id: created_role.id, role: { name: "UpdatedRole", limit_visibility: "0", permissions: ["edit_project", "manage_members", "create_issue_templates", ""], authorized_viewers: "|17|18|" } }
+      put :update, { id: created_role.id, role: { name: "UpdatedRole", permissions: ["edit_project", "manage_members", "create_issue_templates", ""] } }
       updated_role = Role.find_by_name("UpdatedRole")
       updated_role.should_not be_nil
       updated_role.permissions.should_not eq([])
     end
   end
 
-  describe "creating or updating a 'visibility' role" do
-    it "should cancel all permissions for this Role" do
-      post :create, role: { name: "NewRole", limit_visibility: "1", permissions: ["edit_project", "manage_members", "create_issue_templates", ""], authorized_viewers: "|17|18|" }
-      created_role = Role.find_by_name("NewRole")
-      created_role.permissions.should eq([])
-
-      put :update, id: created_role.id, role: { name: "UpdatedRole", limit_visibility: "1", permissions: ["edit_project", "manage_members", "create_issue_templates", ""], authorized_viewers: "|17|18|" }
-      updated_role = Role.find_by_name("UpdatedRole")
-      updated_role.permissions.should eq([])
-    end
-  end
 end

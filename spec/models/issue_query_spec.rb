@@ -1,4 +1,4 @@
-require_relative '../spec_helper'
+require 'spec_helper'
 require 'redmine_limited_visibility/issue_query_patch'
 
 describe IssueQuery do
@@ -11,7 +11,7 @@ describe IssueQuery do
       IssueQuery.operators_by_filter_type.should include :list_visibility
     end
 
-    it 'has a new available column for involved roles' do
+    it 'has a new available column for involved functions' do
       IssueQuery.available_columns.find { |column| column.name == :authorized_viewers }.should_not be_nil
     end
 

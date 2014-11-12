@@ -8,6 +8,9 @@ Redmine::Plugin.register :redmine_limited_visibility do
   author_url 'jeanbaptiste.barth@gmail.com'
   requires_redmine_plugin :redmine_base_rspec, :version_or_higher => '0.0.1' if Rails.env.test?
   requires_redmine_plugin :redmine_base_deface, :version_or_higher => '0.0.1'
+  project_module :limited_visibility do
+    permission :limit_issues_visibility, {  }
+  end
 end
 
 # Custom patches
@@ -22,6 +25,7 @@ Rails.application.config.to_prepare do
   require_dependency 'redmine_limited_visibility/member_patch'
   require_dependency 'redmine_limited_visibility/user_patch'
   if Redmine::Plugin.installed?(:redmine_organizations)
+    require_dependency 'redmine_limited_visibility/organization'
     require_dependency 'redmine_limited_visibility/project_patch'
     require_dependency 'redmine_limited_visibility/organizations_controller_patch'
   end

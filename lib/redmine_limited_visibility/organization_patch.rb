@@ -1,4 +1,4 @@
-require 'organization'
+require_dependency 'organization'
 
 class Organization < ActiveRecord::Base
   def functions_by_project(project)

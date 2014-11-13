@@ -78,14 +78,15 @@ describe RedmineLimitedVisibility::IssuePatch do
   describe "#involved_users" do
     let(:issue) { stub_model(Issue) }
     let(:project) { Project.find(1) }
-    member = Member.where(project_id:1, user_id: 2)
-    let(:member_functions) { MemberFunction.where(member_id:member.id, name:"newFunction", authorized_viewers:"|#{contractor_role.id}|")}
 
     it "returns users 'involved' in this issue, who have at least one function in the authorized_viewer_ids functions" do
-      #it doesn't make any sense functionnally but we don't care...                      # NOT TRUE SINCE WE SWITCH TO FUNCTIONS TODO MODIFY THIS TEST
-      #at least we have predictable ids because we rely on core fixtures
       allow(issue).to receive(:authorized_viewer_ids).and_return([contractor_role.id, project_office_role.id])
-      allow(issue).to receive(:project_id).and_return(1)
+      issue.project = Project.find(1)
+      members = Member.where(project_id:1, user_id: [2,3,5]).all
+      members.each do |member|
+        MemberFunction.where(member_id: member.id, function_id: contractor_role.id).first_or_create
+      end
+
       users = issue.involved_users
       users.map(&:class).uniq.should == [User]
       users.map(&:id).should == [2,3,5]

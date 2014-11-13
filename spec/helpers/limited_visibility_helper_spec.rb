@@ -36,8 +36,10 @@ describe LimitedVisibilityHelper do
       let(:issue) { Issue.new(:project => @project) }
 
       it "returns all functional roles if current user cannot see anything" do
+        function1 = contractor_role.id
+        function2 = project_office_role.id
         allow(self).to receive(:functional_roles_for_current_user).and_return([])
-        function_ids_for_current_viewers(issue).should == [6,7]
+        function_ids_for_current_viewers(issue).should == [function1,function2]
       end
 
       it "returns functional roles for current user if any" do
@@ -56,8 +58,10 @@ describe LimitedVisibilityHelper do
       end
 
       it "returns all functional roles if none" do
+        function1 = contractor_role.id
+        function2 = project_office_role.id
         allow(issue).to receive(:authorized_viewers).and_return(nil)
-        function_ids_for_current_viewers(issue).should == [6,7]
+        function_ids_for_current_viewers(issue).should == [function1,function2]
       end
     end
   end

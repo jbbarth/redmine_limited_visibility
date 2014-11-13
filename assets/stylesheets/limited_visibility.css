@@ -1,0 +1,32 @@
+.visibility_roles .see_everything, .roles .see_everything{
+    color: #d3d3d3;
+    font-style: italic;
+}
+#label_involved_roles{
+    width: 22%;
+    font-weight: bold;
+    display: inline-block;
+    margin-top: 4px;
+}
+.involved-roles .info { margin-top:5px; }
+.involved-roles .role { background-color:#fdd; border: 1px solid #d3d3d3; border-radius:3px; padding:2px 5px 1px 4px; margin:1px 0 2px; cursor:pointer; display:inline-block; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; }
+.involved-roles .role:hover { background-color:#ffe9e9; }
+.involved-roles .role.involved { background-color:#cfb; }
+.involved-roles .role.disabled { cursor:default; }
+.involved-roles .role.involved:hover { background-color:#d7ffc6; }
+/* font awesome icons */
+.involved-roles .role .status-icon { width:1em; display:inline-block; }
+.involved-roles .role:not(.involved) .fa-icon-ok { display:none; }
+.involved-roles .role .fa-icon-ok { color:#080; }
+.involved-roles .role.involved .fa-icon-remove { display:none; }
+.involved-roles .role .fa-icon-remove { color:#800; }
+.involved-roles .role .fa-icon-lock { color:#080; display:none; /* hide icon when not in a form */ }
+form .involved-roles .role .fa-icon-lock { display:inline; }
+.involved-roles .role:not(.disabled) .fa-icon-lock { display:none; }
+
+/* my page */
+a.icon-roles  { background-image: url(../images/magnify.png); margin-right:6px; margin-left: 8px;}
+
+.organizations .role { width:170px; }
+.organizations .permission_roles, .organizations .roles_checkboxes { width:190px; }
+.organizations .visibility_roles, .organizations .functions_checkboxes { width:190px; }

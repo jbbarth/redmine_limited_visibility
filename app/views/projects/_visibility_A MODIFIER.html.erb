@@ -1,0 +1,58 @@
+<%= error_messages_for 'member' %>
+<% functions = Function.all
+   members = @project.member_principals.sort_by{ |x| x.principal.lastname.downcase } %>
+
+<div>
+  <% if members.any? %>
+    <table class="list members">
+      <thead><tr>
+        <th><%= l(:label_user) %> / <%= l(:label_group) %></th>
+        <th><%= l(:label_visibility_by_role) %></th>
+        <th></th>
+      </tr></thead>
+      <tbody>
+      <% members.each do |member| %>
+        <% next if member.new_record? %>
+        <tr id="member-<%= member.id %>" class="<%= cycle 'odd', 'even' %> member">
+          <td class="<%= member.principal.class.name.downcase %>"><%= link_to_user member.principal %></td>
+          <td class="roles">
+            <span id="member-<%= member.id %>-roles">
+              <% if member.functions.all.present? %>
+                <%= h member.functions.sorted.pluck(:name).join(', ') %>
+              <% else %>
+                <span class="see_everything"><%= l('see_everything') %></span>
+              <% end %>
+            </span>
+            <%= form_for(member, {:as => :membership, :remote => true, :url => update_functions_path,
+                                  :method => :put,
+                                  :html => { :id => "member-#{member.id}-roles-form", :class => 'hol' }}
+                ) do |f| %>
+              <p><% functions.each do |function| %>
+                  <label>
+                    <%= check_box_tag 'membership[role_ids][]', function.id, member.functions.include?(function) || (member.functions & functions).empty?,
+                                           :disabled => member.member_functions.detect { |mr| mr.functions_id == function.id && !mr.inherited_from.nil?} %> <%=h function %>
+                  </label><br />
+                <% end %>
+              </p>
+              <%= hidden_field_tag 'id', member.id %>
+              <%= hidden_field_tag 'membership[role_ids][]', '' %>
+              <p><%= submit_tag l(:button_change), :class => "small" %>
+                <%= link_to_function l(:button_cancel),
+                                     "$('#member-#{member.id}-roles').show(); $('#member-#{member.id}-roles-form').hide(); return false;"
+                %></p>
+            <% end %>
+          </td>
+          <td class="buttons" style="text-align: right;">
+            <%= link_to_function l(:button_edit),
+                                 "$('#member-#{member.id}-roles').toggle(); $('#member-#{member.id}-roles-form').toggle(); return false;",
+                                 :class => 'icon icon-edit' %>
+          </td>
+          <%= call_hook(:view_projects_settings_members_table_row, { project: @project, member: member}) %>
+        </tr>
+      <% end; reset_cycle %>
+      </tbody>
+    </table>
+  <% else %>
+    <p class="nodata"><%= l(:label_no_data) %></p>
+  <% end %>
+</div>

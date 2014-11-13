@@ -1,0 +1,34 @@
+<%= title [l(:label_role_plural), roles_path], l(:label_visibilities_report) %>
+
+<%= form_tag(visibilities_functions_path, :id => 'visibilities_form') do %>
+<%= hidden_field_tag 'visibilities[0]', '', :id => nil %>
+<div class="autoscroll">
+<table class="list visibilities">
+<thead>
+    <tr>
+      <th style="width: 200px;white-space: pre-line;vertical-align: middle;"><span>Rôle de l'auteur</span></th>
+      <% @functional_roles.each do |function| %>
+        <th style="width: 100px;white-space:pre-line;vertical-align: middle;">
+          <%= content_tag('span', h(function.name)) %>
+        </th>
+      <% end %>
+    </tr>
+</thead>
+<tbody>
+<% @functional_roles.each do |function| %>
+  <tr class="<%= cycle('odd', 'even') %> visibility-<%= function.name.parameterize %>">
+    <td class="name">
+      <%= content_tag('span', h(function.name)) %>
+    </td>
+    <% @functional_roles.each do |column| %>
+      <td>
+        <%= check_box_tag "visibilities[#{function.id}][]", column.id, (function.authorized_viewer_ids.include?(column.id)), :id => nil, :class => "role-#{function.id}", disabled: function==column %>
+      </td>
+    <% end %>
+  </tr>
+<% end %>
+</tbody>
+</table>
+</div>
+<p><%= submit_tag l(:button_save) %></p>
+<% end %>

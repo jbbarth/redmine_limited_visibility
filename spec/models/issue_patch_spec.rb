@@ -1,84 +1,15 @@
-require_relative '../spec_helper'
+require 'spec_helper'
 
 describe RedmineLimitedVisibility::IssuePatch do
+
+  fixtures :users, :roles, :projects, :members, :member_roles, :issues, :issue_statuses, :trackers, :enumerations, :custom_fields, :enabled_modules
+
   let(:issue) { Issue.new }
-  let(:user) { User.new }
-
-  describe "#visible?" do
-    it "patches Issue#visible?" do
-      issue.method(:visible?).should == issue.method(:visible_with_limited_visibility?)
-    end
-
-    it "delegates to original Issue#visible? in normal cases" do
-      issue.should_receive(:visible_without_limited_visibility?).with(user)
-      issue.visible?(user)
-    end
-
-    it "adds additionnal visibility condition" do
-      issue.stub(:visible_without_limited_visibility?).and_return(true)
-      # Redmine specs can be run within other plugins, which can themselves configure
-      # rspec in a form or an other. The fact that redmine comes out of the box with
-      # the "mocha" gem for mocking makes it hard to know at 100% if the mocking framework
-      # will be mocha or rspec at this point. So the "#any_instance" call could be from
-      # mocha or rspec, hence we setup mock expectations on both. Previously we were trying
-      # to detect if mocha is activated but it doesn't appear in RSpec.configuration
-      # directly it seems...
-      # I added some "rescue nil" calls because for whatever fucked reason, "sometimes" I
-      # don't get mocha loaded when running tests only for this plugin, and in that case
-      # it raises an exception I don't ever want to see... Take that haters :)
-      IssueUserVisibility.any_instance.stubs(:authorized?).returns(:result) rescue nil   #mocha mock
-      IssueUserVisibility.any_instance.stub(:authorized?).and_return(:result)            #rspec mock
-      issue.visible?(user).should == :result
-    end
-  end
-
-  describe ".visible_condition" do
-    it "patches Issue.visible_condition" do
-      # actually this:
-      #   Issue.method(:visible_condition).should == Issue.method(:visible_condition_with_limited_visibility)
-      # doesn't work since we use alias_method_chain on a class method and it's a bit... quirky
-      Issue.method(:visible_condition).to_s.should include "visible_condition_with_limited_visibility>"
-    end
-
-    it "allows admins to view everything" do
-      user.stub(:admin?){ true }
-      #ok that's not obvious but it's the base condition, not modified
-      #as we don't work with a real, db-backed user, condition is falsy
-      #and we can't easily stub everything out cause it's class methods...
-      Issue.visible_condition(user).should == Issue.visible_condition_without_limited_visibility(user)
-    end
-
-    it "allows to see issues with no restriction" do
-      Issue.visible_condition(user).should include "issues.authorized_viewers IS NULL OR issues.authorized_viewers IN ('', '*')"
-    end
-
-    it "generates a visible condition based on user_id" do
-      user.stub(:id){ 731 }
-      Issue.visible_condition(user).should include "issues.authorized_viewers LIKE '%|user=731|%'"
-    end
-
-    it "generates a visible condition based on users organization_id if present" do
-      user.stub(:id){ 731 }
-      user.stub(:organization_id){ 36 }
-      Issue.visible_condition(user).should include "issues.authorized_viewers LIKE '%|user=731|%' OR issues.authorized_viewers LIKE '%|organization=36|%'"
-    end
-
-    it "generates a visible condition based on groups if present" do
-      user.stub(:id){ 731 }
-      user.stub(:group_ids){ [5,7] }
-      Issue.visible_condition(user).should include "issues.authorized_viewers LIKE '%|group=5|%' OR issues.authorized_viewers LIKE '%|group=7|%'"
-    end
-
-    it "generates a visible condition based on roles if any" do
-      user.stub(:projects_by_role){
-        { double(:role_1, :id => 1).as_null_object => [double(:project_1, :id => 24), double(:project_2, :id => 27)],
-          double(:role_2, :id => 7).as_null_object => [double(:project_1bis, :id => 24)] }
-      }
-      Issue.visible_condition(user).should include "issues.authorized_viewers LIKE '%|role=1/project=24|%'"
-      Issue.visible_condition(user).should include "issues.authorized_viewers LIKE '%|role=1/project=27|%'"
-      Issue.visible_condition(user).should include "issues.authorized_viewers LIKE '%|role=7/project=24|%'"
-    end
-  end
+  let(:issue_4) { Issue.find(4) }
+  let(:contractor_role) { Function.where(name: "Contractors").first_or_create }
+  let(:project_office_role) { Function.where(name: "Project Office").first_or_create }
+  let(:issue_with_authorized_viewers) { issue_4.update_attributes!(:authorized_viewers => "|#{contractor_role.id}|"); issue_4 }
+  let(:issue_without_authorized_viewers) { issue_4.update_attributes!(:authorized_viewers => "||"); issue_4 }
 
   describe "#authorized_viewers" do
     it "has a authorized_viewers column" do
@@ -86,10 +17,97 @@ describe RedmineLimitedVisibility::IssuePatch do
     end
 
     it "is a safe attribute" do
-      #avoid loading too many dependencies
+      # avoid loading too many dependencies
       issue.stub(:new_statuses_allowed_to) { [true] }
       issue.safe_attributes = { "authorized_viewers" => "All of them" }
       issue.authorized_viewers.should == "All of them"
+    end
+  end
+
+  describe 'notified_users' do
+    it 'should notify users if their functions are involved' do
+      issue = issue_with_authorized_viewers
+      member = Member.where(user_id: 2, project_id: issue.project_id).first
+      unless member
+        member = Member.new(user_id: 2, project_id: issue.project_id)
+      end
+      member.functions << contractor_role
+      member.save!
+
+      notified = issue.notified_users
+      notified.should_not be_nil
+      notified.size.should > 0
+      notified.should_not include User.anonymous
+      notified.should include User.find(2) # member with right function
+      notified.should_not include User.find(3) # not a member of the project
+      notified.should_not include User.find(8) # member of project 2 but mail_notification = false
+    end
+
+    it 'should NOT notify users if their functions are not involved' do
+      issue = issue_with_authorized_viewers
+      not_involved_function = project_office_role
+
+      member = Member.where(user_id: 2, project_id: issue.project_id).first
+      unless member
+        member = Member.new(user_id: 2, project_id: issue.project_id)
+      end
+      member.functions << not_involved_function
+      member.save!
+
+      notified = issue.notified_users
+      notified.should_not be_nil
+      notified.size.should eq 0
+      notified.should_not include User.anonymous
+      notified.should_not include User.find(2) # member with different function
+    end
+
+    it 'should notify users if issue has no specific function' do
+      issue = issue_without_authorized_viewers
+
+      notified = issue.notified_users
+
+      notified.should_not be_nil
+      notified.size.should eq 1
+      notified.should_not include User.anonymous
+      notified.should include User.find(2) # member without any functional role
+      notified.should_not include User.find(3) # not a member of the project
+      notified.should_not include User.find(8) # member of project 2 but mail_notification = false
+    end
+  end
+
+  describe "#involved_users" do
+    let(:issue) { stub_model(Issue) }
+    let(:project) { Project.find(1) }
+    member = Member.where(project_id:1, user_id: 2)
+    let(:member_functions) { MemberFunction.where(member_id:member.id, name:"newFunction", authorized_viewers:"|#{contractor_role.id}|")}
+
+    it "returns users 'involved' in this issue, who have at least one function in the authorized_viewer_ids functions" do
+      #it doesn't make any sense functionnally but we don't care...                      # NOT TRUE SINCE WE SWITCH TO FUNCTIONS TODO MODIFY THIS TEST
+      #at least we have predictable ids because we rely on core fixtures
+      allow(issue).to receive(:authorized_viewer_ids).and_return([contractor_role.id, project_office_role.id])
+      allow(issue).to receive(:project_id).and_return(1)
+      users = issue.involved_users
+      users.map(&:class).uniq.should == [User]
+      users.map(&:id).should == [2,3,5]
+    end
+  end
+
+  describe "#authorized_viewer_ids" do
+    let(:issue) { stub_model(Issue) }
+
+    it "transforms the #authorized_viewers string into an array of ids" do
+      allow(issue).to receive(:authorized_viewers).and_return("|3|5|99|")
+      issue.authorized_viewer_ids.should == [3, 5, 99]
+    end
+
+    it "returns nil if #authorized_viewers is nil" do
+      allow(issue).to receive(:authorized_viewers).and_return(nil)
+      issue.authorized_viewer_ids.should == []
+    end
+
+    it "removes blank values from the return value" do
+      allow(issue).to receive(:authorized_viewers).and_return("||1| |")
+      issue.authorized_viewer_ids.should == [1]
     end
   end
 end

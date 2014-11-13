@@ -1,0 +1,18 @@
+<%= error_messages_for 'function' %>
+
+<div class="box tabular">
+  <p><%= f.text_field :name, :required => true %></p>
+  <p><%= f.check_box :hidden_on_overview %></p>
+</div>
+
+<div class="visibility_tab">
+  <h3><%= l(:permission_add_issues) %> / <%= l(:permission_edit_issues) %></h3>
+  <div class="box tabular" id="limited_visibility">
+    <fieldset>
+      <legend><%= l(:text_involvement_explanation) %></legend>
+      <%= render "functions/select_involved_roles", viewers: @function.authorized_viewer_ids, current_user_visibility_roles: [] %>
+      <%= hidden_field_tag "function[authorized_viewers]", @function.authorized_viewers, :id => "authorized_viewers" %>
+      <%= hidden_field_tag "current-role", @function.id %>
+    </fieldset>
+  </div>
+</div>

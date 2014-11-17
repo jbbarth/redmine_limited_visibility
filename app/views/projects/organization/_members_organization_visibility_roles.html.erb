@@ -1,0 +1,10 @@
+<% organization_functions = @o.default_functions_by_project(@project) %>
+<span class='visibility_roles' style="float: left;">
+  <span id="orga-<%= @o.id %>-roles">
+    <% if organization_functions.any? %>
+      <%= h organization_functions.map(&:name).join(", ") %>
+    <% else %>
+      <span class="see_everything"><%= l('see_everything') %></span>
+    <% end %>
+  </span>
+</span>

@@ -1,0 +1,9 @@
+<span class='permission_roles' style="float: left;">
+  <span id="member-<%= member.id %>-roles">
+    <% if user_roles.any? %>
+      <%= h user_roles.map(&:name).join(", ") %>
+    <% else %>
+      <span class="see_everything">&nbsp;</span>
+    <% end %>
+  </span>
+</span>

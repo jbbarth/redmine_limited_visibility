@@ -1,0 +1,18 @@
+<% organization_functions = @o.default_functions_by_project(@project) %>
+
+<div class='tech_roles_checkboxes' style="float: left;">
+  <p>
+    <% Role.givable.sorted.each do |role| %>
+      <label><%= check_box_tag 'membership[role_ids][]', role.id, organization_roles.include?(role) %> <%=h role %></label><br />
+    <% end %>
+  </p>
+</div>
+<%= hidden_field_tag 'membership[role_ids][]', '' %>
+<div class='functions_checkboxes' style="float: left;">
+  <p>
+    <% Function.sorted.all.each do |function| %>
+      <label><%= check_box_tag 'membership[function_ids][]', function.id, organization_functions.include?(function) %> <%=h function %></label><br />
+    <% end %>
+  </p>
+</div>
+<%= hidden_field_tag 'membership[function_ids][]', '' %>

@@ -7,25 +7,38 @@ class OrganizationsController < ApplicationController
     new_roles = Role.find(params[:membership][:role_ids].reject(&:empty?))
     new_functions = Function.find(params[:membership][:function_ids].reject(&:empty?))
     @organization = Organization.find(params[:organization_id])
-    @organization.update_project_members(params[:project_id], new_members, new_roles)
-    update_members_functions(new_functions, params[:project_id], @organization.id)
+    old_organization_roles = @organization.default_roles_by_project(@project)
+    old_organization_functions = @organization.default_functions_by_project(@project)
+
+    @organization.delete_all_organization_roles(@project)
+    organization_roles = new_roles.map{ |role| OrganizationRole.new(role_id: role.id, project_id: @project.id) }
+    organization_roles.each do |r|
+      @organization.organization_roles << r
+    end
+
+    @organization.delete_all_organization_functions(@project)
+    organization_functions = new_functions.map{ |function| OrganizationFunction.new(function_id: function.id, project_id: @project.id) }
+    organization_functions.each do |f|
+      @organization.organization_functions << f
+    end
+
+    @organization.update_project_members_with_roles_and_functions(params[:project_id], new_members, new_roles, old_organization_roles, new_functions, old_organization_functions)
     respond_to do |format|
       format.html { redirect_to :controller => 'projects', :action => 'settings', :id => @project.id, :tab => 'members' }
       format.js
     end
   end
 
-  private
-
-    def update_members_functions(new_functions, project_id, organization_id)
-      members = Member.joins(:user).where("organization_id = ? AND project_id = ?", organization_id, project_id).uniq
-      members.each do |member|
-        new_functions.each do |function_id|
-          unless member.functions.map(&:id).include?(function_id)
-            member.functions << Function.find(function_id)
-          end
-        end
-      end if new_functions.present?
+  def update_user_roles
+    @member = Member.find(params[:member_id])
+    new_roles = Role.find(params[:membership][:role_ids].reject(&:empty?))
+    new_functions = Function.find(params[:membership][:function_ids].reject(&:empty?))
+    @member.roles = new_roles | @member.principal.organization.default_roles_by_project(@project)
+    @member.functions = new_functions | @member.principal.organization.default_functions_by_project(@project)
+    respond_to do |format|
+      format.html { redirect_to :controller => 'projects', :action => 'settings', :id => @project.id, :tab => 'members' }
+      format.js
     end
+  end
 
 end

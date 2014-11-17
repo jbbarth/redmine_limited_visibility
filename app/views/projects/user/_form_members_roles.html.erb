@@ -1,0 +1,39 @@
+<% organization_functions = @o.default_functions_by_project(@project) %>
+
+<div class='tech_roles_checkboxes' style="float: left;">
+  <p>
+    <% Role.givable.sorted.each do |role| %>
+      <label><%= check_box_tag 'membership[role_ids][]',
+                               role.id,
+                               user_roles.include?(role),
+                               :disabled => organization_roles.detect {
+                                   |r| r.id == role.id
+                               }
+      %>
+        <%=h role %>
+      </label>
+      <br />
+    <% end %>
+  </p>
+</div>
+<%= hidden_field_tag 'membership[role_ids][]', '' %>
+<div class='functions_checkboxes' style="float: left;">
+  <p>
+    <% Function.sorted.all.each do |function| %>
+      <label><%= check_box_tag 'membership[function_ids][]',
+                               function.id,
+                               user_functions.include?(function),
+                               :disabled => organization_functions.detect {
+                                   |f| f.id == function.id
+                               }
+      %>
+        <%=h function %>
+      </label>
+      <br />
+    <% end %>
+  </p>
+</div>
+<%= hidden_field_tag 'membership[function_ids][]', '' %>
+<p><%= submit_tag l(:button_change), :class => "small" %>
+  <%= link_to_function l(:button_cancel), "toggleOrgaForms(#{member.id}, 'member'); return false;" %>
+</p>

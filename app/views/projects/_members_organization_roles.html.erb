@@ -1,9 +1,0 @@
-<span class='permission_roles' style="float: left;">
-  <span id="orga-<%= o.id %>-roles">
-    <% if o.roles_by_project(@project).all.any? %>
-      <%= h o.roles_by_project(@project).pluck(:name).join(", ") %>
-    <% else %>
-      <span class="see_everything">&nbsp;</span>
-    <% end %>
-  </span>
-</span>

@@ -1,4 +1,4 @@
-.visibility_roles .see_everything, .roles .see_everything{
+.visibility_roles .see_everything, .permission_roles .see_everything{
     color: #d3d3d3;
     font-style: italic;
 }

@@ -5,7 +5,11 @@ class OrganizationsController < ApplicationController
   def update_roles
     new_members = User.find(params[:membership][:user_ids].reject(&:empty?))
     new_roles = Role.find(params[:membership][:role_ids].reject(&:empty?))
-    new_functions = Function.find(params[:membership][:function_ids].reject(&:empty?))
+    if params[:membership][:function_ids].present?
+      new_functions = Function.find(params[:membership][:function_ids].reject(&:empty?))
+    else
+      new_functions = []
+    end
     @organization = Organization.find(params[:organization_id])
     old_organization_roles = @organization.default_roles_by_project(@project)
     old_organization_functions = @organization.default_functions_by_project(@project)

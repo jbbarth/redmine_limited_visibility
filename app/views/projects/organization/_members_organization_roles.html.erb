@@ -4,7 +4,7 @@
     <% if organization_roles.any? %>
       <%= h organization_roles.map(&:name).join(", ") %>
     <% else %>
-      <span class="see_everything">&nbsp;</span>
+      <span class="see_everything"><%= l('see_everything') %></span>
     <% end %>
   </span>
 </span>

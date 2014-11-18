@@ -28,9 +28,9 @@ form .involved-roles .role .fa-icon-lock { display:inline; }
 a.icon-roles  { background-image: url(../images/magnify.png); margin-right:6px; margin-left: 8px;}
 
 /* .organizations .role { width:50%; } */
-.organizations .permission_roles { max-width: 250px;width: 250px; }
+.organizations .permission_roles { max-width: 250px;width: 250px;padding-right: 15px; }
 .organizations .visibility_roles{ width: 250px; }
-.organizations .tech_roles_checkboxes { max-width: 250px;width: 250px;  }
+.organizations .tech_roles_checkboxes { max-width: 250px;width: 250px;padding-right: 15px;  }
 .organizations .functions_checkboxes { width: 250px; }
 table.organizations th { text-align: left; padding-left: 50px; }
 .organizations .visibility_buttons { width: 110px !important;}

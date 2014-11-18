@@ -53,6 +53,16 @@ class FunctionsController < ApplicationController
     end
   end
 
+  def available_functions_per_project
+    functions = Function.find(params[:function_ids].reject(&:empty?))
+    project = Project.find(params[:project_id])
+    project.functions = functions
+    respond_to do |format|
+      format.html { redirect_to :controller => 'projects', :action => 'settings', :id => project.id, :tab => 'functional_roles' }
+      format.js
+    end
+  end
+
   private
 
     def find_function

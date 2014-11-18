@@ -3,6 +3,10 @@
 <% visibility = {name: 'visibility', action: :visibility, partial: 'projects/visibility', label: :label_visibility_by_role}
    tabs = project_settings_tabs
    tabs << visibility unless Redmine::Plugin.installed?(:redmine_organizations) %>
+
+<% available_functions = {name: 'functional_roles', action: :functional_roles, partial: 'projects/settings_functional_roles_tab', label: :label_visibility_roles}
+   tabs << available_functions %>
+
 <%= render_tabs tabs %>
 
 <% html_title(l(:label_settings)) -%>

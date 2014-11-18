@@ -1,6 +1,6 @@
 <p id=involved-roles-form class=involved-roles>
   <label><%= l(:label_involved_members) %></label>
-  <% Function.sorted.each do |function|
+  <% Function.available_functions_for(@project).sorted.each do |function|
       role_is_involved = viewers.include?(function.id)
       role_is_mine = current_user_visibility_roles.include?(function)
     %>

@@ -1,0 +1,17 @@
+class CreateProjectFunctions < ActiveRecord::Migration
+  def self.up
+    create_table "project_functions", :force => true do |t|
+      t.integer "project_id", :null => false
+      t.integer "function_id", :null => false
+    end
+
+    add_index "project_functions", ["project_id"], :name => "index_project_functions_on_project_id"
+    add_index "project_functions", ["function_id"], :name => "index_project_functions_on_function_id"
+  end
+
+  def self.down
+    drop_table :project_functions
+    remove_index :project_functions, :project_id
+    remove_index :project_functions, :function_id
+  end
+end

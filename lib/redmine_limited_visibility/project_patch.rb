@@ -2,6 +2,9 @@ require_dependency 'project'
 
 class Project
 
+  has_many :project_functions, :dependent => :destroy
+  has_many :functions, :through => :project_functions
+
   # Builds a nested hash of users sorted by function and organization
   # => { Function(1) => { Org(1) => [ User(1), User(2), ... ] } }
   #

@@ -16,7 +16,7 @@ class Function < ActiveRecord::Base
   validates_presence_of :name
 
   scope :sorted, lambda { order("#{table_name}.position ASC") }
-  scope :available_functions_for, ->(project = nil) { joins(:project_functions).where("project_id = ?", project.id) }
+  scope :available_functions_for, ->(project) { joins(:project_functions).where("project_id = ?", project.id) }
 
   def authorized_viewer_ids
     "#{authorized_viewers}".split("|").reject(&:blank?).map(&:to_i)

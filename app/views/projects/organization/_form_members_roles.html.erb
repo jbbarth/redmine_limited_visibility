@@ -10,7 +10,9 @@
 <%= hidden_field_tag 'membership[role_ids][]', '' %>
 <div class='functions_checkboxes' style="float: left;">
   <p>
-    <% Function.available_functions_for(@project).sorted.all.each do |function| %>
+    <% functions = Function.available_functions_for(@project).sorted
+       functions = Function.sorted if functions.empty?
+       functions.each do |function| %>
       <label><%= check_box_tag 'membership[function_ids][]', function.id, organization_functions.include?(function) %> <%=h function %></label><br />
     <% end %>
   </p>

@@ -12,3 +12,4 @@ en:
   label_my_page_all_roles: "Show issues for all roles"
   label_my_page_my_roles: "Only show issues where my roles are involved"
   label_visibilities_report: "Visibilities report"
+  text_select_project_functional_roles: "Select functional roles to enable for this project:"

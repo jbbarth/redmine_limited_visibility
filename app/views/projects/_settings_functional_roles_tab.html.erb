@@ -5,14 +5,22 @@
                        :project_id => @project.id },
              :html => { :id => "functions-form" }) do |f| -%>
 
+  <fieldset class="box">
+    <legend><%= l(:text_select_project_functional_roles) %></legend>
+
   <div class='functions_checkboxes'>
     <p>
       <% Function.sorted.all.each do |function| %>
-        <label><%= check_box_tag 'function_ids[]', function.id, @project.functions.include?(function) %> <%=h function %></label><br />
+        <% checked = @project.functions.empty? ? true : @project.functions.include?(function) %>
+        <label><%= check_box_tag 'function_ids[]', function.id, checked %> <%=h function %></label><br />
       <% end %>
     </p>
     <%= hidden_field_tag 'function_ids[]', '' %>
-    <p><%= submit_tag l(:button_change), :class => "small" %></p>
+
   </div>
+
+  </fieldset>
+  <p><%= check_all_links 'functions-form' %></p>
+  <p><%= submit_tag l(:button_change) %></p>
 
 <% end %>

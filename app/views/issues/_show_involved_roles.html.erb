@@ -6,7 +6,9 @@
 <div id='current_involved_roles_list' class='involved-roles' style='display: flex;'>
   <label id="label_involved_roles"><%= l("field_authorized_viewers") %></label>
   <span id="list_of_involved_roles_per_issue">
-  <% Function.available_functions_for(@project).sorted.each do |function| %>
+  <% functions = Function.available_functions_for(@project).sorted
+     functions = Function.sorted if functions.empty?
+     functions.each do |function| %>
     <% styles = "disabled" + (viewers.include?(function.id) || @issue.authorized_viewers.blank? ? " involved" : "") %>
     <%= render "functions/visibility_role", :function => function, :styles => styles %>
   <% end %>

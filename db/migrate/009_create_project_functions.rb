@@ -1,5 +1,6 @@
 class CreateProjectFunctions < ActiveRecord::Migration
   def self.up
+    drop_table :project_functions
     create_table "project_functions", :force => true do |t|
       t.integer "project_id", :null => false
       t.integer "function_id", :null => false

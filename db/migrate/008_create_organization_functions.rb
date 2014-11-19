@@ -4,11 +4,11 @@ class CreateOrganizationFunctions < ActiveRecord::Migration
       t.column :organization_id, :integer, :null => false
       t.column :project_id, :integer, :null => false
       t.column :function_id, :integer, :null => false
-    end
-    add_index :organization_functions, [:organization_id], :name => :index_org_functions_on_orga_id
-    add_index :organization_functions, [:project_id], :name => :index_org_functions_on_project_id
-    add_index :organization_functions, [:function_id], :name => :index_org_functions_on_function_id
-    add_index :organization_functions, [:function_id, :project_id, :organization_id], unique: true, :name => :unicity_index_org_functions_on_function_and_project
+    end unless ActiveRecord::Base.connection.table_exists? 'organization_functions'
+    add_index :organization_functions, [:organization_id], :name => :index_org_functions_on_orga_id unless index_exists?(:organization_functions, [:organization_id])
+    add_index :organization_functions, [:project_id], :name => :index_org_functions_on_project_id unless index_exists?(:organization_functions, [:project_id])
+    add_index :organization_functions, [:function_id], :name => :index_org_functions_on_function_id unless index_exists?(:organization_functions, [:function_id])
+    add_index :organization_functions, [:function_id, :project_id, :organization_id], unique: true, :name => :unicity_index_org_functions_on_function_and_project unless index_exists?(:organization_functions, [:function_id, :project_id, :organization_id], unique: true)
 
     # init current organizations functions
     member_count = Member.count

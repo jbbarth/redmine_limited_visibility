@@ -7,7 +7,7 @@
   <label id="label_involved_roles"><%= l("field_authorized_viewers") %></label>
   <span id="list_of_involved_roles_per_issue">
   <% functions = Function.available_functions_for(@project).sorted if @project
-     functions = Function.sorted if functions.blank?
+     functions = Function.active_by_default.sorted if functions.blank?
      functions.each do |function| %>
     <% styles = "disabled" + (viewers.include?(function.id) || @issue.authorized_viewers.blank? ? " involved" : "") %>
     <%= render "functions/visibility_role", :function => function, :styles => styles %>

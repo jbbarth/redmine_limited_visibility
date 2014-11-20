@@ -13,3 +13,4 @@ fr:
   label_visibilities_report: "Synthèse des visibilités"
   label_technical_role_plural: "Rôles techniques"
   text_select_project_functional_roles: "Sélectionner les rôles fonctionnels à activer pour ce projet :"
+  field_active_by_default: "Afficher par défaut dans tous les projets"

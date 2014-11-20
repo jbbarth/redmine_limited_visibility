@@ -11,7 +11,7 @@
   <div class='functions_checkboxes'>
     <p>
       <% Function.sorted.all.each do |function| %>
-        <% checked = @project.functions.empty? ? true : @project.functions.include?(function) %>
+        <% checked = @project.functions.empty? ? function.active_by_default : @project.functions.include?(function) %>
         <label><%= check_box_tag 'function_ids[]', function.id, checked %> <%=h function %></label><br />
       <% end %>
     </p>

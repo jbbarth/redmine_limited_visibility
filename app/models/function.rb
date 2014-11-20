@@ -17,6 +17,7 @@ class Function < ActiveRecord::Base
 
   scope :sorted, lambda { order("#{table_name}.position ASC") }
   scope :available_functions_for, ->(project) { joins(:project_functions).where("project_id = ?", project.id) }
+  scope :active_by_default, -> { where("active_by_default = ?", TRUE) }
 
   def authorized_viewer_ids
     "#{authorized_viewers}".split("|").reject(&:blank?).map(&:to_i)

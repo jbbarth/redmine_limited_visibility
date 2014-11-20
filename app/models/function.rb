@@ -31,6 +31,10 @@ class Function < ActiveRecord::Base
     true # TODO Remove this method without breaking issues search
   end
 
+  def users_by_project(project)
+    User.joins(:members => :member_functions).where("function_id = ? AND project_id = ?", self.id, project.id).active.order("lastname ASC")
+  end
+
   private
 
     def set_own_visibility

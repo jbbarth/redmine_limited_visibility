@@ -1,4 +1,8 @@
-<span class="role <%= styles %>" data-role-id="<%= function.id %>">
+<% if @project.present?
+     users_by_function = function.users_by_project(@project)
+     users_names = users_by_function.blank? ? "Aucun utilisateur" : users_by_function.map(&:name).join(", ")
+   end %>
+<span class="role <%= styles %>" data-role-id="<%= function.id %>" title="<%= users_names %>">
   <span class=status-icon><i class=fa-icon-ok></i><i class=fa-icon-remove></i></span>
   <%= function.name %>
   <i class="fa-icon-lock"></i>

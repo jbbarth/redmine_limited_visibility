@@ -32,11 +32,11 @@ class IssueQuery < Query
     projects_by_function = User.current.projects_by_function
     sql = projects_by_function.map do |function, projects|
       projects.map do |project|
-        if Redmine::Plugin.installed?(:redmine_multiprojects_issue)
-          "(#{Issue.table_name}.#{field} LIKE '%|#{function.id}|%' AND (#{Project.table_name}.id = #{project.id} OR #{project.id} IN ( SELECT project_id FROM issues_projects WHERE issue_id = #{Issue.table_name}.id )) )"
-        else
+        #if Redmine::Plugin.installed?(:redmine_multiprojects_issue)
+        #  "(#{Issue.table_name}.#{field} LIKE '%|#{function.id}|%' AND (#{Project.table_name}.id = #{project.id} OR #{project.id} IN ( SELECT project_id FROM issues_projects WHERE issue_id = #{Issue.table_name}.id )) )"
+        #else
           "(#{Issue.table_name}.#{field} LIKE '%|#{function.id}|%' AND #{Project.table_name}.id = #{project.id}) "
-        end
+        #end
       end.join(" OR ")
     end.join(" OR ")
     # potentially very long query #TODO Find a way to optimize it

@@ -30,26 +30,4 @@ class User < Principal
     @projects_by_function = hash
   end
 
-  def projects_without_function
-    return @projects_without_function if @projects_without_function
-
-    @projects_without_function = []
-
-    members = Member.joins(:project).
-        where("#{Project.table_name}.status <> 9").
-        where("#{Member.table_name}.user_id = ? OR (#{Project.table_name}.is_public = ? AND #{Member.table_name}.user_id = ?)", self.id, true, Group.builtin_id(self)).
-        preload(:project, :functions)
-
-    members.reject! {|member| member.user_id != id && project_ids.include?(member.project_id)}
-    members.each do |member|
-      if member.functions.blank?
-        @projects_without_function << member.project
-      end
-    end
-
-    @projects_without_function.uniq!
-
-    return @projects_without_function
-  end
-
 end

@@ -101,6 +101,9 @@ describe IssuesController do
 
       it 'displays all issues when the user has no specific function' do
         @membership2.functions = []
+        @issue2.update_attribute(:authorized_viewers, "||")
+        @issue2.reload
+
         get :index, query_id: @query.id
         expect(assigns(:issues)).to_not be_nil
         expect(assigns(:issues)).to include @issue1

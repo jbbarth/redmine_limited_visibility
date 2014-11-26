@@ -31,6 +31,7 @@ class IssueQuery < Query
   def sql_conditions_for_functions_per_projects(field)
     projects_by_function = User.current.projects_by_function
     projects_without_functions = User.current.projects_without_function
+
     sql = projects_by_function.map do |function, projects|
       projects.map do |project|
         if Redmine::Plugin.installed?(:redmine_multiprojects_issue)

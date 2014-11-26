@@ -14,3 +14,6 @@ fr:
   label_technical_role_plural: "Rôles techniques"
   text_select_project_functional_roles: "Sélectionner les rôles fonctionnels à activer pour ce projet :"
   field_active_by_default: "Afficher par défaut dans tous les projets"
+  permission_limit_issues_visibility: "Limiter la visibilité des demandes"
+  permission_manage_functional_roles_by_project: "Gérer les rôles fonctionnels par projet"
+  project_module_limited_visibility: "Visibilité limitée des demandes"

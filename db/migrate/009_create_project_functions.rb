@@ -1,6 +1,6 @@
 class CreateProjectFunctions < ActiveRecord::Migration
   def self.up
-    drop_table :project_functions
+    drop :project_functions if ActiveRecord::Base.connection.table_exists? 'project_functions'
     create_table "project_functions", :force => true do |t|
       t.integer "project_id", :null => false
       t.integer "function_id", :null => false

@@ -1,5 +1,6 @@
 class CreateOrganizationFunctions < ActiveRecord::Migration
   def self.up
+    drop :organization_functions if ActiveRecord::Base.connection.table_exists? 'organization_functions'
     create_table :organization_functions do |t|
       t.column :organization_id, :integer, :null => false
       t.column :project_id, :integer, :null => false

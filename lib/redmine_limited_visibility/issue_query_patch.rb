@@ -30,13 +30,23 @@ class IssueQuery < Query
 
   def sql_conditions_for_functions_per_projects(field)
     projects_by_function = User.current.projects_by_function
+    projects_without_functions = User.current.projects_without_function
     sql = projects_by_function.map do |function, projects|
       projects.map do |project|
-        "(#{Issue.table_name}.#{field} LIKE '%|#{function.id}|%' AND #{Project.table_name}.id = #{project.id}) "
+        if Redmine::Plugin.installed?(:redmine_multiprojects_issue)
+          "(#{Issue.table_name}.#{field} LIKE '%|#{function.id}|%' AND (#{Project.table_name}.id = #{project.id} OR #{project.id} IN ( SELECT project_id FROM issues_projects WHERE issue_id = #{Issue.table_name}.id )) )"
+        else
+          "(#{Issue.table_name}.#{field} LIKE '%|#{function.id}|%' AND #{Project.table_name}.id = #{project.id}) "
+        end
       end.join(" OR ")
     end.join(" OR ")
     # potentially very long query #TODO Find a way to optimize it
-    "(#{sql.present? ? '(' + sql + ') OR ' : ''} #{Issue.table_name}.#{field} IS NULL OR #{Issue.table_name}.#{field} = '||' OR #{Issue.table_name}.#{field} = '' OR #{Issue.table_name}.assigned_to_id = #{User.current.id} OR #{Issue.table_name}.author_id = #{User.current.id})"
+    "(#{sql.present? ? '(' + sql + ') OR ' : ''} #{Issue.table_name}.#{field} IS NULL"\
+    " OR #{Issue.table_name}.#{field} = '||'"\
+    " OR #{Issue.table_name}.#{field} = ''"\
+    " OR #{Issue.table_name}.assigned_to_id = #{User.current.id} OR"\
+    " #{Issue.table_name}.author_id = #{User.current.id} OR"\
+    " #{Project.table_name}.id IN ( #{projects_without_functions.present? ? projects_without_functions.map(&:id).join(',') : 0} ) ) "
   end
 
   # use standard method to validate filters form,

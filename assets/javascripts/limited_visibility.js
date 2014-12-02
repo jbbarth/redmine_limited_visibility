@@ -47,6 +47,7 @@ $(function() {
 
 //disable last role so user cannot cut visibility to himself
 function disable_role_which_cant_be_removed() {
+  /* Temporary disable this feature # client do not want it for now
   //disable last remaining role
   if ($('#involved-roles-form .role.involved.mine').length !== 1) {
     $('#involved-roles-form .role.mine').removeClass('disabled');
@@ -57,6 +58,7 @@ function disable_role_which_cant_be_removed() {
   if ($('#current-role').length == 1) {
     $('[data-role-id='+$('#current-role').val()+']').addClass('disabled')
   }
+  */
 }
 
 //add a mirroring between selected visibility roles and
@@ -75,7 +77,7 @@ $(function() {
       // Update disable class
       disable_role_which_cant_be_removed();
     }
-  })
+  });
   //disable eventual last remaining role
   disable_role_which_cant_be_removed()
-})
+});

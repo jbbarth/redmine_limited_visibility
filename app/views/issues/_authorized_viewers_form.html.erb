@@ -1,20 +1,5 @@
 <% if @project.module_enabled?("limited_visibility") %>
 
-  <script>
-    $(function() {
-      $('#issue-form').submit(function(e) {
-        e.preventDefault();
-        var form = this;
-        if ($('#issue-form .role.involved').length === 0) {
-          alert('<%= l('alert_cant_remove_all_visibility_roles') %>');
-          return false;
-        }else{
-          form.submit(); // submit bypassing the jQuery bound event
-        }
-      });
-    })
-  </script>
-
   <% viewers = function_ids_for_current_viewers(@issue) %>
   <%= render "functions/select_involved_roles", viewers: viewers, current_user_visibility_roles: functional_roles_for_current_user(@issue.project) %>
   <%= hidden_field_tag "issue[authorized_viewers]", "|#{viewers.join("|")}|", :id => "authorized_viewers" %>

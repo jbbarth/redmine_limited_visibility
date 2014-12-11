@@ -5,6 +5,7 @@ class OrganizationsController < ApplicationController
   def update_roles
     new_members = User.find(params[:membership][:user_ids].reject(&:empty?))
     new_roles = Role.find(params[:membership][:role_ids].reject(&:empty?))
+
     if params[:membership][:function_ids].present?
       new_functions = Function.find(params[:membership][:function_ids].reject(&:empty?))
     else
@@ -39,10 +40,14 @@ class OrganizationsController < ApplicationController
     new_functions = Function.find(params[:membership][:function_ids].reject(&:empty?))
     @member.roles = new_roles | @member.principal.organization.default_roles_by_project(@project)
     @member.functions = new_functions | @member.principal.organization.default_functions_by_project(@project)
+    unless @member.save
+      flash[:error] = @member.errors.full_messages.join(', ')
+    end
     respond_to do |format|
       format.html { redirect_to :controller => 'projects', :action => 'settings', :id => @project.id, :tab => 'members' }
       format.js
     end
+
   end
 
 end

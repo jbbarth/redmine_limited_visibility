@@ -25,10 +25,30 @@ describe IssuesController do
     User.current.member_of?(@project2).should be true
   end
 
-  it 'adds an "authorized viewers filter" to existing requests' do
+  it 'do not adds an "authorized viewers filter" to requests if there is no specific project' do
     q = IssueQuery.create!(name: "new-query", user: User.find(2), visibility: 2, project: nil)
     expect(q.filters).to_not include 'authorized_viewers'
     get :index, query_id: q.id
+    response.should be_success
+    expect(assigns(:query)).to_not be_nil
+    expect(assigns(:query).filters).to_not include 'authorized_viewers'
+  end
+
+  it 'do not adds an "authorized viewers filter" to requests if module is not enable for the selected project' do
+    q = IssueQuery.create!(name: "new-query", user: User.find(2), visibility: 2, project: Project.find(1))
+    expect(q.filters).to_not include 'authorized_viewers'
+    get :index, project_id:1, query_id: q.id
+    response.should be_success
+    expect(assigns(:query)).to_not be_nil
+    expect(assigns(:query).filters).to_not include 'authorized_viewers'
+  end
+
+  it 'adds an "authorized viewers filter" to requests if module is enable' do
+    project = Project.find(1)
+    project.enabled_module_names |= ['limited_visibility']
+    q = IssueQuery.create!(name: "new-query", user: User.find(2), visibility: 2, project: project)
+    expect(q.filters).to_not include 'authorized_viewers'
+    get :index, project_id:1, query_id: q.id
     response.should be_success
     expect(assigns(:query)).to_not be_nil
     expect(assigns(:query).filters).to include 'authorized_viewers'

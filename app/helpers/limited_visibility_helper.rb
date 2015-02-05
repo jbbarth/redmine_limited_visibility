@@ -2,13 +2,17 @@ module LimitedVisibilityHelper
   def function_ids_for_current_viewers(issue)
     viewers = []
     if issue.new_record? # create new issue
-      current_functions = functional_roles_for_current_user(issue.project)
-      if current_functions.present? # current user has at least one functional role
-        current_functions.each do |r|
-          viewers = viewers | r.authorized_viewer_ids
+      if issue.authorized_viewer_ids.present?
+        viewers = issue.authorized_viewer_ids
+      else
+        current_functions = functional_roles_for_current_user(issue.project)
+        if current_functions.present? # current user has at least one functional role
+          current_functions.each do |r|
+            viewers = viewers | r.authorized_viewer_ids
+          end
+        else # current user has no visibility role (can see all issues)
+          viewers = Function.pluck(:id)
         end
-      else # current user has no visibility role (can see all issues)
-        viewers = Function.pluck(:id)
       end
     else # update existing issue
       if issue && issue.authorized_viewers.present?
@@ -27,17 +31,17 @@ module LimitedVisibilityHelper
   # Returns a string for users/groups option tags
   def assignable_options_for_select(issue, users, selected=nil)
     s = ''
-    if issue.authorized_viewer_ids.present?
-      functional_roles_ids = issue.authorized_viewer_ids
-    else
-      functional_roles_ids = function_ids_for_current_viewers(issue)
+    if @issue.project.module_enabled?("limited_visibility")
+      if issue.authorized_viewer_ids.present?
+        functional_roles_ids = issue.authorized_viewer_ids
+      else
+        functional_roles_ids = function_ids_for_current_viewers(issue)
+      end
+      functional_roles_ids.each do |function_id|
+        s << content_tag('option', "#{Function.find(function_id).name}", :value => "function-#{function_id}", :selected => (option_value_selected?(function_id, selected) || function_id == selected))
+      end
+      s << "<option disabled>──────────────</option>"
     end
-    functional_roles_ids.each do |function_id|
-      puts "select = #{selected}"
-      puts "function = #{function_id}"
-      s << content_tag('option', "#{Function.find(function_id).name}", :value => "function-#{function_id}", :selected => (option_value_selected?(function_id, selected) || function_id == selected))
-    end
-    s << "<option disabled>──────────────</option>"
     if users.include?(User.current)
       s << content_tag('option', "<< #{l(:label_me)} >>", :value => User.current.id)
     end

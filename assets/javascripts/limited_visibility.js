@@ -76,8 +76,11 @@ $(function() {
 
       // Update disable class
       disable_role_which_cant_be_removed();
+
+      // Reload issue form in order to refresh assign to list when changing visibility
+      $.globalEval( $("#issue_tracker_id").attr("onchange") ); // Execute same onchange action than on the tracker field
     }
   });
   //disable eventual last remaining role
-  disable_role_which_cant_be_removed()
+  disable_role_which_cant_be_removed();
 });

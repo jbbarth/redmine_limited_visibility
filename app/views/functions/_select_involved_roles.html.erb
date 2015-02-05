@@ -1,8 +1,11 @@
+<%
+  @project ||= @issue.project
+  @functions = Function.available_functions_for(@project).sorted
+%>
+
 <p id=involved-roles-form class=involved-roles>
   <label><%= l(:label_involved_members) %></label>
-  <% functions = Function.available_functions_for(@project).sorted if @project
-    functions = Function.sorted if functions.blank?
-    functions.each do |function|
+  <% @functions.each do |function|
       role_is_involved = viewers.include?(function.id)
       role_is_mine = current_user_visibility_roles.include?(function)
     %>

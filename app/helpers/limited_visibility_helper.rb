@@ -23,4 +23,32 @@ module LimitedVisibilityHelper
   def functional_roles_for_current_user(project)
     Function.joins(:members).where(:members => { :user_id => User.current.id, :project_id => project.id })
   end
+
+  # Returns a string for users/groups option tags
+  def assignable_options_for_select(issue, users, selected=nil)
+    s = ''
+    if issue.authorized_viewer_ids.present?
+      functional_roles_ids = issue.authorized_viewer_ids
+    else
+      functional_roles_ids = function_ids_for_current_viewers(issue)
+    end
+    functional_roles_ids.each do |function_id|
+      puts "select = #{selected}"
+      puts "function = #{function_id}"
+      s << content_tag('option', "#{Function.find(function_id).name}", :value => "function-#{function_id}", :selected => (option_value_selected?(function_id, selected) || function_id == selected))
+    end
+    s << "<option disabled>──────────────</option>"
+    if users.include?(User.current)
+      s << content_tag('option', "<< #{l(:label_me)} >>", :value => User.current.id)
+    end
+    groups = ''
+    users.sort.each do |element|
+      selected_attribute = ' selected="selected"' if option_value_selected?(element, selected) || element.id.to_s == selected
+      (element.is_a?(Group) ? groups : s) << %(<option value="#{element.id}"#{selected_attribute}>#{h element.name}</option>)
+    end
+    unless groups.empty?
+      s << %(<optgroup label="#{h(l(:label_group_plural))}">#{groups}</optgroup>)
+    end
+    s.html_safe
+  end
 end

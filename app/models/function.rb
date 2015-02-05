@@ -16,8 +16,15 @@ class Function < ActiveRecord::Base
   validates_presence_of :name
 
   scope :sorted, lambda { order("#{table_name}.position ASC") }
-  scope :available_functions_for, ->(project) { joins(:project_functions).where("project_id = ?", project.id) }
   scope :active_by_default, -> { where("active_by_default = ?", TRUE) }
+
+  def self.available_functions_for(project)
+    functions = Function.joins(:project_functions).where("project_id = ?", project.id).sorted
+    if functions.blank?
+      functions = Function.active_by_default.sorted
+    end
+    functions
+  end
 
   def authorized_viewer_ids
     "#{authorized_viewers}".split("|").reject(&:blank?).map(&:to_i)

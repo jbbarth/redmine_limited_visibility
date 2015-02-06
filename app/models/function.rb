@@ -19,8 +19,8 @@ class Function < ActiveRecord::Base
   scope :active_by_default, -> { where("active_by_default = ?", TRUE) }
 
   def self.available_functions_for(project)
-    functions = Function.joins(:project_functions).where("project_id = ?", project.id).sorted
-    if functions.blank?
+    functions = Function.joins(:project_functions).where("project_id = ?", project.id).sorted if project.present?
+    if functions == nil || functions.blank?
       functions = Function.active_by_default.sorted
     end
     functions

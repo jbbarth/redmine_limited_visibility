@@ -1,5 +1,5 @@
 <%
-  @project ||= @issue.project
+  @project ||= @issue.project if @issue
   @functions = Function.available_functions_for(@project).sorted
 %>
 

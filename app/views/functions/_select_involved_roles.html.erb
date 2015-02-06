@@ -1,6 +1,10 @@
 <%
-  @project ||= @issue.project if @issue
-  @functions = Function.available_functions_for(@project).sorted
+   @project ||= @issue.project if @issue
+   if @project.present?
+     @functions = Function.available_functions_for(@project).sorted
+   else
+     @functions = Function.sorted.all
+   end
 %>
 
 <p id=involved-roles-form class=involved-roles>

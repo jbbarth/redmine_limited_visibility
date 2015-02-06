@@ -65,7 +65,7 @@ function disable_role_which_cant_be_removed() {
 //the "#authorized_viewers" hidden field => |1|4|5|...
 $(function() {
   //bubble up to 'p#involve-roles' to avoid perf issues (not measured, but let's be careful)
-  $('#all_attributes').on('click', '.role', function() {
+  $('#content').on('click', '.role', function() {
     if (!$(this).hasClass('disabled')){
       $(this).toggleClass('involved');
       var authorized = [];

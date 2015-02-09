@@ -10,15 +10,15 @@ module LimitedVisibilityHelper
           current_functions.each do |r|
             viewers = viewers | r.authorized_viewer_ids
           end
-        else # current user has no visibility role (can see all issues)
-          viewers = Function.pluck(:id)
+        else # current user has no visibility role (can see all issues available for the current project)
+          viewers = Function.available_functions_for(issue.project).sorted.pluck(:id)
         end
       end
     else # update existing issue
       if issue && issue.authorized_viewers.present?
-        viewers = issue.authorized_viewers.split('|')
+        viewers = issue.authorized_viewer_ids
       else
-        viewers = Function.pluck(:id)
+        viewers = Function.available_functions_for(issue.project).sorted.pluck(:id)
       end
     end
     viewers.reject(&:blank?).map(&:to_i)
@@ -32,11 +32,7 @@ module LimitedVisibilityHelper
   def assignable_options_for_select(issue, users, selected=nil)
     s = ''
     if @issue.project.module_enabled?("limited_visibility")
-      if issue.authorized_viewer_ids.present?
-        functional_roles_ids = issue.authorized_viewer_ids
-      else
-        functional_roles_ids = function_ids_for_current_viewers(issue)
-      end
+      functional_roles_ids = function_ids_for_current_viewers(issue)
       functional_roles_ids.each do |function_id|
         s << content_tag('option', "#{Function.find(function_id).name}", :value => "function-#{function_id}", :selected => (option_value_selected?(function_id, selected) || function_id == selected))
       end

@@ -12,7 +12,9 @@ describe IssuesController do
     @request.session[:user_id] = 1
     User.current = User.find(1)
     @project = Project.first
+    @project.enable_module!("limited_visibility")
     @project2 = Project.find(2)
+    @project2.enable_module!("limited_visibility")
     @membership = Member.new(user_id: User.current.id, project_id: @project.id)
     @membership.roles << Role.first
     @membership.functions << contractor_role
@@ -35,7 +37,8 @@ describe IssuesController do
   end
 
   it 'do not adds an "authorized viewers filter" to requests if module is not enable for the selected project' do
-    q = IssueQuery.create!(name: "new-query", user: User.find(2), visibility: 2, project: Project.find(1))
+    q = IssueQuery.create!(name: "new-query", user: User.find(2), visibility: 2, project: @project)
+    @project.enabled_module_names -= ['limited_visibility']
     expect(q.filters).to_not include 'authorized_viewers'
     get :index, project_id:1, query_id: q.id
     response.should be_success
@@ -45,7 +48,6 @@ describe IssuesController do
 
   it 'adds an "authorized viewers filter" to requests if module is enable' do
     project = Project.find(1)
-    project.enabled_module_names |= ['limited_visibility']
     q = IssueQuery.create!(name: "new-query", user: User.find(2), visibility: 2, project: project)
     expect(q.filters).to_not include 'authorized_viewers'
     get :index, project_id:1, query_id: q.id
@@ -71,6 +73,7 @@ describe IssuesController do
     q.save!
     get :index, query_id: q.id
     expect(assigns(:issues)).to_not be_nil
+    expect(@project.enabled_module_names).to include "limited_visibility"
     expect(assigns(:issues)).to include issue1
     expect(assigns(:issues)).to_not include issue2
 

@@ -7,9 +7,13 @@ module LimitedVisibilityHelper
       else
         current_functions = functional_roles_for_current_user(issue.project)
         if current_functions.present? # current user has at least one functional role
+          enabled_functions = []
           current_functions.each do |r|
-            viewers = viewers | r.authorized_viewer_ids
+            enabled_functions |= Function.where("id in (?)", r.authorized_viewer_ids).sorted
           end
+          enabled_functions = enabled_functions & Function.available_functions_for(@project).sorted
+          enabled_functions.sort_by {|a| a.position}
+          viewers = enabled_functions.map{ |f| f.id }
         else # current user has no visibility role (can see all issues available for the current project)
           viewers = Function.available_functions_for(issue.project).sorted.pluck(:id)
         end
@@ -25,7 +29,7 @@ module LimitedVisibilityHelper
   end
 
   def functional_roles_for_current_user(project)
-    Function.joins(:members).where(:members => { :user_id => User.current.id, :project_id => project.id })
+    Function.joins(:members).where(:members => { :user_id => User.current.id, :project_id => project.id }).sorted
   end
 
   # Returns a string for users/groups option tags

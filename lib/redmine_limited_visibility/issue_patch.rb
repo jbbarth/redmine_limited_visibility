@@ -6,6 +6,9 @@ module RedmineLimitedVisibility
       base.class_eval do
         unloadable
 
+        belongs_to :assigned_function, class_name: "Function",
+                foreign_key: "assigned_to_function_id"
+
         safe_attributes "authorized_viewers", "assigned_to_function_id"
 
         unless instance_methods.include?(:notified_users_with_limited_visibility)

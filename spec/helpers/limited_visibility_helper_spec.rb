@@ -45,7 +45,7 @@ describe LimitedVisibilityHelper do
       it "returns functional roles for current user if any" do
         dummy_role = stub_model(Function, :authorized_viewers => "|88|")
         allow(self).to receive(:functional_roles_for_current_user).and_return([dummy_role])
-        function_ids_for_current_viewers(issue).should == [88]
+        function_ids_for_current_viewers(issue).should == [88]   # TODO Refactor this test to make it pass...
       end
     end
 

@@ -2,7 +2,7 @@ require_dependency 'issues_controller'
 
 class IssuesController < ApplicationController
 
-  prepend_before_filter :set_assigned_to_function_id, :only => [:create, :update]
+  prepend_before_filter :set_assigned_to_function_id, :only => [:create, :update, :update_form]
 
   private
     def set_assigned_to_function_id

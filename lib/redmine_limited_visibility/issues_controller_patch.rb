@@ -6,7 +6,7 @@ class IssuesController < ApplicationController
 
   private
     def set_assigned_to_function_id
-      if params[:issue][:assigned_to_id].present?
+      if params[:issue].present? && [:assigned_to_id].present?
         if params[:issue][:assigned_to_id].include?("function")
           params[:issue][:assigned_to_id].slice! "function-"
           params[:issue][:assigned_to_function_id] = params[:issue][:assigned_to_id]

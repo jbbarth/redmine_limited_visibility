@@ -7,6 +7,10 @@ module QueriesHelper
     def column_value_with_limited_visibility(column, issue, value)
       if column.name == :authorized_viewers && value.class == String
         functions_from_authorized_viewers(value).join(", ")
+      elsif column.name == :assigned_to && value.blank?
+        if issue.assigned_to_function_id.present?
+          "&#10148; #{issue.assigned_function.name}".html_safe
+        end
       else
         column_value_without_limited_visibility(column, issue, value)
       end

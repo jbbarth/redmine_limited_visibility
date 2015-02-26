@@ -8,5 +8,5 @@ if Redmine::Plugin.installed?(:redmine_organizations)
                        :original      => 'd1b4a2c2eb5c61a65fad04c1fe810bd8006c2736',
                        :name          => 'add-visibility-roles-to-orga',
                        :replace       => 'th.buttons',
-                       :text          => '<th class="visibility_roles"><%= l("label_visibility_roles") %></th><th class="users"> </th><th class="visibility_buttons"> </th>'
+                       :text          => '<th class="visibility_roles"><%= l("label_functional_roles") %></th><th class="users"> </th><th class="visibility_buttons"> </th>'
 end

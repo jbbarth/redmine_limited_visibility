@@ -1,7 +1,7 @@
 class FunctionsController < ApplicationController
   layout 'admin'
 
-  before_filter :require_admin
+  before_filter :require_admin, :except => [:available_functions_per_project]
   before_filter :find_function, :only => [:edit, :update, :destroy]
 
   def new

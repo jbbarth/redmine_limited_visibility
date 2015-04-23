@@ -22,7 +22,7 @@ module QueriesHelper
     # Add 'authorized_viewers' filter if not present
     def retrieve_query_with_limited_visibility
       retrieve_query_without_limited_visibility
-      if @project.present? && @project.module_enabled?("limited_visibility")
+      if @project.blank? || @project.module_enabled?("limited_visibility")
         @query.filters.merge!({ 'authorized_viewers' => { :operator => (User.current.admin? ? "*" : "mine"), :values => [""] } }) if @query.is_a?(IssueQuery) && !@query.filters.include?('authorized_viewers')
       end
     end

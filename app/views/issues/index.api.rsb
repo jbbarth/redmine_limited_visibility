@@ -32,6 +32,12 @@ api.array :issues, api_meta(:total_count => @issue_count, :offset => @offset, :l
         end
       end if include_in_api_response?('relations')
 
+      if issue.watcher_users.include?(User.current)  # && include_in_api_response?('watchers')
+        api.watched "1"
+      else
+        api.watched "0"
+      end
+
       api.array :journals do
         issue.journals.each do |journal|
           api.journal :id => journal.id do

@@ -18,6 +18,7 @@ module QueriesHelper
     alias_method_chain :column_value, :limited_visibility
   end
 
+
   unless instance_methods.include?(:retrieve_query_with_limited_visibility)
     # Add 'authorized_viewers' filter if not present
     def retrieve_query_with_limited_visibility

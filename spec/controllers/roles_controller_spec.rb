@@ -9,7 +9,7 @@ describe RolesController do
   describe "GET 'index'" do
     it "should be successful" do
       get 'index'
-      response.should be_success
+      expect(response).to be_success
       assigns(:functional_roles).should_not be_nil
       assigns(:roles).should_not be_nil
     end

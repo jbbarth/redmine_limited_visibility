@@ -31,7 +31,7 @@ describe IssuesController do
     q = IssueQuery.create!(name: "new-query", user: User.find(2), visibility: 2, project: nil)
     expect(q.filters).to_not include 'authorized_viewers'
     get :index, query_id: q.id
-    response.should be_success
+    expect(response).to be_success
     expect(assigns(:query)).to_not be_nil
     expect(assigns(:query).filters).to_not include 'authorized_viewers'
   end
@@ -41,7 +41,7 @@ describe IssuesController do
     @project.enabled_module_names -= ['limited_visibility']
     expect(q.filters).to_not include 'authorized_viewers'
     get :index, project_id:1, query_id: q.id
-    response.should be_success
+    expect(response).to be_success
     expect(assigns(:query)).to_not be_nil
     expect(assigns(:query).filters).to_not include 'authorized_viewers'
   end
@@ -51,7 +51,7 @@ describe IssuesController do
     q = IssueQuery.create!(name: "new-query", user: User.find(2), visibility: 2, project: project)
     expect(q.filters).to_not include 'authorized_viewers'
     get :index, project_id:1, query_id: q.id
-    response.should be_success
+    expect(response).to be_success
     expect(assigns(:query)).to_not be_nil
     expect(assigns(:query).filters).to include 'authorized_viewers'
   end

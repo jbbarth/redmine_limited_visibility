@@ -1,4 +1,4 @@
-<% if @project.module_enabled?("limited_visibility") %>
+<% if @issue.project.module_enabled?("limited_visibility") %>
 
   <% viewers = function_ids_for_current_viewers(@issue) %>
   <% @functions = Function.available_functions_for(@project).sorted %>

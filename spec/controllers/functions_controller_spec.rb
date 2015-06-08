@@ -14,7 +14,7 @@ describe FunctionsController do
 
     it "should redirect to roles index" do
       post :create, function: { name: "NewFunction" }
-      response.should redirect_to(roles_path)
+      expect(response).to redirect_to(roles_path)
     end
   end
 

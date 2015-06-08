@@ -14,7 +14,7 @@ describe VisibilitiesController do
       current_standard_role = member.roles.first
       put :update_visibility_roles, { id: member.id, membership: {role_ids: [project_office_role.id, contractor_role.id]} }
       expect(assigns(:project)).not_to be nil
-      response.should redirect_to settings_project_path(assigns(:project), :tab => 'visibility')
+      expect(response).to redirect_to settings_project_path(assigns(:project), :tab => 'visibility')
       member.reload
       expect(member.roles).to include project_office_role
       expect(member.roles).to include contractor_role

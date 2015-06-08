@@ -24,7 +24,7 @@ describe RolesController do
 
     it "should redirect to roles index" do
       post :create, role: { name: "NewRole" }
-      response.should redirect_to(roles_path)
+      expect(response).to redirect_to(roles_path)
     end
   end
 

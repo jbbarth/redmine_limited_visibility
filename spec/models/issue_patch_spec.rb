@@ -13,14 +13,14 @@ describe RedmineLimitedVisibility::IssuePatch do
 
   describe "#authorized_viewers" do
     it "has a authorized_viewers column" do
-      issue.attributes.should include "authorized_viewers"
+      expect(issue.attributes).to include "authorized_viewers"
     end
 
     it "is a safe attribute" do
       # avoid loading too many dependencies
-      issue.stub(:new_statuses_allowed_to) { [true] }
+      allow(issue).to receive(:new_statuses_allowed_to).and_return([true])
       issue.safe_attributes = { "authorized_viewers" => "All of them" }
-      issue.authorized_viewers.should == "All of them"
+      expect(issue.authorized_viewers).to eq "All of them"
     end
   end
 
@@ -35,12 +35,12 @@ describe RedmineLimitedVisibility::IssuePatch do
       member.save!
 
       notified = issue.notified_users
-      notified.should_not be_nil
-      notified.size.should > 0
-      notified.should_not include User.anonymous
-      notified.should include User.find(2) # member with right function
-      notified.should_not include User.find(3) # not a member of the project
-      notified.should_not include User.find(8) # member of project 2 but mail_notification = false
+      expect(notified).to_not be_nil
+      expect(notified.size).to be > 0
+      expect(notified).to_not include User.anonymous
+      expect(notified).to include User.find(2) # member with right function
+      expect(notified).to_not include User.find(3) # not a member of the project
+      expect(notified).to_not include User.find(8) # member of project 2 but mail_notification = false
     end
 
     it 'should NOT notify users if their functions are not involved' do
@@ -55,10 +55,10 @@ describe RedmineLimitedVisibility::IssuePatch do
       member.save!
 
       notified = issue.notified_users
-      notified.should_not be_nil
-      notified.size.should eq 0
-      notified.should_not include User.anonymous
-      notified.should_not include User.find(2) # member with different function
+      expect(notified).to_not be_nil
+      expect(notified.size).to eq 0
+      expect(notified).to_not include User.anonymous
+      expect(notified).to_not include User.find(2) # member with different function
     end
 
     it 'should notify users if issue has no specific function' do
@@ -66,17 +66,17 @@ describe RedmineLimitedVisibility::IssuePatch do
 
       notified = issue.notified_users
 
-      notified.should_not be_nil
-      notified.size.should eq 1
-      notified.should_not include User.anonymous
-      notified.should include User.find(2) # member without any functional role
-      notified.should_not include User.find(3) # not a member of the project
-      notified.should_not include User.find(8) # member of project 2 but mail_notification = false
+      expect(notified).to_not be_nil
+      expect(notified.size).to eq 1
+      expect(notified).to_not include User.anonymous
+      expect(notified).to include User.find(2) # member without any functional role
+      expect(notified).to_not include User.find(3) # not a member of the project
+      expect(notified).to_not include User.find(8) # member of project 2 but mail_notification = false
     end
   end
 
   describe "#involved_users" do
-    let(:issue) { stub_model(Issue) }
+    let(:issue) { Issue.new }
     let(:project) { Project.find(1) }
 
     it "returns users 'involved' in this issue, who have at least one function in the authorized_viewer_ids functions" do
@@ -88,27 +88,27 @@ describe RedmineLimitedVisibility::IssuePatch do
       end
 
       users = issue.involved_users
-      users.map(&:class).uniq.should == [User]
-      users.map(&:id).should == [2,3,5]
+      expect(users.map(&:class).uniq).to eq [User]
+      expect(users.map(&:id)).to eq [2,3,5]
     end
   end
 
   describe "#authorized_viewer_ids" do
-    let(:issue) { stub_model(Issue) }
+    let(:issue) { Issue.new }
 
     it "transforms the #authorized_viewers string into an array of ids" do
       allow(issue).to receive(:authorized_viewers).and_return("|3|5|99|")
-      issue.authorized_viewer_ids.should == [3, 5, 99]
+      expect(issue.authorized_viewer_ids).to eq [3, 5, 99]
     end
 
     it "returns nil if #authorized_viewers is nil" do
       allow(issue).to receive(:authorized_viewers).and_return(nil)
-      issue.authorized_viewer_ids.should == []
+      expect(issue.authorized_viewer_ids).to eq []
     end
 
     it "removes blank values from the return value" do
       allow(issue).to receive(:authorized_viewers).and_return("||1| |")
-      issue.authorized_viewer_ids.should == [1]
+      expect(issue.authorized_viewer_ids).to eq [1]
     end
   end
 end

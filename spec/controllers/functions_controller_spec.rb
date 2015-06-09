@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe FunctionsController do
+describe FunctionsController, type: :controller do
   fixtures :users
 
   before { @request.session[:user_id] = 1 }

@@ -12,7 +12,7 @@ describe LimitedVisibilityHelper do
     @membership.functions << contractor_role
     @membership.roles << Role.first
     @membership.save!
-    User.current.member_of?(@project).should be true
+    expect(User.current.member_of?(@project)).to be true
   end
 
   let(:contractor_role) { Function.where(name: "Contractors").first_or_create }
@@ -20,14 +20,14 @@ describe LimitedVisibilityHelper do
 
   describe 'functional_roles_for_current_user' do
     it 'should retrieve functional roles for current user' do
-      functional_roles_for_current_user(@project).should_not be_nil
-      functional_roles_for_current_user(@project).should include contractor_role
-      functional_roles_for_current_user(@project).should_not include project_office_role
+      expect(functional_roles_for_current_user(@project)).to_not be_nil
+      expect(functional_roles_for_current_user(@project)).to include contractor_role
+      expect(functional_roles_for_current_user(@project)).to_not include project_office_role
     end
 
     it "should return an empty array if current user doesn't have any membership on current project" do
       User.current = User.find(6) #not member of @project
-      functional_roles_for_current_user(@project).should == []
+      expect(functional_roles_for_current_user(@project)).to eq []
     end
   end
 
@@ -35,17 +35,15 @@ describe LimitedVisibilityHelper do
     context "with a new issue" do
       let(:issue) { Issue.new(:project => @project) }
 
+      it "returns functional roles for current user if any" do
+        expect(function_ids_for_current_viewers(issue)).to eq [contractor_role.id]
+      end
+
       it "returns all functional roles if current user cannot see anything" do
         function1 = contractor_role.id
         function2 = project_office_role.id
         allow(self).to receive(:functional_roles_for_current_user).and_return([])
-        function_ids_for_current_viewers(issue).should == [function1,function2]
-      end
-
-      it "returns functional roles for current user if any" do
-        dummy_role = stub_model(Function, :authorized_viewers => "|88|")
-        allow(self).to receive(:functional_roles_for_current_user).and_return([dummy_role])
-        function_ids_for_current_viewers(issue).should == [88]   # TODO Refactor this test to make it pass...
+        expect(function_ids_for_current_viewers(issue)).to eq [function1,function2]
       end
     end
 
@@ -54,14 +52,14 @@ describe LimitedVisibilityHelper do
 
       it "returns authorized viewers if any" do
         allow(issue).to receive(:authorized_viewers).and_return("|9|")
-        function_ids_for_current_viewers(issue).should == [9]
+        expect(function_ids_for_current_viewers(issue)).to eq [9]
       end
 
       it "returns all functional roles if none" do
         function1 = contractor_role.id
         function2 = project_office_role.id
         allow(issue).to receive(:authorized_viewers).and_return(nil)
-        function_ids_for_current_viewers(issue).should == [function1,function2]
+        expect(function_ids_for_current_viewers(issue)).to eq [function1,function2]
       end
     end
   end

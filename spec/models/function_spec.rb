@@ -5,8 +5,8 @@ describe Function do
     contractor_role = Function.where(name: "Contractors").first_or_create
     Function.where(name: "Project Office").first_or_create
     functions = Function.all
-    functions.size.should be >= 2
-    functions.find { |role| role.name == contractor_role.name }.should_not be_nil
+    expect(functions.size).to be >= 2
+    expect(functions.find { |role| role.name == contractor_role.name }).to_not be_nil
   end
 
   it 'set default visibility after creation of a new function' do
@@ -16,13 +16,13 @@ describe Function do
 
   describe "#authorized_viewer_ids" do
     it "returns authorized viewer function ids as an array of integers" do
-      function = stub_model(Function, :authorized_viewers => "|3|45|")
-      function.authorized_viewer_ids.should == [3,45]
+      function = Function.new(:authorized_viewers => "|3|45|")
+      expect(function.authorized_viewer_ids).to eq [3,45]
     end
 
     it "doesn't break if column is blank" do
-      function = stub_model(Function, :authorized_viewers => nil)
-      function.authorized_viewer_ids.should == []
+      function = Function.new(:authorized_viewers => nil)
+      expect(function.authorized_viewer_ids).to eq []
     end
   end
 end

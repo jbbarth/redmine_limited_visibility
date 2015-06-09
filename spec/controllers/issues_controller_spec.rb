@@ -2,7 +2,7 @@
 require "spec_helper"
 require 'redmine_limited_visibility/queries_helper_patch'
 
-describe IssuesController do
+describe IssuesController, type: :controller do
   fixtures :users, :roles, :projects, :members, :member_roles, :issues, :issue_statuses, :trackers, :enumerations, :custom_fields, :enabled_modules
 
   let(:contractor_role) { Function.where(name: "Contractors").first_or_create }
@@ -23,17 +23,17 @@ describe IssuesController do
     @membership2.roles << Role.first
     @membership2.functions << project_office_role
     @membership2.save!
-    User.current.member_of?(@project).should be true
-    User.current.member_of?(@project2).should be true
+    expect(User.current.member_of?(@project)).to be true
+    expect(User.current.member_of?(@project2)).to be true
   end
 
-  it 'do not adds an "authorized viewers filter" to requests if there is no specific project' do
+  it 'adds an "authorized viewers" filter to requests if there is no specific project' do
     q = IssueQuery.create!(name: "new-query", user: User.find(2), visibility: 2, project: nil)
     expect(q.filters).to_not include 'authorized_viewers'
     get :index, query_id: q.id
     expect(response).to be_success
     expect(assigns(:query)).to_not be_nil
-    expect(assigns(:query).filters).to_not include 'authorized_viewers'
+    expect(assigns(:query).filters).to include 'authorized_viewers'
   end
 
   it 'do not adds an "authorized viewers filter" to requests if module is not enable for the selected project' do

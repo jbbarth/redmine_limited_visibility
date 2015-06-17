@@ -1,0 +1,45 @@
+<!-- begin untouched core view -->
+
+<fieldset class="box">
+  <legend><%= l(:label_project_plural) %> <%= toggle_checkboxes_link('.projects-selection input:enabled') %></legend>
+  <div class="objects-selection">
+    <div class="projects-selection">
+    <%= render_project_nested_lists(@projects) do |p| %>
+      <label>
+        <%= check_box_tag('membership[project_ids][]', p.id, false, :id => nil, :disabled => @principal.member_of?(p)) %> <%= p %>
+      </label>
+    <% end %>
+    </div>
+  </div>
+</fieldset>
+
+<fieldset class="box">
+  <legend><%= l(:label_role_plural) %> <%= toggle_checkboxes_link('.roles-selection input') %></legend>
+  <div class="roles-selection">
+  <% @roles.each do |role| %>
+    <label>
+      <%= check_box_tag 'membership[role_ids][]', role.id, false, :id => nil %>
+      <%= role %>
+    </label>
+  <% end %>
+  </div>
+</fieldset>
+
+<!-- end untouched core view -->
+
+<!-- Adding here our functional roles -->
+
+<% functions = Function.sorted.all %>
+<fieldset class="box">
+  <legend><%= l(:label_functional_roles) %></legend>
+  <div class="functional-roles-selection two-columns">
+    <% functions.each do |function| %>
+      <div>
+        <%= check_box_tag 'membership[function_ids][]', function.id, false, :id => nil %>
+        <%= h function %>
+      </div>
+    <% end %>
+  </div>
+</fieldset>
+
+<!-- end of our addition -->

@@ -34,3 +34,9 @@ a.icon-roles  { background-image: url(../images/magnify.png); margin-right:6px; 
 .organizations .functions_checkboxes { width: 250px; }
 table.organizations th { text-align: left; padding-left: 50px; }
 .organizations .visibility_buttons { width: 110px !important;}
+
+.two-columns {
+    -webkit-columns: 2;
+    -moz-columns: 2;
+    columns: 2;
+}

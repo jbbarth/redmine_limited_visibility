@@ -26,12 +26,12 @@ class Member < ActiveRecord::Base
         end
         if Redmine::Plugin.installed?(:redmine_limited_visibility)
           function_ids_by_project = function_ids | OrganizationFunction.where(organization_id: principal.organization_id, project_id: project_id).all.collect{|f| f.function_id}
-          project = Project.find(project_id)
+          project = Project.where('id = ?', project_id).first
           function_ids_by_project.each do |function_id|
             if project.functions.present? && !project.functions.map(&:id).include?(function_id.to_i)
               function_ids_by_project.reject! { |id| id == function_id }
             end
-          end
+          end if project.present?
         end
         members << Member.new(:principal => principal, :role_ids => role_ids_by_project, :function_ids => function_ids_by_project, :project_id => project_id)
       end

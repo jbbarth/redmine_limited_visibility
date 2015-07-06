@@ -4,7 +4,8 @@ class IssueQuery < Query
 
   self.operators.merge!({ "mine" => :label_my_roles })
   self.operators_by_filter_type.merge!({ :list_visibility => ["mine", "*"] })
-  self.available_columns << QueryColumn.new(:authorized_viewers, sortable: "#{Issue.table_name}.authorized_viewers", groupable: true)
+  self.available_columns << QueryColumn.new(:authorized_viewers, sortable: "#{Issue.table_name}.authorized_viewers", groupable: true) if self.available_columns.select { |c| c.name == :authorized_viewers }.empty?
+  self.available_columns << QueryColumn.new(:has_been_assigned_to, :sortable => lambda {User.fields_for_order_statement}, :groupable => true) if self.available_columns.select { |c| c.name == :has_been_assigned_to }.empty?
 
   unless instance_methods.include?(:initialize_available_filters_with_authorized_viewers)
     def initialize_available_filters_with_authorized_viewers

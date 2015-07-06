@@ -3,6 +3,28 @@ require_dependency 'queries_helper'
 module QueriesHelper
   include IssuesHelper
 
+  unless instance_methods.include?(:column_content_with_limited_visibility)
+    def column_content_with_limited_visibility(column, issue)
+      if  column.name == :has_been_assigned_to
+        results = []
+        issue.journals.each do |journal|
+          results << journal.details.select {|i| i.prop_key == 'assigned_to_id' }.map(&:value)
+        end
+        results.flatten!
+        if results.present?
+          results.uniq!
+          users = User.where('id' => results)
+          users.collect {|v| column_value(column, issue, v)}.compact.join(', ').html_safe  if users
+        else
+          ""
+        end
+      else
+        column_content_without_limited_visibility(column, issue)
+      end
+    end
+    alias_method_chain :column_content, :limited_visibility
+  end
+
   unless instance_methods.include?(:column_value_with_limited_visibility)
     def column_value_with_limited_visibility(column, issue, value)
       if column.name == :authorized_viewers && value.class == String

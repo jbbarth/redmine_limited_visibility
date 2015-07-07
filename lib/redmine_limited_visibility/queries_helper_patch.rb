@@ -26,17 +26,40 @@ module QueriesHelper
   end
 
   def get_assigned_users_and_functions(column, issue, html=true)
-    results = [issue.assigned_to_id]
+    list_of_users = get_has_been_assigned_users(column, html, issue)
+    list_of_functions = get_has_been_assigned_functions(issue)
+    [list_of_functions, list_of_users].reject(&:blank?).join(', ')
+  end
+
+  def get_has_been_assigned_functions(issue)
+    functions_ids = [issue.assigned_to_function_id]
     issue.journals.each do |journal|
-      results << journal.details.select { |i| i.prop_key == 'assigned_to_id' }.map(&:value)
+      functions_ids << journal.details.select { |i| i.prop_key == 'assigned_to_function_id' }.map(&:old_value)
+      functions_ids << journal.details.select { |i| i.prop_key == 'assigned_to_function_id' }.map(&:value)
     end
-    results.flatten!
-    if results.present?
-      results.uniq!
-      users = User.where('id' => results)
+    functions_ids.flatten!
+    if functions_ids.present?
+      functions_ids.uniq!
+      functions = Function.where('id' => functions_ids)
+      functions.collect { |v| v.name }.compact.join(', ').html_safe if functions
+    else
+      nil
+    end
+  end
+
+  def get_has_been_assigned_users(column, html, issue)
+    users_ids = [issue.assigned_to_id]
+    issue.journals.each do |journal|
+      users_ids << journal.details.select { |i| i.prop_key == 'assigned_to_id' }.map(&:old_value)
+      users_ids << journal.details.select { |i| i.prop_key == 'assigned_to_id' }.map(&:value)
+    end
+    users_ids.flatten!
+    if users_ids.present?
+      users_ids.uniq!
+      users = User.where('id' => users_ids) #would be great to keep the order : ORDER BY FIELD('users'.'id', users_ids)
       users.collect { |v| html ? column_value(column, issue, v) : v.to_s }.compact.join(', ').html_safe if users
     else
-      ""
+      nil
     end
   end
 

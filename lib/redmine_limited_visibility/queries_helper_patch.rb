@@ -6,7 +6,7 @@ module QueriesHelper
   unless instance_methods.include?(:column_content_with_limited_visibility)
     def column_content_with_limited_visibility(column, issue)
       if  column.name == :has_been_assigned_to
-        results = []
+        results = [issue.assigned_to_id]
         issue.journals.each do |journal|
           results << journal.details.select {|i| i.prop_key == 'assigned_to_id' }.map(&:value)
         end

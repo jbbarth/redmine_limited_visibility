@@ -6,23 +6,38 @@ module QueriesHelper
   unless instance_methods.include?(:column_content_with_limited_visibility)
     def column_content_with_limited_visibility(column, issue)
       if  column.name == :has_been_assigned_to
-        results = [issue.assigned_to_id]
-        issue.journals.each do |journal|
-          results << journal.details.select {|i| i.prop_key == 'assigned_to_id' }.map(&:value)
-        end
-        results.flatten!
-        if results.present?
-          results.uniq!
-          users = User.where('id' => results)
-          users.collect {|v| column_value(column, issue, v)}.compact.join(', ').html_safe  if users
-        else
-          ""
-        end
+        get_assigned_users_and_functions(column, issue, true)
       else
         column_content_without_limited_visibility(column, issue)
       end
     end
     alias_method_chain :column_content, :limited_visibility
+  end
+
+  unless instance_methods.include?(:csv_content_with_limited_visibility)
+    def csv_content_with_limited_visibility(column, issue)
+      if  column.name == :has_been_assigned_to
+        get_assigned_users_and_functions(column, issue, false)
+      else
+        csv_content_without_limited_visibility(column, issue)
+      end
+    end
+    alias_method_chain :csv_content, :limited_visibility
+  end
+
+  def get_assigned_users_and_functions(column, issue, html=true)
+    results = [issue.assigned_to_id]
+    issue.journals.each do |journal|
+      results << journal.details.select { |i| i.prop_key == 'assigned_to_id' }.map(&:value)
+    end
+    results.flatten!
+    if results.present?
+      results.uniq!
+      users = User.where('id' => results)
+      users.collect { |v| html ? column_value(column, issue, v) : v.to_s }.compact.join(', ').html_safe if users
+    else
+      ""
+    end
   end
 
   unless instance_methods.include?(:column_value_with_limited_visibility)

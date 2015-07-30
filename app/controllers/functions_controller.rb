@@ -1,7 +1,7 @@
 class FunctionsController < ApplicationController
   layout 'admin'
 
-  before_filter :require_admin, :except => [:available_functions_per_project]
+  before_filter :require_admin, :except => [:available_functions_per_project, :visible_functions_per_tracker]
   before_filter :find_function, :only => [:edit, :update, :destroy]
 
   def new
@@ -57,6 +57,27 @@ class FunctionsController < ApplicationController
     functions = Function.find(params[:function_ids].reject(&:empty?))
     project = Project.find(params[:project_id])
     project.functions = functions
+    respond_to do |format|
+      format.html { redirect_to :controller => 'projects', :action => 'settings', :id => project.id, :tab => 'functional_roles' }
+      format.js
+    end
+  end
+
+  def visible_functions_per_tracker
+    project = Project.find(params[:project_id])
+    tracker_ids = project.tracker_ids
+    function_ids = project.function_ids
+    tracker_ids.each do |tracker_id|
+      function_ids.each do |function_id|
+        project_function = ProjectFunction.where(function_id: function_id, project_id: project.id).first
+        if project_function.present?
+          project_function_tracker = ProjectFunctionTracker.find_or_create_by(tracker_id: tracker_id, project_function_id: project_function.id)
+          project_function_tracker.visible = params["function_visibility"][tracker_id.to_s].include?(function_id.to_s)
+          project_function_tracker.checked = params["function_activation"][tracker_id.to_s].include?(function_id.to_s)
+          project_function_tracker.save
+        end
+      end
+    end
     respond_to do |format|
       format.html { redirect_to :controller => 'projects', :action => 'settings', :id => project.id, :tab => 'functional_roles' }
       format.js

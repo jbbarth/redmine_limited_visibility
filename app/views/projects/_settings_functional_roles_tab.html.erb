@@ -3,24 +3,89 @@
              :url => { :controller => 'functions',
                        :action => 'available_functions_per_project',
                        :project_id => @project.id },
-             :html => { :id => "functions-form" }) do |f| -%>
+             :html => { :id => "functions-form" }) do %>
 
-  <fieldset class="box">
-    <legend><%= l(:text_select_project_functional_roles) %></legend>
+    <fieldset class="box">
+      <legend><%= l(:text_select_project_functional_roles) %></legend>
 
-  <div class='functions_checkboxes'>
-    <p>
-      <% Function.sorted.all.each do |function| %>
-        <% checked = @project.functions.empty? ? function.active_by_default : @project.functions.include?(function) %>
-        <label><%= check_box_tag 'function_ids[]', function.id, checked %> <%=h function %></label><br />
-      <% end %>
-    </p>
-    <%= hidden_field_tag 'function_ids[]', '' %>
+    <div class='functions_checkboxes'>
+      <p>
+        <% Function.sorted.all.each do |function| %>
+          <% checked = @project.functions.empty? ? function.active_by_default : @project.functions.include?(function) %>
+          <label><%= check_box_tag 'function_ids[]', function.id, checked %> <%=h function %></label><br />
+        <% end %>
+      </p>
+      <%= hidden_field_tag 'function_ids[]', '' %>
 
-  </div>
+    </div>
+
+    <p><%= check_all_links 'functions-form' %></p>
+    <p><%= submit_tag l(:button_confirm) %></p>
 
   </fieldset>
-  <p><%= check_all_links 'functions-form' %></p>
-  <p><%= submit_tag l(:button_change) %></p>
 
 <% end %>
+
+
+<fieldset class="box">
+  <legend><%= "Configurer l'état des rôles fonctionnels par tracker" %></legend>
+
+  <% if @project.functions.empty? %>
+    <p>Veuillez tout d'abord confirmer les rôles fonctionnels actifs pour ce projet</p>
+  <% else %>
+
+    <%= form_for(:functions,
+                 :method => :put,
+                 :url => { :controller => 'functions',
+                           :action => 'visible_functions_per_tracker',
+                           :project_id => @project.id},
+                 :html => {:id => "visibilities-form"}) do %>
+      <div class="autoscroll">
+        <table class="list visibilities">
+          <thead>
+          <tr>
+            <th style="width: 200px;white-space: pre-line;vertical-align: middle;"></th>
+            <% @project.trackers.sorted.all.each do |function| %>
+              <th style="width: 100px;white-space:pre-line;vertical-align: middle;">
+                <%= content_tag('span', h(function.name)) %>
+              </th>
+            <% end %>
+          </tr>
+          </thead>
+          <tbody>
+          <% visible_functions_per_tracker, checked_functions_per_tracker = {}, {}
+             @project.trackers.each { |t|  visible_functions_per_tracker[t.id] = []; checked_functions_per_tracker[t.id] = [] }
+             ProjectFunctionTracker.joins(:project_function).includes(:project_function).where("project_id = ?", @project.id).each do |r|
+               visible_functions_per_tracker[r.tracker_id] << r.project_function.function_id if r.visible
+               checked_functions_per_tracker[r.tracker_id] << r.project_function.function_id if r.checked
+             end
+             %>
+          <% functions = @project.functions.present? ? @project.functions : Function.active_by_default.sorted.all %>
+          <% functions.each do |function| %>
+            <tr class="<%= cycle('odd', 'even') %> visibility-<%= function.name.parameterize %>">
+              <td class="name">
+                <%= content_tag('span', h(function.name)) %>
+              </td>
+              <% @project.trackers.sorted.all.each do |tracker| %>
+                <td>
+                  <label><%= check_box_tag "function_visibility[#{tracker.id}][]", function.id, (visible_functions_per_tracker[tracker.id].include?(function.id)), :id => nil, :class => "function-#{function.id}" %>
+                  Visible
+                  </label>
+                  <br>
+                  <label>
+                  <%= check_box_tag "function_activation[#{tracker.id}][]", function.id, (checked_functions_per_tracker[tracker.id].include?(function.id)), :id => nil, :class => "function-#{function.id}" %>
+                  Coché
+                  </label>
+                </td>
+              <% end %>
+            </tr>
+          <% end %>
+          </tbody>
+        </table>
+      </div>
+      <p><%= check_all_links 'visibilities-form' %></p>
+      <p><%= submit_tag l(:button_save) %></p>
+    <% end %>
+  <% end %>
+
+</fieldset>

@@ -72,8 +72,8 @@ class FunctionsController < ApplicationController
         project_function = ProjectFunction.where(function_id: function_id, project_id: project.id).first
         if project_function.present?
           project_function_tracker = ProjectFunctionTracker.find_or_create_by(tracker_id: tracker_id, project_function_id: project_function.id)
-          project_function_tracker.visible = params["function_visibility"][tracker_id.to_s].include?(function_id.to_s)
-          project_function_tracker.checked = params["function_activation"][tracker_id.to_s].include?(function_id.to_s)
+          project_function_tracker.visible = params["function_visibility"][tracker_id.to_s].present? && params["function_visibility"][tracker_id.to_s].include?(function_id.to_s)
+          project_function_tracker.checked = params["function_activation"][tracker_id.to_s].present? && params["function_activation"][tracker_id.to_s].include?(function_id.to_s)
           project_function_tracker.save
         end
       end

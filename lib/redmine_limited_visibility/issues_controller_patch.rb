@@ -4,6 +4,8 @@ class IssuesController < ApplicationController
 
   prepend_before_filter :set_assigned_to_function_id, :only => [:create, :update]
 
+  before_filter :set_previous_tracker_id, :only => [:new, :edit]
+
   private
     def set_assigned_to_function_id
       if params[:issue].present? && params[:issue][:assigned_to_id].present?
@@ -15,5 +17,9 @@ class IssuesController < ApplicationController
           params[:issue][:assigned_to_function_id] = nil
         end
       end
+    end
+
+    def set_previous_tracker_id
+      @previous_tracker_id = params[:previous_tracker_id]
     end
 end

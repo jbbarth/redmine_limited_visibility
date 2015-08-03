@@ -1,4 +1,28 @@
 module LimitedVisibilityHelper
+
+  def function_ids_for_current_tracker(issue, previous_tracker_id)
+    viewers = []
+    if issue.new_record? # create new issue
+      if issue.authorized_viewer_ids.present? && previous_tracker_id.to_i == issue.tracker_id
+        viewers = issue.authorized_viewer_ids
+      else
+        current_functions = ProjectFunctionTracker.joins(:project_function).where("project_id = ? AND tracker_id = ?", issue.project_id, issue.tracker_id)
+        if current_functions.present? # current tracker has at least one functional role in settings
+          viewers = current_functions.select{ |f| f.checked == true }.map{ |c| c.function.id }
+        else # else check all functions
+          viewers = Function.available_functions_for(issue.project).sorted.pluck(:id)
+        end
+      end
+    else # update existing issue
+      if issue && issue.authorized_viewers.present?
+        viewers = issue.authorized_viewer_ids
+      else
+        viewers = Function.available_functions_for(issue.project).sorted.pluck(:id)
+      end
+    end
+    viewers.reject(&:blank?).map(&:to_i)
+  end
+
   def function_ids_for_current_viewers(issue)
     viewers = []
     if issue.new_record? # create new issue
@@ -55,4 +79,5 @@ module LimitedVisibilityHelper
     end
     s.html_safe
   end
+
 end

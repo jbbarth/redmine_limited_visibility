@@ -5,16 +5,33 @@
    else
      @functions = Function.sorted
    end
+   hidden_functions ||= []
 %>
 
 <p id=involved-roles-form class=involved-roles>
   <label><%= l(:label_involved_members) %></label>
-  <% @functions.each do |function|
-      role_is_involved = viewers.include?(function.id)
-      role_is_mine = current_user_visibility_roles.include?(function)
-    %>
-    <% styles = role_is_involved ? 'involved' : '' %>
-    <% styles << (role_is_mine ? ' mine' : '') %>
+  <% (@functions-hidden_functions).each do |function| %>
+    <% styles = viewers.include?(function.id) ? 'involved ' : '' %>
+    <% styles << (current_user_visibility_roles.include?(function) ? ' mine' : '') %>
     <%= render "functions/visibility_role", :function => function, :styles => styles %>
   <% end %>
+  <% hidden_functions.each_with_index do |function, index| %>
+    <%= ' ( ' if index==0 %>
+    <%= link_to_function 'Voir les rôles masqués',
+                         "$('.hidden_function').toggle();toggle_name(this);return false;",
+                         :class => 'toggle-hidden-functions',
+                         :style => ''  if index==0  %>
+    <% styles = viewers.include?(function.id) ? 'involved ' : '' %>
+    <% styles << (current_user_visibility_roles.include?(function) ? ' mine' : '') %>
+    <% styles << ' hidden_function' %>
+    <%= render "functions/visibility_role", :function => function, :styles => styles %>
+    <%= ' ) ' if index==hidden_functions.length-1 %>
+  <% end %>
 </p>
+
+<script>
+  $('.hidden_function').hide();
+  function toggle_name(lnk_obj){
+    lnk_obj.innerHTML = (lnk_obj.innerHTML == 'Cacher ces rôles') ? 'Voir les rôles masqués' : 'Cacher ces rôles' ;
+  }
+</script>

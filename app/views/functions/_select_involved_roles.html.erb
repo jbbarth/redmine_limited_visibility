@@ -18,7 +18,7 @@
   <% hidden_functions.each_with_index do |function, index| %>
     <%= ' ( ' if index==0 %>
     <%= link_to_function 'Voir les rôles masqués',
-                         "$('.hidden_function').toggle();toggle_name(this);return false;",
+                         "$(this).closest('div').find('.hidden_function').toggle();toggle_name(this);return false;",
                          :class => 'toggle-hidden-functions',
                          :style => ''  if index==0  %>
     <% styles = viewers.include?(function.id) ? 'involved ' : '' %>

@@ -3,15 +3,39 @@
   <% viewers = function_ids_for_current_viewers(@issue) %>
   <% @functions = Function.available_functions_for(@project).sorted %>
 
-  <hr/>
+  <% hidden_functions = ProjectFunctionTracker.joins(:project_function).includes(:project_function).where("project_id = ? AND tracker_id = ? AND visible != ?", @issue.project_id, @issue.tracker_id, true).map{ |c| c.function } %>
+
+
+     <hr/>
   <div id='current_involved_roles_list' class='involved-roles' style='display: flex;'>
     <label id="label_involved_roles"><%= l("field_authorized_viewers") %></label>
     <span id="list_of_involved_roles_per_issue">
-    <% @functions.each do |function| %>
+    <% (@functions-hidden_functions).each do |function| %>
       <% styles = "disabled" + (viewers.include?(function.id) || @issue.authorized_viewers.blank? ? " involved" : "") %>
       <%= render "functions/visibility_role", :function => function, :styles => styles %>
     <% end %>
+
+
+      <% hidden_functions.each_with_index do |function, index| %>
+    <%= ' ( ' if index==0 %>
+        <%= link_to_function 'Voir les rôles masqués',
+                             "$(this).closest('div').find('.hidden_function').toggle();toggle_name(this);return false;",
+                             :class => 'toggle-hidden-functions',
+                             :style => ''  if index==0  %>
+        <% styles = viewers.include?(function.id) ? 'involved ' : '' %>
+        <% styles << ' hidden_function' %>
+        <%= render "functions/visibility_role", :function => function, :styles => styles %>
+        <%= ' ) ' if index==hidden_functions.length-1 %>
+  <% end %>
+
     </span>
   </div>
 
 <% end %>
+
+<script>
+  $('.hidden_function').hide();
+  function toggle_name(lnk_obj){
+    lnk_obj.innerHTML = (lnk_obj.innerHTML == 'Cacher ces rôles') ? 'Voir les rôles masqués' : 'Cacher ces rôles' ;
+  }
+</script>

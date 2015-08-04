@@ -46,7 +46,7 @@
           <tr>
             <th style="width: 200px;white-space: pre-line;vertical-align: middle;"></th>
             <% @project.trackers.sorted.all.each do |function| %>
-              <th style="width: 100px;white-space:pre-line;vertical-align: middle;">
+              <th style="width: 100px;white-space:pre-line;vertical-align: middle;text-align: left;">
                 <%= content_tag('span', h(function.name)) %>
               </th>
             <% end %>
@@ -67,7 +67,7 @@
                 <%= content_tag('span', h(function.name)) %>
               </td>
               <% @project.trackers.sorted.all.each do |tracker| %>
-                <td>
+                <td style="text-align: left;">
                   <label><%= check_box_tag "function_visibility[#{tracker.id}][]", function.id, (visible_functions_per_tracker[tracker.id].include?(function.id)), :id => nil, :class => "function-#{function.id}" %>
                   Visible
                   </label>

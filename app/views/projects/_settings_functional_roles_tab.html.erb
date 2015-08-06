@@ -7,7 +7,8 @@
   <fieldset class="box">
     <legend>Copier les paramètres d'un autre projet</legend>
     <p>
-      <% projects = User.current.projects.active.select(:id, :name, :identifier, :lft, :rgt).to_a
+      <% projects = Project.active.where("id IN (?)", ProjectFunction.select(:project_id).group(:project_id).pluck(:project_id)).select(:id, :name, :identifier, :lft, :rgt).to_a
+         projects -= [@project]
          if projects.any?
            options =
                ("<option value=''>Sélectionner un projet</option>" +
@@ -17,8 +18,13 @@
            end
            options = options.gsub('&nbsp;&#187;', '&nbsp;').html_safe %>
            <%= select_tag :project_from, options %>
-        <% end %>
-      <%= submit_tag l(:button_copy) %>
+           <%= submit_tag l(:button_copy) %>
+        <% else %>
+
+           <p>Aucun autre projet n'est configuré pour l'instant</p>
+
+         <% end %>
+
     </p>
   </fieldset>
 <% end %>

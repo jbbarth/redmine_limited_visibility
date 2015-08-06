@@ -64,7 +64,7 @@ class FunctionsController < ApplicationController
       pf.project_function_trackers.each do |pft|
         new_pft = ProjectFunctionTracker.new
         new_pft.attributes = pft.attributes.dup.except("id", "project_function_id")
-        pf.project_function_trackers << new_pft
+        new_pf.project_function_trackers << new_pft
       end
       current_project.project_functions << new_pf
     end

@@ -77,8 +77,8 @@
                checked_functions_per_tracker[r.tracker_id] << r.project_function.function_id if r.checked
              end
              %>
-          <% functions = @project.functions.present? ? @project.functions : Function.active_by_default.sorted.all %>
-          <% functions.each do |function| %>
+          <% functions = @project.functions.present? ? @project.functions : Function.active_by_default %>
+          <% functions.sorted.each do |function| %>
             <tr class="<%= cycle('odd', 'even') %> visibility-<%= function.name.parameterize %>">
               <td class="name">
                 <%= content_tag('span', h(function.name)) %>

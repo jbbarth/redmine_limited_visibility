@@ -16,22 +16,21 @@
     <%= render "functions/visibility_role", :function => function, :styles => styles %>
   <% end %>
   <% hidden_functions.each_with_index do |function, index| %>
-    <%= ' ( ' if index==0 %>
-    <%= link_to_function 'Voir les rôles masqués',
+    <%= link_to_function 'Voir les rôles silencieux',
                          "$(this).closest('div').find('.hidden_function').toggle();toggle_name(this);return false;",
                          :class => 'toggle-hidden-functions',
                          :style => ''  if index==0  %>
+    <%= '<BR>'.html_safe if index==0 %>
     <% styles = viewers.include?(function.id) ? 'involved ' : '' %>
     <% styles << (current_user_visibility_roles.include?(function) ? ' mine' : '') %>
     <% styles << ' hidden_function' %>
     <%= render "functions/visibility_role", :function => function, :styles => styles %>
-    <%= ' ) ' if index==hidden_functions.length-1 %>
   <% end %>
 </p>
 
 <script>
   $('.hidden_function').hide();
   function toggle_name(lnk_obj){
-    lnk_obj.innerHTML = (lnk_obj.innerHTML == 'Cacher ces rôles') ? 'Voir les rôles masqués' : 'Cacher ces rôles' ;
+    lnk_obj.innerHTML = (lnk_obj.innerHTML == 'Cacher les rôles silencieux') ? 'Voir les rôles silencieux' : 'Cacher les rôles silencieux' ;
   }
 </script>

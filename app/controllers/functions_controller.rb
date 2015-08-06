@@ -53,10 +53,35 @@ class FunctionsController < ApplicationController
     end
   end
 
+  def copy_functions_settings_from_project
+    current_project = Project.find(params[:project_id])
+    project_from = Project.find(params[:project_from])
+
+    current_project.project_functions = []
+    project_from.project_functions.each do |pf|
+      new_pf = ProjectFunction.new
+      new_pf.attributes = pf.attributes.dup.except("id", "project_id")
+      pf.project_function_trackers.each do |pft|
+        new_pft = ProjectFunctionTracker.new
+        new_pft.attributes = pft.attributes.dup.except("id", "project_function_id")
+        pf.project_function_trackers << new_pft
+      end
+      current_project.project_functions << new_pf
+    end
+    current_project.autochecked_functions_mode = project_from.autochecked_functions_mode
+    current_project.save
+    respond_to do |format|
+      format.html { redirect_to :controller => 'projects', :action => 'settings', :id => current_project.id, :tab => 'functional_roles' }
+      format.js
+    end
+  end
+
   def available_functions_per_project
     functions = Function.find(params[:function_ids].reject(&:empty?))
     project = Project.find(params[:project_id])
+    project.autochecked_functions_mode = params[:autocheck_mode]
     project.functions = functions
+    project.save
     respond_to do |format|
       format.html { redirect_to :controller => 'projects', :action => 'settings', :id => project.id, :tab => 'functional_roles' }
       format.js

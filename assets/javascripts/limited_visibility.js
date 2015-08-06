@@ -76,6 +76,15 @@ function update_assigned_to_options() {
   });
 }
 
+function toggle_autochecked_checkboxes() {
+  if ($("select#autocheck_mode").val() == 1){
+    // autochecked_by_user_function: hide autocheck checkboxes by tracker
+    $('.autocheck_checkbox').hide();
+  } else {
+    $('.autocheck_checkbox').show();
+  }
+}
+
 //add a mirroring between selected visibility roles and
 //the "#authorized_viewers" hidden field => |1|4|5|...
 $(function() {
@@ -89,7 +98,7 @@ $(function() {
       });
       $('#authorized_viewers').val('|' + authorized.join('|') + '|');
 
-      // Update disable class
+      // Update disabled class
       disable_role_which_cant_be_removed();
 
       // Update assigned_to select options so user can't assigned to a role which has no visibility
@@ -97,7 +106,13 @@ $(function() {
     }
 
   });
+
+  $("select#autocheck_mode").on("change", toggle_autochecked_checkboxes);
+  toggle_autochecked_checkboxes();
+
   //disable eventual last remaining role
   disable_role_which_cant_be_removed();
+
   update_assigned_to_options();
+
 });

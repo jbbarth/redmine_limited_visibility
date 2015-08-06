@@ -1,34 +1,51 @@
 <%= form_for(:functions,
              :method => :put,
              :url => { :controller => 'functions',
+                       :action => 'copy_functions_settings_from_project',
+                       :project_id => @project.id }) do %>
+
+  <fieldset class="box">
+    <legend>Copier les paramètres d'un autre projet</legend>
+    <p>
+      <% projects = User.current.projects.active.select(:id, :name, :identifier, :lft, :rgt).to_a
+         if projects.any?
+           options =
+               ("<option value=''>Sélectionner un projet</option>" +
+                   '<option value="" disabled="disabled">---</option>').html_safe
+           options << project_tree_options_for_select(projects) do |p|
+             { :value => p.id }
+           end
+           options = options.gsub('&nbsp;&#187;', '&nbsp;').html_safe %>
+           <%= select_tag :project_from, options %>
+        <% end %>
+      <%= submit_tag l(:button_copy) %>
+    </p>
+  </fieldset>
+<% end %>
+
+<%= form_for(:functions,
+             :method => :put,
+             :url => { :controller => 'functions',
                        :action => 'available_functions_per_project',
                        :project_id => @project.id },
              :html => { :id => "functions-form" }) do %>
 
-    <fieldset class="box">
-      <legend><%= l(:text_select_project_functional_roles) %></legend>
-
-    <div class='functions_checkboxes'>
-      <p>
-        <% Function.sorted.all.each do |function| %>
-          <% checked = @project.functions.empty? ? function.active_by_default : @project.functions.include?(function) %>
-          <label><%= check_box_tag 'function_ids[]', function.id, checked %> <%=h function %></label><br />
-        <% end %>
-      </p>
-      <%= hidden_field_tag 'function_ids[]', '' %>
-
-    </div>
-
-    <p><%= check_all_links 'functions-form' %></p>
-    <p><%= submit_tag l(:button_confirm) %></p>
-
+  <fieldset class="box">
+    <p>
+      <label><%= l(:text_select_project_functional_roles) %></label>
+      <%= select_tag :function_ids, options_for_select(Function.sorted.collect{|f| [f.name, f.id]}, Function.sorted.select{|f| @project.functions.present? ? @project.functions.include?(f) : f.active_by_default }.map(&:id)), {:multiple => true} %>
+    </p>
+    <p>
+      <label>Rôles pré-cochés en fonction </label>
+      <%= select_tag :autocheck_mode, options_for_select({"du rôle de l'utilisateur" => '1', "du tracker" => '2'}, @project.autochecked_functions_mode || '1') %>
+    </p>
+    <p><%= submit_tag l(:button_save) %></p>
   </fieldset>
-
 <% end %>
 
 
 <fieldset class="box">
-  <legend><%= "Configurer l'état des rôles fonctionnels par tracker" %></legend>
+  <h4><%= "Etat des rôles fonctionnels par tracker :" %></h4>
 
   <% if @project.functions.empty? %>
     <p>Veuillez tout d'abord confirmer les rôles fonctionnels actifs pour ce projet</p>
@@ -68,13 +85,13 @@
               </td>
               <% @project.trackers.sorted.all.each do |tracker| %>
                 <td style="text-align: left;">
-                  <label><%= check_box_tag "function_visibility[#{tracker.id}][]", function.id, (visible_functions_per_tracker[tracker.id].include?(function.id)), :id => nil, :class => "function-#{function.id}" %>
-                  Visible
-                  </label>
-                  <br>
                   <label>
-                  <%= check_box_tag "function_activation[#{tracker.id}][]", function.id, (checked_functions_per_tracker[tracker.id].include?(function.id)), :id => nil, :class => "function-#{function.id}" %>
-                  Coché
+                    <%= check_box_tag "function_visibility[#{tracker.id}][]", function.id, (visible_functions_per_tracker[tracker.id].include?(function.id)), :id => nil, :class => "function-#{function.id}" %>
+                    Visible
+                  </label>
+                  <label style="display: block;" class="autocheck_checkbox">
+                    <%= check_box_tag "function_activation[#{tracker.id}][]", function.id, (checked_functions_per_tracker[tracker.id].include?(function.id)), :id => nil, :class => "function-#{function.id}" %>
+                    Coché
                   </label>
                 </td>
               <% end %>
@@ -89,3 +106,17 @@
   <% end %>
 
 </fieldset>
+
+<script type="text/javascript">
+  $(function() {
+    $('select#function_ids').select2({
+      containerCss: {width: '600px', minwidth: '600px'},
+      width: 'style'
+    });
+    $('select#autocheck_mode').select2({
+      containerCss: {width: '180px', minwidth: '180px'},
+      width: 'style'
+    });
+    $('#project_from').select2();
+  });
+</script>

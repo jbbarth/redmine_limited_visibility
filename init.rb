@@ -18,13 +18,15 @@ end
 # Custom patches
 require_dependency 'redmine_limited_visibility/hooks'
 Rails.application.config.to_prepare do
+  unless Rails.env.test? #Avoid breaking core tests (specially csv core tests including ALL columns)
+    require_dependency 'redmine_limited_visibility/queries_helper_patch'
+    require_dependency 'redmine_limited_visibility/issue_query_patch'
+    require_dependency 'redmine_limited_visibility/my_controller_patch'
+  end
   require_dependency 'redmine_limited_visibility/issue_patch'
-  require_dependency 'redmine_limited_visibility/queries_helper_patch' unless Rails.env.test?
-  require_dependency 'redmine_limited_visibility/issue_query_patch' unless Rails.env.test?
   require_dependency 'redmine_limited_visibility/issues_helper_patch'
   require_dependency 'redmine_limited_visibility/issues_pdf_helper_patch'
   require_dependency 'redmine_limited_visibility/roles_controller_patch'
-  require_dependency 'redmine_limited_visibility/my_controller_patch'
   require_dependency 'redmine_limited_visibility/issues_controller_patch'
   require_dependency 'redmine_limited_visibility/member_patch'
   require_dependency 'redmine_limited_visibility/user_patch'

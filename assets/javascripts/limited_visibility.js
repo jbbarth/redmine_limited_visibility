@@ -61,6 +61,21 @@ function disable_role_which_cant_be_removed() {
   */
 }
 
+function update_assigned_to_options() {
+  $('#involved-roles-form .role').each(function() {
+    var element = $(this);
+    var option = $('#issue_assigned_to_id option[value="function-'+element.data('role-id')+'"]');
+    if (element.hasClass('involved')){
+      // option.removeAttr("disabled");
+      option.show();
+    }else{
+      // option.attr("disabled", "disabled");
+      option.removeAttr("selected");
+      option.hide();
+    }
+  });
+}
+
 //add a mirroring between selected visibility roles and
 //the "#authorized_viewers" hidden field => |1|4|5|...
 $(function() {
@@ -77,10 +92,12 @@ $(function() {
       // Update disable class
       disable_role_which_cant_be_removed();
 
-      // Reload issue form in order to refresh assign to list when changing visibility
-      $.globalEval( $("#issue_tracker_id").attr("onchange") ); // Execute same onchange action than on the tracker field
+      // Update assigned_to select options so user can't assigned to a role which has no visibility
+      update_assigned_to_options();
     }
+
   });
   //disable eventual last remaining role
   disable_role_which_cant_be_removed();
+  update_assigned_to_options();
 });

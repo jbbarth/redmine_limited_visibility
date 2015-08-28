@@ -1,6 +1,7 @@
 # require_relative File.expand_path('../../fast_spec_helper', __FILE__)
 require "spec_helper"
 require 'redmine_limited_visibility/queries_helper_patch'
+require 'redmine_limited_visibility/issue_query_patch'
 
 describe IssuesController, type: :controller do
   fixtures :users, :roles, :projects, :members, :member_roles, :issues, :issue_statuses, :trackers, :enumerations, :custom_fields, :enabled_modules
@@ -62,9 +63,12 @@ describe IssuesController, type: :controller do
     # No authorized_viewers on issues
     get :index, query_id: q.id
     expect(assigns(:issues)).to_not be_nil
+    expect(assigns(:issues)).to_not be_empty
     issues = assigns(:issues).select{ |i| i.project == @project }
     issue1 = issues.first
     issue2 = issues.second
+    expect(issue1).to_not be_nil
+    expect(issue2).to_not be_nil
 
     # check if authorized_viewers match user visibility
     issue1.update_attribute(:authorized_viewers, "|#{contractor_role.id}|") # User visibility role
@@ -79,6 +83,7 @@ describe IssuesController, type: :controller do
 
     # displays all issues when the user has no specific function
     @membership.functions = []
+    @membership2.functions = []
     get :index, query_id: q.id
     expect(assigns(:issues)).to_not be_nil
     expect(assigns(:issues)).to include issue1

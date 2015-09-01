@@ -2,7 +2,7 @@ class Function < ActiveRecord::Base
   unloadable
   acts_as_list
 
-  attr_accessible :name, :position, :authorized_viewers
+  attr_accessible :name, :position, :authorized_viewers, :move_to
 
   has_many :member_functions, :dependent => :destroy
   has_many :members, :through => :member_functions

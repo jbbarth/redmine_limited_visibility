@@ -16,7 +16,7 @@
     <%= render "functions/visibility_role", :function => function, :styles => styles %>
   <% end %>
   <% hidden_functions.each_with_index do |function, index| %>
-    <%= link_to_function 'Voir les rôles silencieux',
+    <%= link_to_function l('show_silent_roles'),
                          "$(this).closest('div').find('.hidden_function').toggle();toggle_name(this);return false;",
                          :class => 'toggle-hidden-functions',
                          :style => ''  if index==0  %>
@@ -31,6 +31,6 @@
 <script>
   $('.hidden_function').hide();
   function toggle_name(lnk_obj){
-    lnk_obj.innerHTML = (lnk_obj.innerHTML == 'Cacher les rôles silencieux') ? 'Voir les rôles silencieux' : 'Cacher les rôles silencieux' ;
+    lnk_obj.innerHTML = (lnk_obj.innerHTML == '<%= l('hide_silent_roles') %>') ? '<%= l('show_silent_roles') %>' : '<%= l('hide_silent_roles') %>' ;
   }
 </script>

@@ -19,3 +19,5 @@ fr:
   project_module_limited_visibility: "Visibilité limitée des demandes"
   field_assigned_to_function: "Assigné au groupe"
   field_has_been_assigned_to: "A été assigné à"
+  show_silent_roles: "Voir les rôles silencieux"
+  hide_silent_roles: "Cacher les rôles silencieux"

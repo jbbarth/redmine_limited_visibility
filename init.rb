@@ -3,7 +3,7 @@ Redmine::Plugin.register :redmine_limited_visibility do
   name 'Redmine Limited Visibility plugin'
   author 'Jean-Baptiste BARTH'
   description 'This is a plugin for Redmine'
-  requires_redmine :version_or_higher => '3.0.0'
+  requires_redmine :version_or_higher => '3.1.0'
   version '0.2.0'
   url 'https://github.com/jbbarth/redmine_limited_visibility'
   author_url 'jeanbaptiste.barth@gmail.com'

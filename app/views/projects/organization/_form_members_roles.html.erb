@@ -1,4 +1,4 @@
-<% organization_functions = @o.default_functions_by_project(@project) %>
+<% organization_functions = @o.default_functions_by_project(@project) unless @o.blank? %>
 
 <div class='tech_roles_checkboxes' style="float: left;">
   <p>

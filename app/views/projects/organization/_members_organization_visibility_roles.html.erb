@@ -1,4 +1,4 @@
-<% organization_functions = @o.default_functions_by_project(@project) %>
+<% organization_functions = @o.default_functions_by_project(@project) unless @o.blank? %>
 <span class='visibility_roles' style="float: left;">
   <span id="orga-<%= @o.id %>-roles">
     <% if organization_functions.any? %>

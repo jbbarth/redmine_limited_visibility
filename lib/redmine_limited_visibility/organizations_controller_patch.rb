@@ -36,10 +36,12 @@ class OrganizationsController < ApplicationController
 
   def update_user_roles
     @member = Member.find(params[:member_id])
-    new_roles = Role.find(params[:membership][:role_ids].reject(&:empty?))
-    new_functions = Function.find(params[:membership][:function_ids].reject(&:empty?))
-    @member.roles = new_roles | @member.principal.organization.default_roles_by_project(@project)
-    @member.functions = new_functions | @member.principal.organization.default_functions_by_project(@project)
+    @member.roles = Role.find(params[:membership][:role_ids].reject(&:empty?))
+    @member.functions = Function.find(params[:membership][:function_ids].reject(&:empty?))
+    if @member.principal.organization_id.present?
+      @member.roles |= @member.principal.organization.default_roles_by_project(@project)
+      @member.functions |= @member.principal.organization.default_functions_by_project(@project)
+    end
     unless @member.save
       flash[:error] = @member.errors.full_messages.join(', ')
     end

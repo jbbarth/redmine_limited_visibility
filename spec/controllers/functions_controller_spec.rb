@@ -22,8 +22,12 @@ describe FunctionsController, type: :controller do
     it "should save or update a new function" do
       post :create, function: { name: "NewFunction", authorized_viewers: "|17|18|" }
       created_function = Function.find_by_name("NewFunction")
+      #test put method
       put :update, id: created_function.id, function: { name: "UpdatedFunction", authorized_viewers: "|17|18|" }
-      updated_function = Function.find_by_name("UpdatedFunction")
+      expect(created_function.reload.name).to eq "UpdatedFunction"
+      #test patch method (new default method used by Rails to update)
+      patch :update, id: created_function.id, function: { name: "UpdatedFunctionViaPatchMethod", authorized_viewers: "|17|18|" }
+      expect(created_function.reload.name).to eq "UpdatedFunctionViaPatchMethod"
     end
   end
 end

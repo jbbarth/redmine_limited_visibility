@@ -24,7 +24,7 @@ class FunctionsController < ApplicationController
   end
 
   def update
-    if request.put? and @function.update_attributes(params[:function])
+    if @function.update_attributes(params[:function])
       flash[:notice] = l(:notice_successful_update)
       redirect_to roles_path
     else

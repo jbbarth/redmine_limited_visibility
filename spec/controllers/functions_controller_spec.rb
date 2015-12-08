@@ -20,14 +20,16 @@ describe FunctionsController, type: :controller do
 
   describe "creating or updating a 'functional' role" do
     it "should save or update a new function" do
-      post :create, function: { name: "NewFunction", authorized_viewers: "|17|18|" }
+      post :create, function: { name: "NewFunction", authorized_viewers: "|17|18|", hidden_on_overview: false }
       created_function = Function.find_by_name("NewFunction")
       #test put method
       put :update, id: created_function.id, function: { name: "UpdatedFunction", authorized_viewers: "|17|18|" }
       expect(created_function.reload.name).to eq "UpdatedFunction"
       #test patch method (new default method used by Rails to update)
-      patch :update, id: created_function.id, function: { name: "UpdatedFunctionViaPatchMethod", authorized_viewers: "|17|18|" }
+      patch :update, id: created_function.id, function: { name: "UpdatedFunctionViaPatchMethod", hidden_on_overview: true, active_by_default: false }
       expect(created_function.reload.name).to eq "UpdatedFunctionViaPatchMethod"
+      expect(created_function.hidden_on_overview).to eq true
+      expect(created_function.active_by_default).to eq false
     end
   end
 end

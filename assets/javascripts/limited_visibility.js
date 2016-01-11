@@ -74,6 +74,22 @@ function update_assigned_to_options() {
       option.hide();
     }
   });
+
+  // Hide assignable users if their functions are disabled
+  $('#issue_assigned_to_id option').each(function(){
+    var user_option = $(this);
+    if(user_option.attr('functional_roles')){
+      user_option.hide();
+      $('#involved-roles-form .role').each(function() {
+        var element = $(this);
+        if (element.hasClass('involved')) {
+          if (user_option.attr('functional_roles').split(',').indexOf(element.data('role-id').toString()) >= 0){
+            user_option.show();
+          }
+        }
+      });
+    }
+  });
 }
 
 function toggle_autochecked_checkboxes() {

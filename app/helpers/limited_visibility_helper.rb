@@ -70,9 +70,11 @@ module LimitedVisibilityHelper
       s << content_tag('option', "<< #{l(:label_me)} >>", :value => User.current.id)
     end
     groups = ''
+
     users.sort.each do |element|
       selected_attribute = ' selected="selected"' if option_value_selected?(element, selected) || element.id.to_s == selected
-      (element.is_a?(Group) ? groups : s) << %(<option value="#{element.id}"#{selected_attribute}>#{h element.name}</option>)
+      functional_roles_attribute = " functional_roles='#{issue.project.functions_per_user[element.id].join(',')}'"
+      (element.is_a?(Group) ? groups : s) << %(<option value="#{element.id}"#{selected_attribute}#{functional_roles_attribute}>#{h element.name}</option>)
     end
     unless groups.empty?
       s << %(<optgroup label="#{h(l(:label_group_plural))}">#{groups}</optgroup>)

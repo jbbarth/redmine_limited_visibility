@@ -78,7 +78,7 @@ function update_assigned_to_options() {
   // Hide assignable users if their functions are disabled
   $('#issue_assigned_to_id option').each(function(){
     var user_option = $(this);
-    if(user_option.attr('functional_roles')){
+    if(user_option.attr('functional_roles') && $('#involved-roles-form .role').length>0){
       user_option.hide();
       $('#involved-roles-form .role').each(function() {
         var element = $(this);

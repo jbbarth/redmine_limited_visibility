@@ -73,7 +73,8 @@ module LimitedVisibilityHelper
 
     users.sort.each do |element|
       selected_attribute = ' selected="selected"' if option_value_selected?(element, selected) || element.id.to_s == selected
-      functional_roles_attribute = " functional_roles='#{issue.project.functions_per_user[element.id].join(',')}'"
+      functional_roles_ids = issue.project.functions_per_user[element.id]
+      functional_roles_attribute = functional_roles_ids.present? ? " functional_roles='#{functional_roles_ids.join(',')}'" : ""
       (element.is_a?(Group) ? groups : s) << %(<option value="#{element.id}"#{selected_attribute}#{functional_roles_attribute}>#{h element.name}</option>)
     end
     unless groups.empty?

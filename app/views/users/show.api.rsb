@@ -40,7 +40,7 @@ api.user do
               api.role attrs
             end
           end
-        end
+        end unless Rails.env == 'test'
         # END - Custom data
       end if membership.project
     end

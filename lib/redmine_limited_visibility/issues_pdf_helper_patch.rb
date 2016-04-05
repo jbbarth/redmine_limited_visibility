@@ -1,3 +1,5 @@
+include CustomFieldsHelper
+
 module Redmine
   module Export
     module PDF

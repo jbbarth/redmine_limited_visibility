@@ -18,7 +18,7 @@ describe RedmineLimitedVisibility::IssuePatch do
 
     it "is a safe attribute" do
       # avoid loading too many dependencies
-      allow(issue).to receive(:new_statuses_allowed_to).and_return([true])
+      allow(issue).to receive(:new_statuses_allowed_to).and_return(IssueStatus.all)
       issue.safe_attributes = { "authorized_viewers" => "All of them" }
       expect(issue.authorized_viewers).to eq "All of them"
     end

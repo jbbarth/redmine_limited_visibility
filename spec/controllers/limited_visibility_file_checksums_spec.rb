@@ -9,6 +9,6 @@ describe "LimitedVisibilityFileChecksums" do
 
   it "should check core new membership checksums" do
     #the partial is completely overridden so it can be loaded through ajax (deface doesn't work well with ajax)
-    assert_checksum "6266f2ca0b0c29b4a1cdfb3fdd40018b", "app/views/principal_memberships/_new_form.html.erb"
+    assert_checksum "a46f82ef462d56e3ff21d478e70e8d89", "app/views/principal_memberships/_new_form.html.erb"
   end
 end

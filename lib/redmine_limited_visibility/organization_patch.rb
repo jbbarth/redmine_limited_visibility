@@ -9,7 +9,7 @@ class Organization < ActiveRecord::Base
   end
 
   def default_functions_by_project(project)
-    organization_functions.where("project_id = ?", project.id).map(&:function).reject{|f| f.blank?}.sort_by { |f| f.position}.uniq
+    organization_functions.includes(:function).where("project_id = ?", project.id).map(&:function).reject{|f| f.blank?}.sort_by { |f| f.position}.uniq
   end
 
   def update_project_members_with_roles_and_functions(project_id, new_members, new_roles, old_organization_roles, new_functions, old_organization_functions)

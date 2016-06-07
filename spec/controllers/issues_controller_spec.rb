@@ -90,6 +90,22 @@ describe IssuesController, type: :controller do
     expect(assigns(:issues)).to include issue2
   end
 
+  it 'assigned the issue either to a user or to a functional role' do
+    issue = Issue.first
+
+    # Assignation to a user
+    put :update, { id: issue.id, issue: {assigned_to_id: "#{User.current.id}"} }
+    issue.reload
+    expect(issue.assigned_to_function_id).to be_nil
+    expect(issue.assigned_to_id).to eq User.current.id
+
+    # Assignation to a functional role
+    put :update, { id: issue.id, issue: {assigned_to_id: "function-#{contractor_role.id}"} }
+    issue.reload
+    expect(issue.assigned_to_function_id).to eq contractor_role.id
+    expect(issue.assigned_to_id).to be_nil
+  end
+
   # Test compatibility with the redmine multiprojects_issue plugin
   if Redmine::Plugin.installed?(:redmine_multiprojects_issue)
     describe 'multiprojects_issues' do

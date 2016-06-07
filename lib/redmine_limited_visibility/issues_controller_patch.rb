@@ -12,7 +12,7 @@ class IssuesController < ApplicationController
         if params[:issue][:assigned_to_id].present? && params[:issue][:assigned_to_id].to_s.include?("function")
           params[:issue][:assigned_to_id].slice! "function-"
           params[:issue][:assigned_to_function_id] = params[:issue][:assigned_to_id]
-          params[:issue][:assigned_to_id] = nil
+          params[:issue][:assigned_to_id] = ""
         else
           params[:issue][:assigned_to_function_id] = nil
         end

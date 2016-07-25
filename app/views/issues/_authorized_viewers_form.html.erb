@@ -14,4 +14,21 @@
 
   <%= hidden_field_tag 'previous_tracker_id', @issue.tracker.id %>
 
+  <% if Setting['plugin_redmine_limited_visibility']['must_have_at_least_one_visible_function'] == 'true' %>
+    <script>
+      $(function() {
+        $('#issue-form').submit(function(e) {
+          e.preventDefault();
+          var form = this;
+          if ($('.role.involved').not('.disabled').not('.hidden_function').length == 0) {
+            alert('<%= l('alert_cant_remove_all_visibility_roles') %>');
+            return false;
+          }else{
+            form.submit(); // submit bypassing the jQuery bound event
+          }
+        });
+      })
+    </script>
+  <% end %>
+
 <% end %>

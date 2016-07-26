@@ -9,6 +9,7 @@ en:
   field_authorized_viewers: "Involved members"
   label_my_roles: "my roles"
   alert_cant_remove_all_visibility_roles: "Please select at least one type of involved members"
+  settings_must_have_at_least_one_visible_function: "Issues must have at least one functional role checked"
   label_my_page_all_roles: "Show issues for all roles"
   label_my_page_my_roles: "Only show issues where my roles are involved"
   label_visibilities_report: "Visibilities report"

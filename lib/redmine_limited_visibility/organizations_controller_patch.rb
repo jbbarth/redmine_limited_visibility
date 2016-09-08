@@ -36,8 +36,8 @@ class OrganizationsController < ApplicationController
 
   def update_user_roles
     new_roles = Role.find(params[:membership][:role_ids].reject(&:empty?))
-    new_functions = Function.find(params[:membership][:function_ids].reject(&:empty?))
     if params[:member_id]
+      new_functions = Function.find_by_id(params[:membership][:function_ids]).reject!(&:empty?)
       @member = Member.find(params[:member_id])
       if @member.principal.organization_id.present?
         @member.roles = new_roles | @member.principal.organization.default_roles_by_project(@project)
@@ -56,8 +56,10 @@ class OrganizationsController < ApplicationController
       end
     end
 
-    unless @member.save
-      flash[:error] = @member.errors.full_messages.join(', ')
+    if @member
+      unless @member.save
+        flash[:error] = @member.errors.full_messages.join(', ')
+      end
     end
     respond_to do |format|
       format.html { redirect_to :controller => 'projects', :action => 'settings', :id => @project.id, :tab => 'members' }

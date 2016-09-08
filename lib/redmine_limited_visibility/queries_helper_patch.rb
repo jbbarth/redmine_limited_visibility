@@ -26,7 +26,7 @@ module QueriesHelper
   end
 
   def get_assigned_users_and_functions(column, issue, html=true)
-    list_of_users = get_has_been_assigned_users(column, html, issue)
+    list_of_users = get_has_been_assigned_users(column, issue, html)
     list_of_functions = get_has_been_assigned_functions(issue)
     [list_of_functions, list_of_users].reject(&:blank?).join(', ')
   end
@@ -47,7 +47,7 @@ module QueriesHelper
     end
   end
 
-  def get_has_been_assigned_users(column, html, issue)
+  def get_has_been_assigned_users(column, issue, html)
     users_ids = [issue.assigned_to_id]
     issue.journals.each do |journal|
       users_ids << journal.details.select { |i| i.prop_key == 'assigned_to_id' }.map(&:old_value)

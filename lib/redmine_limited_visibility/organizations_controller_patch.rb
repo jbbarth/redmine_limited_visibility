@@ -37,8 +37,8 @@ class OrganizationsController < ApplicationController
   def update_user_roles
     new_roles = Role.find(params[:membership][:role_ids].reject(&:empty?))
     if params[:member_id]
-      if Function.find_by_id(params[:membership][:function_ids])
-        new_functions = Function.find_by_id(params[:membership][:function_ids]).reject!(&:empty?)
+      if params[:membership][:function_ids].present?
+        new_functions = Function.find(params[:membership][:function_ids].reject(&:empty?))
       else
         new_functions = []
       end

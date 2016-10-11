@@ -79,8 +79,8 @@
           <% visible_functions_per_tracker, checked_functions_per_tracker = {}, {}
              @project.trackers.each { |t|  visible_functions_per_tracker[t.id] = []; checked_functions_per_tracker[t.id] = [] }
              ProjectFunctionTracker.joins(:project_function).includes(:project_function).where("project_id = ?", @project.id).each do |r|
-               visible_functions_per_tracker[r.tracker_id] << r.project_function.function_id if r.visible
-               checked_functions_per_tracker[r.tracker_id] << r.project_function.function_id if r.checked
+               visible_functions_per_tracker[r.tracker_id] << r.project_function.function_id if visible_functions_per_tracker[r.tracker_id] && r.visible
+               checked_functions_per_tracker[r.tracker_id] << r.project_function.function_id if checked_functions_per_tracker[r.tracker_id] && r.checked
              end
              %>
           <% functions = @project.functions.present? ? @project.functions : Function.active_by_default %>

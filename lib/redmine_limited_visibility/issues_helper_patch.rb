@@ -76,6 +76,6 @@ module IssuesHelper
   end
 
   def functions_from_authorized_viewers(authorized_viewers)
-    Function.where(:id => "#{authorized_viewers}".split("|"))
+    Function.where(:id => "#{authorized_viewers}".split("|")).sorted
   end
 end

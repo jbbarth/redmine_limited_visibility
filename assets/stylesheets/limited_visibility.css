@@ -3,7 +3,7 @@
     font-style: italic;
 }
 #label_involved_roles{
-    width: 22%;
+    min-width: 175px;
     font-weight: bold;
     display: inline-block;
     margin-top: 4px;

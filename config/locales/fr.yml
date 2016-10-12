@@ -14,7 +14,7 @@ fr:
   label_visibilities_report: "Synthèse des visibilités"
   label_technical_role_plural: "Rôles techniques"
   text_select_project_functional_roles: "Rôles fonctionnels activés pour ce projet :"
-  field_active_by_default: "Afficher par défaut dans tous les projets"
+  field_active_by_default: "Activé par défaut dans tous les projets"
   permission_limit_issues_visibility: "Limiter la visibilité des demandes"
   permission_manage_functional_roles_by_project: "Gérer les rôles fonctionnels par projet"
   project_module_limited_visibility: "Visibilité limitée des demandes"
@@ -23,3 +23,4 @@ fr:
   field_has_been_assigned_to_function: "A été assigné au groupe"
   show_silent_roles: "Voir les rôles silencieux"
   hide_silent_roles: "Cacher les rôles silencieux"
+  field_see_all_issues: "Les utilisateurs ayant cette fonction voient toutes les demandes par défault"

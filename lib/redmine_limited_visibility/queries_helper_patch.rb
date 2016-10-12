@@ -84,7 +84,14 @@ module QueriesHelper
     def retrieve_query_with_limited_visibility
       retrieve_query_without_limited_visibility
       if @project.blank? || @project.module_enabled?("limited_visibility")
-        @query.filters.merge!({ 'authorized_viewers' => { :operator => (User.current.admin? ? "*" : "mine"), :values => [""] } }) if @query.is_a?(IssueQuery) && !@query.filters.include?('authorized_viewers')
+        should_see_all = []
+        User.current.members.map(&:functions).each do |functions|
+          functions.map(&:see_all_issues).each do |param|
+            should_see_all << param
+          end
+        end
+        see_all_issues = true if User.current.admin? || should_see_all.include?(true)
+        @query.filters.merge!({ 'authorized_viewers' => { :operator => (see_all_issues ? "*" : "mine"), :values => [""] } }) if @query.is_a?(IssueQuery) && !@query.filters.include?('authorized_viewers')
       end
     end
     alias_method_chain :retrieve_query, :limited_visibility

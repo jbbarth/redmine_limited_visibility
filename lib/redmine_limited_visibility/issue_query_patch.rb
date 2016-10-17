@@ -6,6 +6,7 @@ class IssueQuery < Query
   self.operators_by_filter_type.merge!({ :list_visibility => ["mine", "*"] })
   self.available_columns << QueryColumn.new(:authorized_viewers, sortable: "#{Issue.table_name}.authorized_viewers", groupable: true) if self.available_columns.select { |c| c.name == :authorized_viewers }.empty?
   self.available_columns << QueryColumn.new(:has_been_assigned_to, :sortable => lambda {User.fields_for_order_statement}, :groupable => true) if self.available_columns.select { |c| c.name == :has_been_assigned_to }.empty?
+  self.available_columns << QueryColumn.new(:has_been_visible_by, :sortable => false, :groupable => true) if self.available_columns.select { |c| c.name == :has_been_visible_by }.empty?
 
   unless instance_methods.include?(:initialize_available_filters_with_authorized_viewers)
     def initialize_available_filters_with_authorized_viewers
@@ -13,6 +14,9 @@ class IssueQuery < Query
 
       all_functions = Function.all.map { |s| [s.name, s.id.to_s] }
       add_available_filter "authorized_viewers", type: :list_visibility, values: all_functions
+      add_available_filter("has_been_visible_by_id",
+                           :type => :list_optional, :values => all_functions
+      ) unless all_functions.empty?
 
       assigned_to_values = @available_filters["assigned_to_id"][:values]
       add_available_filter("has_been_assigned_to_id",
@@ -80,6 +84,42 @@ class IssueQuery < Query
         journal_sql = "#{boolean_switch} EXISTS (SELECT DISTINCT #{Journal.table_name}.journalized_id FROM #{Journal.table_name}, #{JournalDetail.table_name}" +
             " WHERE #{Issue.table_name}.id = #{Journal.table_name}.journalized_id AND #{Journal.table_name}.id = #{JournalDetail.table_name}.journal_id AND #{Journal.table_name}.journalized_type = 'Issue' AND #{JournalDetail.table_name}.prop_key = 'assigned_to_function_id'" +
             " AND (#{journal_condition1} OR #{journal_condition2}))"
+
+        "((#{issue_attr_sql}) #{operator_switch} (#{journal_sql}))"
+    end
+  end
+
+  def sql_for_has_been_visible_by_id_field(field, operator, value)
+    case operator
+      when "*", "!*" # All / None
+        boolean_switch = operator == "!*" ? 'NOT' : ''
+        statement = operator == "!*" ? "#{Issue.table_name}.authorized_viewers IS NULL AND" : "(#{Issue.table_name}.authorized_viewers IS NOT NULL) OR"
+        "(#{statement} #{boolean_switch} EXISTS (SELECT DISTINCT #{Journal.table_name}.journalized_id FROM #{Journal.table_name}, #{JournalDetail.table_name}" +
+            " WHERE #{Issue.table_name}.id = #{Journal.table_name}.journalized_id AND #{Journal.table_name}.id = #{JournalDetail.table_name}.journal_id AND #{Journal.table_name}.journalized_type = 'Issue' AND #{JournalDetail.table_name}.prop_key = 'authorized_viewers'))"
+      when "=", "!"
+        boolean_switch = operator == "!" ? 'NOT' : ''
+        operator_switch = operator == "!" ? 'AND' : 'OR'
+
+        has_no_specified_visibility = "#{Issue.table_name}.authorized_viewers IS NULL"
+        visible_by_statement = operator == "!" ? "(#{has_no_specified_visibility}) OR" : ''
+
+        issue_attr_sql, journal_condition1, journal_condition2 = ""
+        values = value.collect{|val| self.class.connection.quote_string(val)}
+        values.each_with_index do |function_id, index|
+          if index > 0
+            issue_attr_sql << " #{operator_switch} "
+            journal_condition1 << " #{operator_switch} "
+            journal_condition2 << " #{operator_switch} "
+          end
+          issue_attr_sql << "(#{visible_by_statement} #{Issue.table_name}.authorized_viewers #{boolean_switch} LIKE '%|#{function_id}|%' )"
+          journal_condition1 = "#{JournalDetail.table_name}.value #{boolean_switch} LIKE '%|#{function_id}|%' "
+          journal_condition2 = "#{JournalDetail.table_name}.old_value #{boolean_switch} LIKE '%|#{function_id}|%' "
+        end
+        journal_condition1 = "1=0" if journal_condition1.blank?
+        journal_condition2 = "1=0" if journal_condition2.blank?
+        journal_sql = "#{boolean_switch} EXISTS (SELECT DISTINCT #{Journal.table_name}.journalized_id FROM #{Journal.table_name}, #{JournalDetail.table_name}" +
+            " WHERE #{Issue.table_name}.id = #{Journal.table_name}.journalized_id AND #{Journal.table_name}.id = #{JournalDetail.table_name}.journal_id AND #{Journal.table_name}.journalized_type = 'Issue' AND #{JournalDetail.table_name}.prop_key = 'authorized_viewers'" +
+            " AND ((#{journal_condition1}) OR (#{journal_condition2})))"
 
         "((#{issue_attr_sql}) #{operator_switch} (#{journal_sql}))"
     end

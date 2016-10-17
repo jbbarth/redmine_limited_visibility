@@ -7,6 +7,8 @@ module QueriesHelper
     def column_content_with_limited_visibility(column, issue)
       if  column.name == :has_been_assigned_to
         get_assigned_users_and_functions(column, issue, true)
+      elsif  column.name == :has_been_visible_by
+        get_has_been_authorized_viewers(column, issue, true)
       else
         column_content_without_limited_visibility(column, issue)
       end
@@ -41,6 +43,22 @@ module QueriesHelper
     if functions_ids.present?
       functions_ids.uniq!
       functions = Function.where('id' => functions_ids)
+      functions.collect { |v| v.name }.compact.join(', ').html_safe if functions
+    else
+      nil
+    end
+  end
+
+  def get_has_been_authorized_viewers(column, issue, html)
+    functions_ids = issue.authorized_viewer_ids
+    issue.journals.each do |journal|
+      functions_ids << journal.details.select { |i| i.prop_key == 'authorized_viewers' }.map{ |journal_detail| journal_detail.old_value.split('|').reject(&:blank?).map(&:to_i) }
+      functions_ids << journal.details.select { |i| i.prop_key == 'authorized_viewers' }.map{ |journal_detail| journal_detail.value.split('|').reject(&:blank?).map(&:to_i) }
+    end
+    functions_ids.flatten!
+    if functions_ids.present?
+      functions_ids.uniq!
+      functions = Function.where('id' => functions_ids).sorted
       functions.collect { |v| v.name }.compact.join(', ').html_safe if functions
     else
       nil

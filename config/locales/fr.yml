@@ -21,6 +21,7 @@ fr:
   field_assigned_to_function: "Assigné au groupe"
   field_has_been_assigned_to: "A été assigné à"
   field_has_been_assigned_to_function: "A été assigné au groupe"
+  field_has_been_visible_by: "A été visible par"
   show_silent_roles: "Voir les rôles silencieux"
   hide_silent_roles: "Cacher les rôles silencieux"
   field_see_all_issues: "Les utilisateurs ayant cette fonction voient toutes les demandes par défault"

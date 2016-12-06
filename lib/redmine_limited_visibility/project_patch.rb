@@ -65,7 +65,7 @@ class Project
       next if role_ids.empty?
       new_member.role_ids = role_ids
 
-      # TODO: Refactor this patch and use alias_method_chain in order to keep untouched the original 'copy_members' method
+      # TODO: Refactor this patch and use Module#prepend in order to keep untouched the original 'copy_members' method
       # Start
       function_ids = member.member_functions.map(&:function_id)
       new_member.function_ids = function_ids

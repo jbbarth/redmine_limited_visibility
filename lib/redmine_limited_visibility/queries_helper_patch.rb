@@ -20,6 +20,8 @@ module QueriesHelper
     def csv_content_with_limited_visibility(column, issue)
       if  column.name == :has_been_assigned_to
         get_assigned_users_and_functions(column, issue, false)
+      elsif column.name == :has_been_visible_by
+        get_has_been_authorized_viewers(column, issue, false)
       else
         csv_content_without_limited_visibility(column, issue)
       end

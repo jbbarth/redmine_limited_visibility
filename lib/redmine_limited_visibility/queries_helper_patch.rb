@@ -54,8 +54,8 @@ module QueriesHelper
   def get_has_been_authorized_viewers(column, issue, html)
     functions_ids = issue.authorized_viewer_ids
     issue.journals.each do |journal|
-      functions_ids << journal.details.select { |i| i.prop_key == 'authorized_viewers' }.map{ |journal_detail| journal_detail.old_value.split('|').reject(&:blank?).map(&:to_i) }
-      functions_ids << journal.details.select { |i| i.prop_key == 'authorized_viewers' }.map{ |journal_detail| journal_detail.value.split('|').reject(&:blank?).map(&:to_i) }
+      functions_ids << journal.details.select { |i| i.prop_key == 'authorized_viewers' && i.old_value.present? }.map{ |journal_detail| journal_detail.old_value.split('|').reject(&:blank?).map(&:to_i) }
+      functions_ids << journal.details.select { |i| i.prop_key == 'authorized_viewers' && i.value.present? }.map{ |journal_detail| journal_detail.value.split('|').reject(&:blank?).map(&:to_i) }
     end
     functions_ids.flatten!
     if functions_ids.present?

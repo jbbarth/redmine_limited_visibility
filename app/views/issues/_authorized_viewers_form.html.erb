@@ -1,13 +1,14 @@
 <% if @issue.project.module_enabled?("limited_visibility")
 
     config_functions = ProjectFunctionTracker.joins(:project_function).includes(:project_function).where("project_id = ? AND tracker_id = ?", @issue.project_id, @issue.tracker_id)
+    hidden_functions = config_functions.reject{ |f| f.visible == true }.map{ |c| c.function } if config_functions.present?
 
-    if @issue.project.autochecked_functions_mode == '1' || config_functions.empty?
+    if @issue.project.autochecked_functions_mode == '1'
       viewers = function_ids_for_current_viewers(@issue)
     else
       viewers = function_ids_for_current_tracker(@issue, @previous_tracker_id)
-      hidden_functions = config_functions.reject{ |f| f.visible == true }.map{ |c| c.function }
-    end %>
+    end
+%>
 
   <%= render "functions/select_involved_roles", viewers: viewers, current_user_visibility_roles: functional_roles_for_current_user(@issue.project), hidden_functions: hidden_functions %>
   <%= hidden_field_tag "issue[authorized_viewers]", "|#{viewers.join("|")}|", :id => "authorized_viewers" %>

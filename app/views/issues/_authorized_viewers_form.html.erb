@@ -2,7 +2,7 @@
 
     config_functions = ProjectFunctionTracker.joins(:project_function).includes(:project_function).where("project_id = ? AND tracker_id = ?", @issue.project_id, @issue.tracker_id)
 
-    if config_functions.empty?
+    if @issue.project.autochecked_functions_mode == '1' || config_functions.empty?
       viewers = function_ids_for_current_viewers(@issue)
     else
       viewers = function_ids_for_current_tracker(@issue, @previous_tracker_id)

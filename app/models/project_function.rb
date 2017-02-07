@@ -7,5 +7,9 @@ class ProjectFunction < ActiveRecord::Base
   validates_uniqueness_of :project_id, scope: [:function_id]
   validates_presence_of :project, :function
 
-  attr_accessible :function_id
+  attr_accessible :function_id, :project_id, :authorized_viewers
+
+  def authorized_viewer_ids
+    "#{authorized_viewers}".split("|").reject(&:blank?).map(&:to_i)
+  end
 end

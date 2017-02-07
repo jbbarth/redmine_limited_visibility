@@ -95,9 +95,11 @@ function update_assigned_to_options() {
 function toggle_autochecked_checkboxes() {
   if ($("select#autocheck_mode").val() == 1){
     // autochecked_by_user_function: hide autocheck checkboxes by tracker
-    $('.autocheck_checkbox').hide();
+    $('#autocheck_functions_per_function').show();
+    $('#autocheck_functions_per_tracker').hide();
   } else {
-    $('.autocheck_checkbox').show();
+    $('#autocheck_functions_per_function').hide();
+    $('#autocheck_functions_per_tracker').show();
   }
 }
 

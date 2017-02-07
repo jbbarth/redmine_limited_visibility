@@ -32,8 +32,14 @@ module LimitedVisibilityHelper
         current_functions = functional_roles_for_current_user(issue.project)
         if current_functions.present? # current user has at least one functional role
           enabled_functions = []
-          current_functions.each do |r|
-            enabled_functions |= Function.where("id in (?)", r.authorized_viewer_ids).sorted
+          current_functions.each do |f|
+            functions_per_project = ProjectFunction.where('project_id = ? AND function_id = ?', issue.project_id, f.id)
+            functions_per_project.each do |pf|
+              if pf.authorized_viewer_ids.present?
+                enabled_functions |= Function.where("id in (?)", pf.authorized_viewer_ids).sorted
+              end
+            end
+            enabled_functions |= Function.where("id in (?)", f.authorized_viewer_ids).sorted if enabled_functions.empty?
           end
           enabled_functions = enabled_functions & Function.available_functions_for(@project).sorted
           enabled_functions.sort_by {|a| a.position}

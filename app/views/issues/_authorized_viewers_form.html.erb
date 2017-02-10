@@ -3,10 +3,11 @@
     config_functions = ProjectFunctionTracker.joins(:project_function).includes(:project_function).where("project_id = ? AND tracker_id = ?", @issue.project_id, @issue.tracker_id)
     hidden_functions = config_functions.reject{ |f| f.visible == true }.map{ |c| c.function } if config_functions.present?
 
-    if @issue.project.autochecked_functions_mode == '1'
-      viewers = function_ids_for_current_viewers(@issue)
-    else
+    if @issue.project.autochecked_functions_mode == '2'
       viewers = function_ids_for_current_tracker(@issue, @previous_tracker_id)
+    else
+      #autocheck based on current user functions per default
+      viewers = function_ids_for_current_viewers(@issue)
     end
 %>
 

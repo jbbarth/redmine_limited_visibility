@@ -4,9 +4,9 @@ class CreateProjectFunctionTrackers < ActiveRecord::Migration
     create_table "project_function_trackers", :force => true do |t|
       t.integer "project_function_id", :null => false
       t.integer "tracker_id", :null => false
-      t.boolean "visible"
+      t.boolean "visible", :default => true
       t.boolean "checked"
-    end unless ActiveRecord::Base.connection.table_exists? 'project_function_trackers'
+    end
 
     add_index "project_function_trackers", ["project_function_id"], :name => "index_project_function_trackers_on_project_function_id" unless index_exists?(:project_function_trackers, [:project_function_id], :name => "index_project_function_trackers_on_project_function_id")
     add_index "project_function_trackers", ["tracker_id"], :name => "index_project_function_trackers_on_tracker_id" unless index_exists?(:project_function_trackers, [:tracker_id], :name => "index_project_function_trackers_on_tracker_id")

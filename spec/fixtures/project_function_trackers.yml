@@ -1,0 +1,25 @@
+---
+project_function_trackers_001:
+  id: 1
+  project_function_id: 1
+  tracker_id: 1
+  visible: false
+  checked: false
+project_function_trackers_002:
+  id: 2
+  project_function_id: 1
+  tracker_id: 2
+  visible: false
+  checked: false
+project_function_trackers_001:
+  id: 3
+  project_function_id: 2
+  tracker_id: 1
+  visible: false
+  checked: false
+project_function_trackers_002:
+  id: 4
+  project_function_id: 2
+  tracker_id: 2
+  visible: false
+  checked: false

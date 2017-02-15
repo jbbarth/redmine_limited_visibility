@@ -1,0 +1,11 @@
+---
+project_functions_001:
+  id: 1
+  project_id: 1
+  function_id: 1
+  authorized_viewers: "|1|2|"
+project_functions_002:
+  id: 2
+  project_id: 1
+  function_id: 2
+  authorized_viewers: "|2|"

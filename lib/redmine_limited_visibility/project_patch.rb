@@ -4,6 +4,7 @@ class Project
 
   has_many :project_functions, :dependent => :destroy
   has_many :functions, :through => :project_functions
+  has_many :project_function_trackers, :through => :project_functions
 
   has_many :organization_functions
 

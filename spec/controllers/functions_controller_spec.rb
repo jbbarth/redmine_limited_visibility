@@ -1,9 +1,11 @@
 require 'spec_helper'
 
 describe FunctionsController, type: :controller do
-  fixtures :users
+  fixtures :users, :functions, :projects, :trackers, :projects_trackers, :project_functions, :project_function_trackers
 
-  before { @request.session[:user_id] = 1 }
+  before do
+    @request.session[:user_id] = 1
+  end
 
   describe "creating a function" do
     it "should increment the Function count" do
@@ -30,6 +32,48 @@ describe FunctionsController, type: :controller do
       expect(created_function.reload.name).to eq "UpdatedFunctionViaPatchMethod"
       expect(created_function.hidden_on_overview).to eq true
       expect(created_function.active_by_default).to eq false
+    end
+  end
+
+  describe "modify the available functions per project" do
+    it "should save or update project_function relations" do
+      # create
+      expect do
+        put :available_functions_per_project, {project_id: 2, autocheck_mode: "1", function_ids: ["1", "2", "3", "4"]}
+      end.to change(ProjectFunction, :count).by(4)
+      created_relation = ProjectFunction.last
+      expect(created_relation.reload.authorized_viewers).to be nil
+      expect(created_relation.project.autochecked_functions_mode).to eq "1"
+      # update
+      expect do
+        put :available_functions_per_project, {project_id: 2, autocheck_mode: "2", function_ids: ["1", "2", "4"]}
+      end.to change(ProjectFunction, :count).by(-1)
+      created_relation = ProjectFunction.last
+      expect(created_relation.reload.authorized_viewers).to be nil
+      expect(created_relation.project.autochecked_functions_mode).to eq "2"
+    end
+  end
+
+  describe "visible_functions_per_tracker" do
+    it "should save the visible functions per project" do
+      pfts = Project.find(1).project_function_trackers
+      expect(pfts.map(&:visible).uniq).to eq [false]
+      put :visible_functions_per_tracker, {project_id: 1, function_visibility: {'1'=>[1,2], '2'=>[1,2], '3'=>[1,2]}}
+      expect(pfts.reload.map(&:visible).uniq).to eq [true]
+    end
+
+    it "should save the default checked functions per project" do
+      put :visible_functions_per_tracker, {project_id: 2, function_activation_per_user_function: {'1'=>[1,2], '2'=>[1,2]}}
+    end
+  end
+
+  describe "copy_functions_settings_from_project" do
+    it "should test the copy of all settings" do
+      current_available_functions = Project.find(2).functions
+      expect(current_available_functions.count).to eq 0
+      expect do
+        put :copy_functions_settings_from_project, {project_id: 2, project_from: "1"}
+      end.to change(current_available_functions.reload, :count).by(2)
     end
   end
 end

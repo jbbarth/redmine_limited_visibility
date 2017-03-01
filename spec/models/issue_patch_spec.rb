@@ -75,6 +75,46 @@ describe RedmineLimitedVisibility::IssuePatch do
     end
   end
 
+  # Test compatibility with the redmine multiprojects_issue plugin
+  if Redmine::Plugin.installed?(:redmine_multiprojects_issue)
+    describe 'multiprojects_issues' do
+      it 'should NOT notify users if their functions are not involved in secondary project' do
+
+        # SETUP
+        Project.find(2).enable_module!('redmine_limited_visibility')
+        Project.find(5).enable_module!('redmine_limited_visibility')
+        multiproject_issue = issue_with_authorized_viewers # issue_id: 4 & project_id: 2 & authorized_viewers: "|#{contractor_role.id}|"
+        multiproject_issue.projects = [multiproject_issue.project, Project.find(5)] #other project id = 5
+        multiproject_issue.save!
+        new_member = Member.new(:project_id => 5, :user_id => 4) #only member of secondary project
+        new_member.roles = [Role.find(2)]
+        new_member.save!
+
+        # it should notified users from other projects if the issue has no specific visibility
+        notified_users_from_other_projects = multiproject_issue.notified_users_from_other_projects
+        refute_nil notified_users_from_other_projects
+        expect(notified_users_from_other_projects).to_not include User.anonymous
+        expect(notified_users_from_other_projects).to include User.find(1) # member of project 5 only, but admin
+        expect(notified_users_from_other_projects).to_not include User.find(3) # not a member
+        expect(Member.where(user_id: 4, project_id: 5).first.functions).to eq []
+        expect(notified_users_from_other_projects).to include User.find(4) # member of project 5 only, not admin, no functional role specified
+        expect(notified_users_from_other_projects).to_not include User.find(8) # member of project 2 and 5 but mail_notification = only_my_events
+
+        # it should NOT notified users from other projects if the issue has a specific visibility and the user is not involved
+        not_involved_function = project_office_role
+        member = Member.find_or_create_by(user_id: 4, project_id: 5)
+        member.functions << not_involved_function
+        member.save!
+
+        notified = multiproject_issue.notified_users
+
+        expect(notified).to_not be_nil
+        expect(notified).to_not include User.anonymous
+        expect(notified).to_not include User.find(4) # member of project 5 only, not admin, with a different functional role
+      end
+    end
+  end
+
   describe "#involved_users" do
     let(:issue) { Issue.new }
     let(:project) { Project.find(1) }
@@ -87,7 +127,7 @@ describe RedmineLimitedVisibility::IssuePatch do
         MemberFunction.where(member_id: member.id, function_id: contractor_role.id).first_or_create
       end
 
-      users = issue.involved_users
+      users = issue.involved_users(issue.project)
       expect(users.map(&:class).uniq).to eq [User]
       expect(users.map(&:id)).to eq [2,3,5]
     end

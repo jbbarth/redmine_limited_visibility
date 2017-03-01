@@ -3,7 +3,9 @@ require 'spec_helper'
 describe LimitedVisibilityHelper do
 
   # TODO Add fixtures for member_functions
-  fixtures :users, :roles, :projects, :members, :member_roles, :enabled_modules, :issues
+  fixtures :users, :roles, :projects, :members,
+           :member_roles, :enabled_modules, :issues,
+           :functions, :project_function_trackers, :project_functions
 
   before do
     User.current = User.find(1)
@@ -36,14 +38,17 @@ describe LimitedVisibilityHelper do
       let(:issue) { Issue.new(:project => @project) }
 
       it "returns functional roles for current user if any" do
+        @project.functions = [] # Override fixtures...
         expect(function_ids_for_current_viewers(issue)).to eq [contractor_role.id]
       end
 
       it "returns all functional roles if current user cannot see anything" do
+        @project.functions = [] # Override fixtures...
         function1 = contractor_role.id
         function2 = project_office_role.id
         allow(self).to receive(:functional_roles_for_current_user).and_return([])
-        expect(function_ids_for_current_viewers(issue)).to eq [function1,function2]
+        expect(function_ids_for_current_viewers(issue)).to include function1
+        expect(function_ids_for_current_viewers(issue)).to include function2
       end
     end
 
@@ -56,10 +61,12 @@ describe LimitedVisibilityHelper do
       end
 
       it "returns all functional roles if none" do
+        @project.functions = [] # Override fixtures...
         function1 = contractor_role.id
         function2 = project_office_role.id
         allow(issue).to receive(:authorized_viewers).and_return(nil)
-        expect(function_ids_for_current_viewers(issue)).to eq [function1,function2]
+        expect(function_ids_for_current_viewers(issue)).to include function1
+        expect(function_ids_for_current_viewers(issue)).to include function2
       end
     end
   end

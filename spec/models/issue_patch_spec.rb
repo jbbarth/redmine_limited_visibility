@@ -81,8 +81,8 @@ describe RedmineLimitedVisibility::IssuePatch do
       it 'should NOT notify users if their functions are not involved in secondary project' do
 
         # SETUP
-        Project.find(2).enable_module!('redmine_limited_visibility')
-        Project.find(5).enable_module!('redmine_limited_visibility')
+        Project.find(2).enable_module!('limited_visibility')
+        Project.find(5).enable_module!('limited_visibility')
         multiproject_issue = issue_with_authorized_viewers # issue_id: 4 & project_id: 2 & authorized_viewers: "|#{contractor_role.id}|"
         multiproject_issue.projects = [multiproject_issue.project, Project.find(5)] #other project id = 5
         multiproject_issue.save!

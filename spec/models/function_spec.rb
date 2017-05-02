@@ -25,4 +25,12 @@ describe Function do
       expect(function.authorized_viewer_ids).to eq []
     end
   end
+
+  it "can create a function with a long name (> 30 chars)" do
+    name = "Security manager and executive director"
+    function = Function.new(name: name)
+    expect(function.valid?).to be true
+    expect(function.save).to be true
+    expect(function.reload.name).to eq name
+  end
 end

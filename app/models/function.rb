@@ -14,6 +14,7 @@ class Function < ActiveRecord::Base
                :if => Proc.new { |_| Function.column_names.include?("authorized_viewers") }
 
   validates_presence_of :name
+  validates_length_of :name, maximum: 40
 
   scope :sorted, lambda { order("#{table_name}.position ASC") }
   scope :active_by_default, -> { where("active_by_default = ?", TRUE) }

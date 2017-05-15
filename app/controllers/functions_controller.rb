@@ -1,7 +1,7 @@
 class FunctionsController < ApplicationController
   layout 'admin'
 
-  before_filter :require_admin, :except => [:available_functions_per_project, :visible_functions_per_tracker]
+  before_filter :require_admin, :except => [:available_functions_per_project, :visible_functions_per_tracker, :activated_functions_per_tracker]
   before_filter :find_function, :only => [:edit, :update, :destroy]
 
   def new
@@ -89,30 +89,19 @@ class FunctionsController < ApplicationController
   end
 
   def visible_functions_per_tracker
+    context = :visibility
     project = Project.find(params[:project_id])
-    tracker_ids = project.tracker_ids
-    function_ids = project.function_ids
-    tracker_ids.each do |tracker_id|
-      function_ids.each do |function_id|
-        project_function = ProjectFunction.where(function_id: function_id, project_id: project.id).first
-        if project_function.present?
-          project_function_tracker = ProjectFunctionTracker.find_or_create_by(tracker_id: tracker_id, project_function_id: project_function.id)
-          project_function_tracker.visible = true if project_function_tracker.visible.nil? # Set default value
-          if params["function_visibility"]
-            project_function_tracker.visible = params["function_visibility"].present? && params["function_visibility"][tracker_id.to_s].present? && params["function_visibility"][tracker_id.to_s].include?(function_id.to_s)
-          end
-          if params["function_activation_per_tracker"].present?
-            project_function_tracker.checked = params["function_activation_per_tracker"].present? && params["function_activation_per_tracker"][tracker_id.to_s].present? && params["function_activation_per_tracker"][tracker_id.to_s].include?(function_id.to_s)
-          end
-          project_function_tracker.save
-
-          if params["function_activation_per_user_function"].present?
-             project_function.authorized_viewers = '|'+params["function_activation_per_user_function"][function_id.to_s].join('|')+'|'
-             project_function.save
-          end
-        end
-      end
+    set_function_params_per_project_and_tracker(context, project, params)
+    respond_to do |format|
+      format.html { redirect_to :controller => 'projects', :action => 'settings', :id => project.id, :tab => 'functional_roles' }
+      format.js
     end
+  end
+
+  def activated_functions_per_tracker
+    context = :autochecked
+    project = Project.find(params[:project_id])
+    set_function_params_per_project_and_tracker(context, project, params)
     respond_to do |format|
       format.html { redirect_to :controller => 'projects', :action => 'settings', :id => project.id, :tab => 'functional_roles' }
       format.js
@@ -125,6 +114,33 @@ class FunctionsController < ApplicationController
       @function = Function.find(params[:id])
     rescue ActiveRecord::RecordNotFound
       render_404
+    end
+
+    def set_function_params_per_project_and_tracker(context, project, params)
+      tracker_ids = project.tracker_ids
+      function_ids = project.function_ids
+      tracker_ids.each do |tracker_id|
+        function_ids.each do |function_id|
+          project_function = ProjectFunction.where(function_id: function_id, project_id: project.id).first
+          if project_function.present?
+            project_function_tracker = ProjectFunctionTracker.find_or_create_by(tracker_id: tracker_id, project_function_id: project_function.id)
+            project_function_tracker.visible = true if project_function_tracker.visible.nil? # Set default value
+            if context == :visibility
+              project_function_tracker.visible = params["function_visibility"].present? && params["function_visibility"][tracker_id.to_s].present? && params["function_visibility"][tracker_id.to_s].include?(function_id.to_s)
+            end
+
+            if context == :autochecked
+              project_function_tracker.checked = params["function_activation_per_tracker"].present? && params["function_activation_per_tracker"][tracker_id.to_s].present? && params["function_activation_per_tracker"][tracker_id.to_s].include?(function_id.to_s)
+            end
+            project_function_tracker.save
+
+            if context == :autochecked
+              project_function.authorized_viewers = '|'+params["function_activation_per_user_function"][function_id.to_s].join('|')+'|'
+              project_function.save
+            end
+          end
+        end
+      end
     end
 
 end

@@ -62,8 +62,16 @@ describe FunctionsController, type: :controller do
       expect(pfts.reload.map(&:visible).uniq).to eq [true]
     end
 
-    it "should save the default checked functions per project" do
-      put :visible_functions_per_tracker, {project_id: 2, function_activation_per_user_function: {'1'=>[1,2], '2'=>[1,2]}}
+    it "should save the automatically checked functions per function" do
+      expect(
+        put :activated_functions_per_tracker, {project_id: 2, function_activation_per_user_function: {'1'=>[1,2], '2'=>[1,2]}}
+      ).to redirect_to(:controller => 'projects', :action => 'settings', :id => 2, :tab => 'functional_roles')
+    end
+
+    it "should save the automatically checked functions per trackers" do
+      expect(
+        put :activated_functions_per_tracker, {project_id: 2, function_activation_per_tracker: {'2'=>[1,2], '3'=>[1,2]}}
+      ).to redirect_to(:controller => 'projects', :action => 'settings', :id => 2, :tab => 'functional_roles')
     end
   end
 

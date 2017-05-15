@@ -4,6 +4,7 @@ RedmineApp::Application.routes.draw do
       match '/visibilities', to: "functions#visibilities", :via => [:get, :post]
       put '/available_functions_per_project', to: "functions#available_functions_per_project"
       put '/visible_functions_per_tracker', to: "functions#visible_functions_per_tracker"
+      put '/activated_functions_per_tracker', to: "functions#activated_functions_per_tracker"
       put '/copy_functions_settings_from_project', to: "functions#copy_functions_settings_from_project"
     end
   end

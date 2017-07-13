@@ -5,11 +5,11 @@ Deface::Override.new :virtual_path  => "my/page",
   %(
     <%= if params[:limited_visibility].present? && params[:limited_visibility] == 'false'
           link_to l(:label_my_page_my_roles), my_page_path,
-                :class => "icon icon-roles",
+                :class => "icon icon-visibility",
                 :id => "show_all_roles"
         else
           link_to l(:label_my_page_all_roles), my_page_path(:limited_visibility => false),
-                :class => "icon icon-roles",
+                :class => "icon icon-visibility",
                 :id => "show_all_roles"
         end %>
   )

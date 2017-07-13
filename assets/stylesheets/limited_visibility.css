@@ -25,7 +25,7 @@ form .involved-roles .role .fa-icon-lock { display:inline; }
 .involved-roles .role:not(.disabled) .fa-icon-lock { display:none; }
 
 /* my page */
-a.icon-roles  { background-image: url(../images/magnify.png); margin-right:6px; margin-left: 8px;}
+a.icon-visibility  { background-image: url(../images/magnify.png); margin-right:6px; margin-left: 8px;}
 
 /* .organizations .role { width:50%; } */
 .organizations .permission_roles { max-width: 250px;width: 250px;padding-right: 15px; }

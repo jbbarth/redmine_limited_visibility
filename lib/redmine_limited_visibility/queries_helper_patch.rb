@@ -84,20 +84,19 @@ module QueriesHelper
   end
 
   unless instance_methods.include?(:column_value_with_limited_visibility)
-    def column_value_with_limited_visibility(column, issue, value)
+    def column_value_with_limited_visibility(column, item, value)
       if column.name == :authorized_viewers && value.class == String
         functions_from_authorized_viewers(value).join(", ")
       elsif column.name == :assigned_to && value.blank?
-        if issue.assigned_to_function_id.present?
-          "&#10148; #{issue.assigned_function.name}".html_safe
+        if item.assigned_to_function_id.present?
+          "&#10148; #{item.assigned_function.name}".html_safe
         end
       else
-        column_value_without_limited_visibility(column, issue, value)
+        column_value_without_limited_visibility(column, item, value)
       end
     end
     alias_method_chain :column_value, :limited_visibility
   end
-
 
   unless instance_methods.include?(:retrieve_query_with_limited_visibility)
     # Add 'authorized_viewers' filter if not present

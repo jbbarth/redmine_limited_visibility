@@ -30,9 +30,13 @@ ActionDispatch::Callbacks.to_prepare do
   require_dependency 'redmine_limited_visibility/issues_pdf_helper_patch'
   require_dependency 'redmine_limited_visibility/projects_helper_patch'
   require_dependency 'redmine_limited_visibility/roles_controller_patch'
+
   require_dependency 'redmine_limited_visibility/issues_controller_patch'
+
   require_dependency 'redmine_limited_visibility/member_patch'
+
   require_dependency 'redmine_limited_visibility/user_patch'
+
   if Redmine::Plugin.installed?(:redmine_organizations)
     require_dependency 'redmine_limited_visibility/organization_patch'
     require_dependency 'redmine_limited_visibility/project_patch'

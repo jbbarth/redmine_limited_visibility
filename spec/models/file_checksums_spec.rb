@@ -9,7 +9,7 @@ describe "FileChecksums" do
 
   it "should core blocks checksums" do
     # tbody in index view is overridden and should be reviewed each time it changes (copy/paste from core file in override)
-    assert_checksum %w(c41a00ab7905f8a76af5471aebcc702b b5709933b0adc728ca69ebe90b4cb9ea), "app/views/roles/index.html.erb"
+    assert_checksum %w(c41a00ab7905f8a76af5471aebcc702b b5709933b0adc728ca69ebe90b4cb9ea fb6cbf9eb0ac7abd08916d97c1fdd183), "app/views/roles/index.html.erb"
   end
 
 end

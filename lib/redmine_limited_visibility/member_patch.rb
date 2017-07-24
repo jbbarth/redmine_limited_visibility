@@ -18,14 +18,17 @@ class Member < ActiveRecord::Base
     if attributes
       project_ids = Array.wrap(attributes[:project_ids] || attributes[:project_id])
       role_ids = []
-      role_ids |= attributes[:role_ids].map(&:to_i) if attributes[:role_ids]
+      role_ids |= Array.wrap(attributes[:role_ids]).map(&:to_i) if attributes[:role_ids]
       function_ids = []
-      function_ids |= attributes[:function_ids].map(&:to_i) if attributes[:function_ids]
+      function_ids_by_project = []
+      function_ids |= Array.wrap(attributes[:function_ids]).map(&:to_i) if attributes[:function_ids]
       project_ids.each do |project_id|
         if Redmine::Plugin.installed?(:redmine_organizations)
           # Member must have the selected role AND the role given by his/her organization
           all_roles_ids = Role.all.collect(&:id)
           role_ids_by_project = role_ids | OrganizationRole.where(organization_id: principal.organization_id, project_id: project_id).all.map{|r| all_roles_ids.include?(r.role_id) ? r.role_id : nil}
+        else
+          role_ids_by_project = role_ids
         end
         if Redmine::Plugin.installed?(:redmine_limited_visibility)
           all_functions_ids = Function.all.collect(&:id)
@@ -37,7 +40,11 @@ class Member < ActiveRecord::Base
             end
           end if project.present?
         end
-        members << Member.new(:principal => principal, :role_ids => role_ids_by_project, :function_ids => function_ids_by_project, :project_id => project_id)
+        member = Member.find_or_new(project_id, principal)
+        member.role_ids |= role_ids_by_project
+        member.function_ids |= function_ids_by_project
+        member.save
+        members << member
       end
       principal.members << members
     end

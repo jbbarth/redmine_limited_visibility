@@ -5,7 +5,7 @@ module QueriesHelper
 
   unless instance_methods.include?(:column_content_with_limited_visibility)
     def column_content_with_limited_visibility(column, issue)
-      if  column.name == :has_been_assigned_to
+      if column.name == :has_been_assigned_to
         get_assigned_users_and_functions(column, issue, true)
       elsif  column.name == :has_been_visible_by
         get_has_been_authorized_viewers(column, issue, true)
@@ -88,7 +88,7 @@ module QueriesHelper
       if column.name == :authorized_viewers && value.class == String
         functions_from_authorized_viewers(value).join(", ")
       elsif column.name == :assigned_to && value.blank?
-        if item.assigned_to_function_id.present?
+        if item.assigned_function.present?
           "&#10148; #{item.assigned_function.name}".html_safe
         end
       else

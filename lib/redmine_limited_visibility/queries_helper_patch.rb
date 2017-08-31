@@ -100,8 +100,8 @@ module QueriesHelper
 
   unless instance_methods.include?(:retrieve_query_with_limited_visibility)
     # Add 'authorized_viewers' filter if not present
-    def retrieve_query_with_limited_visibility
-      retrieve_query_without_limited_visibility
+    def retrieve_query_with_limited_visibility(klass=IssueQuery, use_session=true)
+      retrieve_query_without_limited_visibility(klass, use_session)
       if @project.blank? || @project.module_enabled?("limited_visibility")
         should_see_all = []
         User.current.members.map(&:functions).each do |functions|

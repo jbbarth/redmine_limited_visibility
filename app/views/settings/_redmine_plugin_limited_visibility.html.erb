@@ -1,9 +1,22 @@
-<div>
-  <span colspan="2" style="text-align: left;font-weight: bold;"><%= l(:settings_must_have_at_least_one_visible_function) %> :</span>
-  <span>
-    <%= radio_button_tag "settings[must_have_at_least_one_visible_function]", true, Setting['plugin_redmine_limited_visibility']['must_have_at_least_one_visible_function'] == 'true', :id => "settings_must_have_at_least_one_visible_function" %>
-    <%= l(:general_text_Yes) %>
-    <%= radio_button_tag "settings[must_have_at_least_one_visible_function]", false, Setting['plugin_redmine_limited_visibility']['must_have_at_least_one_visible_function'] == 'false', :id => "settings_must_have_at_least_one_visible_function" %>
-    <%= l(:general_text_No) %>
-  </span>
-</div>
+<table>
+  <tbody>
+  <tr>
+    <th><%= l(:settings_must_have_at_least_one_visible_function) %> :</th>
+    <td>
+      <%= radio_button_tag "settings[must_have_at_least_one_visible_function]", true, Setting['plugin_redmine_limited_visibility']['must_have_at_least_one_visible_function'] == 'true', :id => "settings_must_have_at_least_one_visible_function" %>
+      <%= l(:general_text_Yes) %>
+      <%= radio_button_tag "settings[must_have_at_least_one_visible_function]", false, Setting['plugin_redmine_limited_visibility']['must_have_at_least_one_visible_function'] == 'false', :id => "settings_must_have_at_least_one_visible_function" %>
+      <%= l(:general_text_No) %>
+    </td>
+  </tr>
+  <tr>
+    <th style="min-width: 300px;">Projets utilisant le module :</th>
+    <td>
+      <% projects = EnabledModule.where(name: 'limited_visibility').map(&:project) %>
+      <% projects.each do |p| %>
+        <span class="list_templates_projects_names"><%= link_to_project(p) %></span>
+      <% end %>
+    </td>
+  </tr>
+  </tbody>
+</table>

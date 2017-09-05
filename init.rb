@@ -11,7 +11,7 @@ Redmine::Plugin.register :redmine_limited_visibility do
   requires_redmine_plugin :redmine_base_deface, :version_or_higher => '0.0.1'
   project_module :limited_visibility do
     permission :manage_functional_roles_by_project, {:functions => [:available_functions_per_project]}
-    permission :limit_issues_visibility, {  }
+    permission :change_issues_visibility, {  }
   end
   settings :default => { 'must_have_at_least_one_visible_function' => false},
            :partial => 'settings/redmine_plugin_limited_visibility'

@@ -12,8 +12,18 @@ class IssueQuery < Query
     def initialize_available_filters_with_authorized_viewers
       initialize_available_filters_without_authorized_viewers
 
-      all_functions = Function.all.map { |s| [s.name, s.id.to_s] }
+      if project.present?
+        all_functions = project.functions.map { |s| [s.name, s.id.to_s] }
+      else
+        all_functions = Function.all.map { |s| [s.name, s.id.to_s] }
+      end
+
       add_available_filter "authorized_viewers", type: :list_visibility, values: all_functions
+
+      add_available_filter("assigned_to_function_id",
+                           :type => :list_optional, :values => all_functions
+      ) unless all_functions.empty?
+
       add_available_filter("has_been_visible_by_id",
                            :type => :list_optional, :values => all_functions
       ) unless all_functions.empty?
@@ -59,6 +69,23 @@ class IssueQuery < Query
             " AND (#{journal_condition1} OR #{journal_condition2}))"
 
         "((#{issue_attr_sql}) #{operator_switch} (#{journal_sql}))"
+    end
+  end
+
+  def sql_for_assigned_to_function_id_field(field, operator, value)
+    case operator
+      when "*", "!*" # All / None
+        boolean_switch = (operator == "!*" ? '' : 'NOT')
+        "(#{Issue.table_name}.assigned_to_function_id IS #{boolean_switch} NULL)"
+      when "=", "!"
+        boolean_switch = operator == "!" ? 'NOT' : ''
+
+        assigned_to_empty = "#{Issue.table_name}.assigned_to_function_id IS NULL"
+        assigned_to_id_statement = operator == "!" ? "#{assigned_to_empty} OR" : ''
+
+        issue_attr_sql = "(#{assigned_to_id_statement} #{Issue.table_name}.assigned_to_function_id #{boolean_switch} IN (" + value.collect{|val| val.include?('function') ? "null" : "'#{self.class.connection.quote_string(val)}'"}.join(",") + "))"
+
+        "(#{issue_attr_sql})"
     end
   end
 

@@ -19,5 +19,10 @@ describe IssueQuery do
       query = IssueQuery.new
       expect(query.available_filters).to include 'authorized_viewers'
     end
+
+    it 'initialize an "assigned_to_function_id" filter' do
+      query = IssueQuery.new
+      expect(query.available_filters).to include 'assigned_to_function_id'
+    end
   end
 end

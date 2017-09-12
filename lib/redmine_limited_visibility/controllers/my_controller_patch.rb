@@ -1,5 +1,5 @@
 require_dependency 'my_controller'
-require 'redmine_limited_visibility/issue_query_patch'
+require 'redmine_limited_visibility/models/issue_query_patch'
 
 class MyController < ApplicationController
 

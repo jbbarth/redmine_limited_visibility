@@ -115,4 +115,51 @@ module QueriesHelper
     end
     alias_method_chain :retrieve_query, :limited_visibility
   end
+
+  def filters_options_for_select(query)
+    ungrouped = []
+    grouped = {}
+    query.available_filters.map do |field, field_options|
+      if field_options[:type] == :relation
+        group = :label_relations
+      elsif field_options[:type] == :tree
+        group = query.is_a?(IssueQuery) ? :label_relations : nil
+      elsif field =~ /^cf_\d+\./
+        group = (field_options[:through] || field_options[:field]).try(:name)
+      elsif field =~ /^(.+)\./
+        # association filters
+        group = "field_#{$1}".to_sym
+
+      ## Start PATCH
+      elsif %w(member_of_group
+                assigned_to_role
+                assigned_to_member_with_function_id
+                assigned_to_function_id
+                has_been_assigned_to_id
+                has_been_assigned_to_function_id).include?(field)
+        group = :field_assigned_to
+      elsif %w(authorized_viewers has_been_visible_by_id).include?(field)
+        group = :field_authorized_viewers
+      ## End PATCH
+
+      elsif field_options[:type] == :date_past || field_options[:type] == :date
+        group = :label_date
+      end
+      if group
+        (grouped[group] ||= []) << [field_options[:name], field]
+      else
+        ungrouped << [field_options[:name], field]
+      end
+    end
+    # Don't group dates if there's only one (eg. time entries filters)
+    if grouped[:label_date].try(:size) == 1
+      ungrouped << grouped.delete(:label_date).first
+    end
+    s = options_for_select([[]] + ungrouped)
+    if grouped.present?
+      localized_grouped = grouped.map {|k,v| [k.is_a?(Symbol) ? l(k) : k.to_s, v]}
+      s << grouped_options_for_select(localized_grouped)
+    end
+    s
+  end
 end

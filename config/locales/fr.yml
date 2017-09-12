@@ -19,6 +19,7 @@ fr:
   permission_manage_functional_roles_by_project: "Gérer les rôles fonctionnels par projet"
   project_module_limited_visibility: "Visibilité limitée des demandes"
   field_assigned_to_function: "Assigné au groupe"
+  field_assigned_to_member_with_function: "Fonction de l'assigné"
   field_has_been_assigned_to: "A été assigné à"
   field_has_been_assigned_to_function: "A été assigné au groupe"
   field_has_been_visible_by: "A été visible par"

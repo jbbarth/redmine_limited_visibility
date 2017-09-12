@@ -20,6 +20,10 @@ class IssueQuery < Query
 
       add_available_filter "authorized_viewers", type: :list_visibility, values: all_functions
 
+      add_available_filter("assigned_to_member_with_function_id",
+                           :type => :list_optional, :values => all_functions
+      ) unless all_functions.empty?
+
       add_available_filter("assigned_to_function_id",
                            :type => :list_optional, :values => all_functions
       ) unless all_functions.empty?
@@ -86,6 +90,25 @@ class IssueQuery < Query
         issue_attr_sql = "(#{assigned_to_id_statement} #{Issue.table_name}.assigned_to_function_id #{boolean_switch} IN (" + value.collect{|val| val.include?('function') ? "null" : "'#{self.class.connection.quote_string(val)}'"}.join(",") + "))"
 
         "(#{issue_attr_sql})"
+    end
+  end
+
+  def sql_for_assigned_to_member_with_function_id_field(field, operator, value)
+    case operator
+      when "*", "!*" # Member / Not member
+        sw = operator == "!*" ? 'NOT' : ''
+        nl = operator == "!*" ? "#{Issue.table_name}.assigned_to_id IS NULL OR" : ''
+        "(#{nl} #{Issue.table_name}.assigned_to_id #{sw} IN (SELECT DISTINCT #{Member.table_name}.user_id FROM #{Member.table_name}" +
+            " WHERE #{Member.table_name}.project_id = #{Issue.table_name}.project_id))"
+      when "=", "!"
+        function_cond = value.any? ?
+                        "#{MemberFunction.table_name}.function_id IN (" + value.collect{|val| "'#{self.class.connection.quote_string(val)}'"}.join(",") + ")" :
+                        "1=0"
+
+        sw = operator == "!" ? 'NOT' : ''
+        nl = operator == "!" ? "#{Issue.table_name}.assigned_to_id IS NULL OR" : ''
+        "(#{nl} #{Issue.table_name}.assigned_to_id #{sw} IN (SELECT DISTINCT #{Member.table_name}.user_id FROM #{Member.table_name}, #{MemberFunction.table_name}" +
+            " WHERE #{Member.table_name}.project_id = #{Issue.table_name}.project_id AND #{Member.table_name}.id = #{MemberFunction.table_name}.member_id AND #{function_cond}))"
     end
   end
 

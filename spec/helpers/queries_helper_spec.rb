@@ -1,5 +1,5 @@
 require 'spec_helper'
-require 'redmine_limited_visibility/queries_helper_patch'
+require 'redmine_limited_visibility/helpers/queries_helper_patch'
 
 describe QueriesHelper, type: :helper do
 

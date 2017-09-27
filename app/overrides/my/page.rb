@@ -10,7 +10,6 @@ override =   %(
         end %>
   )
 
-
 Deface::Override.new :virtual_path  => "my/page",
                      :name          => "add-roles_selection-to-my-page",
                      :original      => "bc6ae6262eef79aab70c151bfacde1eb8e66512f",

@@ -12,4 +12,9 @@ describe "FileChecksums" do
     assert_checksum %w(c41a00ab7905f8a76af5471aebcc702b b5709933b0adc728ca69ebe90b4cb9ea fb6cbf9eb0ac7abd08916d97c1fdd183), "app/views/roles/index.html.erb"
   end
 
+  it "should repeat any change in my/page" do
+    # my/page is completely overriden, and any future change should be copied to the plugin
+    assert_checksum %w(f724b9bb0ffe7cf73cf9ffa162768699), "app/views/my/page.html.erb"
+  end
+
 end

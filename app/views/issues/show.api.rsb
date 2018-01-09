@@ -74,6 +74,12 @@ api.issue do
         api.notes journal.notes
         api.created_on journal.created_on
         api.private_notes journal.private_notes
+        api.array :attachments do
+          journal.attachments.each do |attachment|
+            render_api_attachment(attachment, api)
+          end
+        end if include_in_api_response?('attachments')
+
         api.array :details do
           journal.visible_details.each do |detail|
             api.detail :property => detail.property, :name => detail.prop_key do

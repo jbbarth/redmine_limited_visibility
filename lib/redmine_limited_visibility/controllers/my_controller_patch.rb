@@ -9,6 +9,13 @@ class MyController < ApplicationController
     @groups = @user.pref.my_page_groups
     @blocks = @user.pref.my_page_layout
     @visibility_condition = IssueQuery.new.sql_conditions_for_functions_per_projects('authorized_viewers') unless params[:limited_visibility] == 'false'
+    if params[:limited_visibility] == 'false'
+      @visibility = '*'
+    else
+      @visibility = 'mine'
+    end
+    @my_team = @user.organization
+    @my_team_user_ids = @my_team.present? ? @my_team.users.pluck(:id) : []
   end
 
 end

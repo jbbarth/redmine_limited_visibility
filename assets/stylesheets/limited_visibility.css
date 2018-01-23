@@ -14,6 +14,7 @@
 .involved-roles .role.involved { background-color:#cfb; }
 .involved-roles .role.disabled { cursor:default; }
 .involved-roles .role.involved:hover { background-color:#d7ffc6; }
+.involved-roles .role.no-member, .involved-roles .role.no-member:hover { background-color:#dddddd; }
 /* font awesome icons */
 .involved-roles .role .status-icon { width:1em; display:inline-block; }
 .involved-roles .role:not(.involved) .fa-icon-ok { display:none; }

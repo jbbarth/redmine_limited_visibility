@@ -1,4 +1,4 @@
-require 'spec_helper'
+require File.dirname(__FILE__) + '/../spec_helper'
 require 'redmine_limited_visibility/helpers/queries_helper_patch'
 
 describe QueriesHelper, type: :helper do

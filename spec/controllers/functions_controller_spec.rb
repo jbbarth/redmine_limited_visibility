@@ -1,4 +1,4 @@
-require 'spec_helper'
+require File.dirname(__FILE__) + '/../spec_helper'
 
 describe FunctionsController, type: :controller do
   fixtures :users, :functions, :projects, :trackers, :projects_trackers, :project_functions, :project_function_trackers

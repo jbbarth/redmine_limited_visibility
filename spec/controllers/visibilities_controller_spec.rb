@@ -1,4 +1,4 @@
-require "spec_helper"
+require File.dirname(__FILE__) + '/../spec_helper'
 
 =begin     UPDATE WHEN MAKING THE PLUGIN WORK WITHOUT THE ORGANIZATIONS PLUGIN
 describe VisibilitiesController do

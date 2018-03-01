@@ -66,35 +66,36 @@ class Project
       next if role_ids.empty?
       new_member.role_ids = role_ids
 
-      # TODO: Refactor this patch and use Module#prepend in order to keep untouched the original 'copy_members' method
-      # Start
+      ### TODO: Refactor this patch and use Module#prepend in order to keep untouched the original 'copy_members' method
+      ### Start
       function_ids = member.member_functions.map(&:function_id)
       new_member.function_ids = function_ids
-      # End of the patch
+      ### End of the patch
 
       new_member.project = self
       self.members << new_member
     end
 
-    # Patch - Restart
+    ### Patch - Restart
     self.functions = project.project_functions.map(&:function)
 
-    # TODO Only if organization plugin is installed
-    orga_functions_to_copy = project.organization_functions
-    orga_functions_to_copy.each do |orga_function|
-      new_orga_function = OrganizationFunction.new
-      new_orga_function.attributes = orga_function.attributes.dup.except("id", "project_id")
-      self.organization_functions << new_orga_function
-    end
+    # Only if organization plugin is installed
+    if Redmine::Plugin.installed?(:redmine_organizations)
+      orga_functions_to_copy = project.organization_functions
+      orga_functions_to_copy.each do |orga_function|
+        new_orga_function = OrganizationFunction.new
+        new_orga_function.attributes = orga_function.attributes.dup.except("id", "project_id")
+        self.organization_functions << new_orga_function
+      end
 
-    orga_roles_to_copy = project.organization_roles
-    orga_roles_to_copy.each do |orga_role|
-      new_orga_role = OrganizationRole.new
-      new_orga_role.attributes = orga_role.attributes.dup.except("id", "project_id")
-      self.organization_roles << new_orga_role
-      self.organization_roles << new_orga_role
+      orga_roles_to_copy = project.organization_roles
+      orga_roles_to_copy.each do |orga_role|
+        new_orga_role = OrganizationRole.new
+        new_orga_role.attributes = orga_role.attributes.dup.except("id", "project_id")
+        self.organization_roles << new_orga_role
+      end
     end
-    # End of the patch
+    ### End of the patch
 
   end
 

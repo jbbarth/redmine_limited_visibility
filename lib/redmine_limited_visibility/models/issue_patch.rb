@@ -23,16 +23,21 @@ module RedmineLimitedVisibility
         end
 
         def involved_users(project)
-          users_involved_by_their_functions = User.joins(:members => :member_functions)
-              .where(:members => { :project_id => project.id },
-                     :member_functions => { :function_id => authorized_viewer_ids })
+          if project.module_enabled?("limited_visibility")
+            users_involved_by_their_functions = User.joins(:members => :member_functions)
+                                                    .where(:members => { :project_id => project.id },
+                                                           :member_functions => { :function_id => authorized_viewer_ids })
 
-          members_without_functions = Member.includes(:user)
-              .where(:members => { :project_id => project.id })
-              .reject{|m| m.member_functions.present?}
-          users_without_functions = members_without_functions.map(&:user).reject(&:blank?)
+            members_without_functions = Member.includes(:user)
+                                            .where(:members => { :project_id => project.id })
+                                            .reject{|m| m.member_functions.present?}
+            users_without_functions = members_without_functions.map(&:user).reject(&:blank?)
 
-          users_involved_by_their_functions | users_without_functions
+            users_involved_by_their_functions | users_without_functions
+          else
+            all_members = User.joins(:members).where(:members => { :project_id => project.id })
+            all_members
+          end
         end
 
         def authorized_viewer_ids

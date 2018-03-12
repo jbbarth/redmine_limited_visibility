@@ -43,8 +43,9 @@ describe RedmineLimitedVisibility::IssuePatch do
       expect(notified).to_not include User.find(8) # member of project 2 but mail_notification = false
     end
 
-    it 'should NOT notify users if their functions are not involved' do
+    it 'should NOT notify users if their functions are not involved AND module is enabled for the project' do
       issue = issue_with_authorized_viewers
+      issue.project.enable_module!('limited_visibility')
       not_involved_function = project_office_role
 
       member = Member.where(user_id: 2, project_id: issue.project_id).first
@@ -59,6 +60,25 @@ describe RedmineLimitedVisibility::IssuePatch do
       expect(notified.size).to eq 0
       expect(notified).to_not include User.anonymous
       expect(notified).to_not include User.find(2) # member with different function
+    end
+
+    it 'SHOULD notify users if their functions are not involved BUT module is DISABLED for the project' do
+      issue = issue_with_authorized_viewers
+      issue.project.disable_module!('limited_visibility')
+      not_involved_function = project_office_role
+
+      member = Member.where(user_id: 2, project_id: issue.project_id).first
+      unless member
+        member = Member.new(user_id: 2, project_id: issue.project_id)
+      end
+      member.functions << not_involved_function
+      member.save!
+
+      notified = issue.notified_users
+      expect(notified).to_not be_nil
+      expect(notified.size).to be > 0
+      expect(notified).to_not include User.anonymous
+      expect(notified).to include User.find(2) # member with different function
     end
 
     it 'should notify users if issue has no specific function' do

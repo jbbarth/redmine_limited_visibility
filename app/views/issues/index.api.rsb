@@ -50,14 +50,7 @@ api.array :issues, api_meta(:total_count => @issue_count, :offset => @offset, :l
             api.user(:id => journal.user_id, :name => journal.user.name) unless journal.user.nil?
             api.notes journal.notes
             api.created_on journal.created_on
-            #api.array :details do
-            #  journal.visible_details.each do |detail|
-            #    api.detail :property => detail.property, :name => detail.prop_key do
-            #      api.old_value detail.old_value
-            #      api.new_value detail.value
-            #    end
-            #  end
-            #end
+            api.private_notes journal.private_notes
           end
         end
       end if include_in_api_response?('journals')

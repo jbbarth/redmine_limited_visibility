@@ -10,7 +10,8 @@ describe QueriesHelper, type: :helper do
     it "should return a String with function's names" do
       value = column_value(QueryColumn.new(:authorized_viewers), nil, "|#{contractor_role.id}|#{project_office_role.id}|")
       expect(value).to be_a_kind_of String
-      expect(value).to include "#{contractor_role.name}, #{project_office_role.name}"
+      expect(value).to include contractor_role.name
+      expect(value).to include project_office_role.name
     end
   end
 end

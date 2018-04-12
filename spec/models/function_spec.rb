@@ -33,4 +33,26 @@ describe Function do
     expect(function.save).to be true
     expect(function.reload.name).to eq name
   end
+
+  describe "functions_from_authorized_viewers" do
+    it "returns a list of functions from an authorized_viewers string" do
+      contractor_role = Function.where(name: "Contractors").first_or_create
+      roles = Function.functions_from_authorized_viewers("|#{contractor_role.id}|")
+      expect(roles.map(&:class).uniq).to eq [Function]
+      expect(roles.map(&:id)).to eq [contractor_role.id]
+    end
+
+    it "returns an empty array if no authorized_viewer given" do
+      expect(Function.functions_from_authorized_viewers("")).to eq []
+      expect(Function.functions_from_authorized_viewers(nil)).to eq []
+    end
+
+    it "doesn't break if function doesn't exist anymore" do
+      expect(Function.functions_from_authorized_viewers("99999")).to eq []
+    end
+
+    it "doesn't break if data is completely invalid" do
+      expect(Function.functions_from_authorized_viewers("   |foo|bar=1||")).to eq []
+    end
+  end
 end

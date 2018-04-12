@@ -49,6 +49,17 @@ class Project
     @functions_per_user
   end
 
+  def members_per_function
+    hash = {}
+    self.memberships.includes(:member_functions).each do |m|
+      m.member_functions.each do |f|
+        hash[f.function_id] = 0 if hash[f.function_id].blank?
+        hash[f.function_id] += 1
+      end
+    end
+    hash
+  end
+
   # Copies members from +project+
   def copy_members(project)
 

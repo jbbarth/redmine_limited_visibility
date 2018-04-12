@@ -1,8 +1,8 @@
 # require_relative File.expand_path('../../fast_spec_helper', __FILE__)
 require File.dirname(__FILE__) + '/../spec_helper'
 
-require 'redmine_limited_visibility/helpers/queries_helper_patch'
 require 'redmine_limited_visibility/models/issue_query_patch'
+require 'redmine_limited_visibility/helpers/queries_helper_patch'
 
 describe IssuesController, type: :controller do
   fixtures :users, :roles, :projects, :members, :member_roles, :issues, :issue_statuses, :trackers, :enumerations, :custom_fields, :enabled_modules

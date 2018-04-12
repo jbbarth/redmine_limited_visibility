@@ -17,7 +17,7 @@ class Function < ActiveRecord::Base
   validates_length_of :name, maximum: 40
 
   scope :sorted, lambda { order("#{table_name}.position ASC") }
-  scope :active_by_default, -> { where("active_by_default = ?", TRUE) }
+  scope :active_by_default, -> { where("active_by_default = ?", true) }
 
   def self.available_functions_for(project)
     functions = Function.joins(:project_functions).where("project_id = ?", project.id).sorted if project.present?
@@ -41,6 +41,10 @@ class Function < ActiveRecord::Base
 
   def users_by_project(project)
     User.joins(:members => :member_functions).where("function_id = ? AND project_id = ?", self.id, project.id).active.order("lastname ASC")
+  end
+
+  def self.functions_from_authorized_viewers(authorized_viewers)
+    Function.where(:id => "#{authorized_viewers}".split("|")).sorted
   end
 
   private

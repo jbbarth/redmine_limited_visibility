@@ -1,35 +1,5 @@
 <% @project.functions ||= Function.active_by_default %>
-
-<%= form_for(:functions,
-             :method => :put,
-             :url => { :controller => 'functions',
-                       :action => 'copy_functions_settings_from_project',
-                       :project_id => @project.id }) do %>
-
-  <fieldset class="box">
-    <legend>Copier les paramètres d'un autre projet</legend>
-    <p>
-      <% projects = Project.active.where("id IN (?)", ProjectFunction.select(:project_id).group(:project_id).pluck(:project_id)).select(:id, :name, :identifier, :lft, :rgt).to_a
-         projects -= [@project]
-         if projects.any?
-           options =
-               ("<option value=''>Sélectionner un projet</option>" +
-                   '<option value="" disabled="disabled">---</option>').html_safe
-           options << project_tree_options_for_select(projects) do |p|
-             { :value => p.id }
-           end
-           options = options.gsub('&nbsp;&#187;', '&nbsp;').html_safe %>
-           <%= select_tag :project_from, options %>
-           <%= submit_tag l(:button_copy) %>
-        <% else %>
-
-           <p>Aucun autre projet n'est configuré pour l'instant</p>
-
-         <% end %>
-
-    </p>
-  </fieldset>
-<% end %>
+<% members_per_function = @project.members_per_function %>
 
 <%= form_for(:functions,
              :method => :put,
@@ -41,19 +11,18 @@
   <fieldset class="box">
     <p>
       <label><%= l(:text_select_project_functional_roles) %></label>
-      <%= select_tag :function_ids, options_for_select(Function.sorted.collect{|f| [f.name, f.id]}, Function.sorted.select{|f| @project.functions.present? ? @project.functions.include?(f) : f.active_by_default }.map(&:id)), {:multiple => true} %>
+      <%= select_tag :function_ids, options_for_select(Function.sorted.collect{|f| ["#{f.name}#{" (#{members_per_function[f.id]} membres)" if members_per_function[f.id].present?}", f.id]}, Function.sorted.select{|f| @project.functions.present? ? @project.functions.include?(f) : f.active_by_default }.map(&:id)), {:multiple => true} %>
     </p>
     <p>
-      <label>Rôles pré-cochés en fonction </label>
-      <%= select_tag :autocheck_mode, options_for_select({"du rôle de l'utilisateur" => '1', "du tracker" => '2'}, @project.autochecked_functions_mode || '1') %>
+      <label>Les visibilités par rôle seront pré-remplies en fonction </label>
+      <%= select_tag :autocheck_mode, options_for_select({"du rôle de l'utilisateur" => '1', "du tracker de la demande" => '2'}, @project.autochecked_functions_mode || '1') %>
     </p>
     <p><%= submit_tag l(:button_save) %></p>
   </fieldset>
 <% end %>
 
+<h2 style="margin-top: 10px;"><%= "Rôles silencieux par tracker :" %></h2>
 <fieldset class="box">
-  <h4><%= "Rôles silencieux par tracker :" %></h4>
-
   <% if @project.functions.empty? %>
     <p>Veuillez tout d'abord confirmer les rôles fonctionnels actifs pour ce projet</p>
   <% else %>
@@ -68,9 +37,9 @@
         <table class="list visibilities">
           <thead>
           <tr>
-            <th style="width: 200px;white-space: pre-line;vertical-align: middle;"></th>
+            <th style="width: 200px;vertical-align: middle;"></th>
             <% @project.trackers.sorted.all.each do |function| %>
-              <th style="width: 100px;white-space:pre-line;vertical-align: middle;text-align: left;">
+              <th style="width: 100px;vertical-align: middle;text-align: left;">
                 <%= content_tag('span', h(function.name)) %>
               </th>
             <% end %>
@@ -109,9 +78,8 @@
 
 </fieldset>
 
+<h2 style="margin-top: 10px;"><%= "Valeurs par défaut :" %></h2>
 <fieldset class="box">
-  <h4><%= "Valeurs par défaut :" %></h4>
-
   <%= form_for(:functions,
                :method => :put,
                :url => { :controller => 'functions',
@@ -124,7 +92,7 @@
         <tr>
           <th style="width: 200px;white-space: pre-line;vertical-align: middle;"></th>
           <% @project.trackers.sorted.all.each do |function| %>
-            <th style="width: 100px;white-space:pre-line;vertical-align: middle;text-align: left;">
+            <th style="width: 100px;vertical-align: middle;text-align: left;">
               <%= content_tag('span', h(function.name)) %>
             </th>
           <% end %>
@@ -164,7 +132,7 @@
           <tr>
             <th style="width: 200px;white-space: pre-line;vertical-align: middle;">Rôle de l'utilisateur >></th>
             <% @project.functions.sorted.all.each do |function| %>
-              <th style="width: 100px;white-space:pre-line;vertical-align: middle;text-align: left;">
+              <th style="width: 100px;vertical-align: middle;text-align: left;">
                 <%= content_tag('span', h(function.name)) %>
               </th>
             <% end %>
@@ -209,6 +177,36 @@
   <% end %>
 
 </fieldset>
+
+<%= form_for(:functions,
+             :method => :put,
+             :url => { :controller => 'functions',
+                       :action => 'copy_functions_settings_from_project',
+                       :project_id => @project.id }) do %>
+  <h2 style="margin-top: 10px;">Copier les paramètres d'un autre projet</h2>
+  <fieldset class="box">
+    <p>
+      <% projects = Project.active.where("id IN (?)", ProjectFunction.select(:project_id).group(:project_id).pluck(:project_id)).select(:id, :name, :identifier, :lft, :rgt).to_a
+         projects -= [@project]
+         if projects.any?
+           options =
+               ("<option value=''>Sélectionner un projet</option>" +
+                   '<option value="" disabled="disabled">---</option>').html_safe
+           options << project_tree_options_for_select(projects) do |p|
+             { :value => p.id }
+           end
+           options = options.gsub('&nbsp;&#187;', '&nbsp;').html_safe %>
+        <%= select_tag :project_from, options %>
+        <%= submit_tag l(:button_copy) %>
+      <% else %>
+
+      <p>Aucun autre projet n'est configuré pour l'instant</p>
+
+    <% end %>
+
+    </p>
+  </fieldset>
+<% end %>
 
 
 <script type="text/javascript">

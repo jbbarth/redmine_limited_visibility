@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_dependency 'issue_query'
 
 class IssueQuery < Query
@@ -8,9 +10,20 @@ class IssueQuery < Query
   self.available_columns << QueryColumn.new(:has_been_assigned_to, :sortable => lambda {User.fields_for_order_statement}, :groupable => true) if self.available_columns.select { |c| c.name == :has_been_assigned_to }.empty?
   self.available_columns << QueryColumn.new(:has_been_visible_by, :sortable => false, :groupable => true) if self.available_columns.select { |c| c.name == :has_been_visible_by }.empty?
 
-  unless instance_methods.include?(:initialize_available_filters_with_authorized_viewers)
-    def initialize_available_filters_with_authorized_viewers
-      initialize_available_filters_without_authorized_viewers
+  # use standard method to validate filters form,
+  # but ignore "can't be blank" error on authorized_viewers filter because it doesn't require any value
+  def validate_query_filters
+    super
+    m = label_for('authorized_viewers') + " " + l(:blank, scope: 'activerecord.errors.messages')
+    errors.messages[:base] = errors.messages[:base] - [m] if errors.messages[:base].present? && errors.messages[:base].include?(m)
+  end
+end
+
+module PluginLimitedVisibility
+  module IssueQueryPatch
+
+    def initialize_available_filters
+      super
 
       if project.present?
         all_functions = project.functions.map { |s| [s.name, s.id.to_s] }
@@ -41,16 +54,14 @@ class IssueQuery < Query
                            :type => :list_optional, :values => all_functions
       ) unless all_functions.empty?
     end
-    alias_method_chain :initialize_available_filters, :authorized_viewers
-  end
 
-  def sql_for_has_been_assigned_to_id_field(field, operator, value)
+    def sql_for_has_been_assigned_to_id_field(field, operator, value)
 
-    if value.delete('me')
-      value.push User.current.id.to_s
-    end
+      if value.delete('me')
+        value.push User.current.id.to_s
+      end
 
-    case operator
+      case operator
       when "*", "!*" # All / None
         boolean_switch = operator == "!*" ? 'NOT' : ''
         statement = operator == "!*" ? "#{Issue.table_name}.assigned_to_id IS NULL AND" : "(#{Issue.table_name}.assigned_to_id IS NOT NULL) OR"
@@ -73,11 +84,11 @@ class IssueQuery < Query
             " AND (#{journal_condition1} OR #{journal_condition2}))"
 
         "((#{issue_attr_sql}) #{operator_switch} (#{journal_sql}))"
+      end
     end
-  end
 
-  def sql_for_assigned_to_function_id_field(field, operator, value)
-    case operator
+    def sql_for_assigned_to_function_id_field(field, operator, value)
+      case operator
       when "*", "!*" # All / None
         boolean_switch = (operator == "!*" ? '' : 'NOT')
         "(#{Issue.table_name}.assigned_to_function_id IS #{boolean_switch} NULL)"
@@ -90,11 +101,11 @@ class IssueQuery < Query
         issue_attr_sql = "(#{assigned_to_id_statement} #{Issue.table_name}.assigned_to_function_id #{boolean_switch} IN (" + value.collect{|val| val.include?('function') ? "null" : "'#{self.class.connection.quote_string(val)}'"}.join(",") + "))"
 
         "(#{issue_attr_sql})"
+      end
     end
-  end
 
-  def sql_for_assigned_to_member_with_function_id_field(field, operator, value)
-    case operator
+    def sql_for_assigned_to_member_with_function_id_field(field, operator, value)
+      case operator
       when "*", "!*" # Member / Not member
         sw = operator == "!*" ? 'NOT' : ''
         nl = operator == "!*" ? "#{Issue.table_name}.assigned_to_id IS NULL OR" : ''
@@ -102,18 +113,18 @@ class IssueQuery < Query
             " WHERE #{Member.table_name}.project_id = #{Issue.table_name}.project_id))"
       when "=", "!"
         function_cond = value.any? ?
-                        "#{MemberFunction.table_name}.function_id IN (" + value.collect{|val| "'#{self.class.connection.quote_string(val)}'"}.join(",") + ")" :
-                        "1=0"
+                            "#{MemberFunction.table_name}.function_id IN (" + value.collect{|val| "'#{self.class.connection.quote_string(val)}'"}.join(",") + ")" :
+                            "1=0"
 
         sw = operator == "!" ? 'NOT' : ''
         nl = operator == "!" ? "#{Issue.table_name}.assigned_to_id IS NULL OR" : ''
         "(#{nl} #{Issue.table_name}.assigned_to_id #{sw} IN (SELECT DISTINCT #{Member.table_name}.user_id FROM #{Member.table_name}, #{MemberFunction.table_name}" +
             " WHERE #{Member.table_name}.project_id = #{Issue.table_name}.project_id AND #{Member.table_name}.id = #{MemberFunction.table_name}.member_id AND #{function_cond}))"
+      end
     end
-  end
 
-  def sql_for_has_been_assigned_to_function_id_field(field, operator, value)
-    case operator
+    def sql_for_has_been_assigned_to_function_id_field(field, operator, value)
+      case operator
       when "*", "!*" # All / None
         boolean_switch = operator == "!*" ? 'NOT' : ''
         statement = operator == "!*" ? "#{Issue.table_name}.assigned_to_function_id IS NULL AND" : "(#{Issue.table_name}.assigned_to_function_id IS NOT NULL) OR"
@@ -136,11 +147,11 @@ class IssueQuery < Query
             " AND (#{journal_condition1} OR #{journal_condition2}))"
 
         "((#{issue_attr_sql}) #{operator_switch} (#{journal_sql}))"
+      end
     end
-  end
 
-  def sql_for_has_been_visible_by_id_field(field, operator, value)
-    case operator
+    def sql_for_has_been_visible_by_id_field(field, operator, value)
+      case operator
       when "*", "!*" # All / None
         boolean_switch = operator == "!*" ? 'NOT' : ''
         statement = operator == "!*" ? "#{Issue.table_name}.authorized_viewers IS NULL AND" : "(#{Issue.table_name}.authorized_viewers IS NOT NULL) OR"
@@ -172,67 +183,63 @@ class IssueQuery < Query
             " AND ((#{journal_condition1}) OR (#{journal_condition2})))"
 
         "((#{issue_attr_sql}) #{operator_switch} (#{journal_sql}))"
+      end
     end
-  end
 
-  def sql_for_authorized_viewers_field(field, operator, value)
-    case operator
-    when "*" # display all functional roles
-      sql = "" # no filter
-    when "mine" # only my functional roles
-      sql = sql_conditions_for_functions_per_projects(field)
-    # when "=", "!"
-    #  sql = value.map { |role| "#{Issue.table_name}.#{field} #{operator == "!" ? 'NOT' : ''} LIKE '%|#{role}|%' " }.join(" OR ")
-    else
-      raise "unsupported value for authorized_viewers field: '#{operator}'"
+    def sql_for_authorized_viewers_field(field, operator, value)
+      case operator
+      when "*" # display all functional roles
+        sql = "" # no filter
+      when "mine" # only my functional roles
+        sql = sql_conditions_for_functions_per_projects(field)
+        # when "=", "!"
+        #  sql = value.map { |role| "#{Issue.table_name}.#{field} #{operator == "!" ? 'NOT' : ''} LIKE '%|#{role}|%' " }.join(" OR ")
+      else
+        raise "unsupported value for authorized_viewers field: '#{operator}'"
+      end
+      sql
     end
-    sql
-  end
 
-  def sql_conditions_for_functions_per_projects(field)
+    def sql_conditions_for_functions_per_projects(field)
 
-    conditions = Rails.cache.fetch ['sql_conditions_for_functions_per_projects',
-                                    User.current,
-                                    Member.maximum(:id),
-                                    MemberFunction.maximum(:id),
-                                    Project.maximum(:updated_on),
-                                    (Time.now.strftime("%Y%m%d%H").to_i)].join('/') do
+      conditions = Rails.cache.fetch ['sql_conditions_for_functions_per_projects',
+                                      User.current,
+                                      Member.maximum(:id),
+                                      MemberFunction.maximum(:id),
+                                      Project.maximum(:updated_on),
+                                      (Time.now.strftime("%Y%m%d%H").to_i)].join('/') do
 
-      projects_by_function = User.current.projects_by_function
-      projects_without_functions = User.current.projects_without_function
-      projects_ids_where_module_is_enabled = EnabledModule.where("name = ?", "limited_visibility").pluck(:project_id)
+        projects_by_function = User.current.projects_by_function
+        projects_without_functions = User.current.projects_without_function
+        projects_ids_where_module_is_enabled = EnabledModule.where("name = ?", "limited_visibility").pluck(:project_id)
 
-      sql = projects_by_function.map do |function, projects|
-        projects.map do |project|
-          if projects_ids_where_module_is_enabled.include?(project.id)
-            if Redmine::Plugin.installed?(:redmine_multiprojects_issue)
-              "(#{Issue.table_name}.#{field} LIKE '%|#{function.id}|%' AND (#{Project.table_name}.id = #{project.id} OR #{project.id} IN ( SELECT project_id FROM issues_projects WHERE issue_id = #{Issue.table_name}.id )) )"
+        sql = projects_by_function.map do |function, projects|
+          projects.map do |project|
+            if projects_ids_where_module_is_enabled.include?(project.id)
+              if Redmine::Plugin.installed?(:redmine_multiprojects_issue)
+                "(#{Issue.table_name}.#{field} LIKE '%|#{function.id}|%' AND (#{Project.table_name}.id = #{project.id} OR #{project.id} IN ( SELECT project_id FROM issues_projects WHERE issue_id = #{Issue.table_name}.id )) )"
+              else
+                "(#{Issue.table_name}.#{field} LIKE '%|#{function.id}|%' AND #{Project.table_name}.id = #{project.id}) "
+              end
             else
-              "(#{Issue.table_name}.#{field} LIKE '%|#{function.id}|%' AND #{Project.table_name}.id = #{project.id}) "
+              projects_without_functions << project
+              " false "
             end
-          else
-            projects_without_functions << project
-            " false "
-          end
+          end.join(" OR ")
         end.join(" OR ")
-      end.join(" OR ")
 
-      # potentially very long query #TODO Find a way to optimize it
-      "(#{sql.present? ? '(' + sql + ') OR ' : ''} #{Issue.table_name}.#{field} IS NULL"\
+        # potentially very long query #TODO Find a way to optimize it
+        "(#{sql.present? ? '(' + sql + ') OR ' : ''} #{Issue.table_name}.#{field} IS NULL"\
       " OR #{Issue.table_name}.#{field} = '||' "\
       " OR #{Issue.table_name}.#{field} = '' "\
       " OR #{Issue.table_name}.assigned_to_id = #{User.current.id} "\
       " OR #{Issue.table_name}.author_id = #{User.current.id} "\
       " OR #{Project.table_name}.id IN ( #{projects_without_functions.present? ? projects_without_functions.map(&:id).join(',') : 0} ) ) "
+      end
+      conditions
     end
-    conditions
-  end
 
-  # use standard method to validate filters form,
-  # but ignore "can't be blank" error on authorized_viewers filter because it doesn't require any value
-  def validate_query_filters
-    super
-    m = label_for('authorized_viewers') + " " + l(:blank, scope: 'activerecord.errors.messages')
-    errors.messages[:base] = errors.messages[:base] - [m] if errors.messages[:base].present? && errors.messages[:base].include?(m)
   end
 end
+
+IssueQuery.prepend PluginLimitedVisibility::IssueQueryPatch

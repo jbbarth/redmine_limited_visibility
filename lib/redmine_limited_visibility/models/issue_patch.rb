@@ -1,7 +1,21 @@
 require_dependency 'issue'
 
 module RedmineLimitedVisibility
+  module PrependedIssuePatch
+    def notified_users
+      if authorized_viewer_ids.present?
+        super & involved_users(self.project)
+      else
+        super
+      end
+    end
+  end
+end
+Issue.prepend RedmineLimitedVisibility::PrependedIssuePatch
+
+module RedmineLimitedVisibility
   module IssuePatch
+
     def self.included(base)
       base.class_eval do
         unloadable
@@ -10,17 +24,6 @@ module RedmineLimitedVisibility
                 foreign_key: "assigned_to_function_id"
 
         safe_attributes "authorized_viewers", "assigned_to_function_id"
-
-        unless instance_methods.include?(:notified_users_with_limited_visibility)
-          def notified_users_with_limited_visibility
-            if authorized_viewer_ids.present?
-              notified_users_without_limited_visibility & involved_users(self.project)
-            else
-              notified_users_without_limited_visibility
-            end
-          end
-          alias_method_chain :notified_users, :limited_visibility
-        end
 
         def involved_users(project)
           if project.module_enabled?("limited_visibility")
@@ -49,5 +52,5 @@ module RedmineLimitedVisibility
 end
 
 unless Issue.included_modules.include? RedmineLimitedVisibility::IssuePatch
-  Issue.send :include, RedmineLimitedVisibility::IssuePatch
+  Issue.include RedmineLimitedVisibility::IssuePatch
 end

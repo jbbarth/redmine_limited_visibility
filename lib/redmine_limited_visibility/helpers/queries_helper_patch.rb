@@ -38,7 +38,7 @@ module PluginLimitedVisibility
     def get_assigned_users_and_functions(column, issue, html=true)
       list_of_users = get_has_been_assigned_users(column, issue, html)
       list_of_functions = get_has_been_assigned_functions(issue)
-      [list_of_functions, list_of_users].reject(&:blank?).join(', ')
+      [list_of_functions, list_of_users].reject(&:blank?).join(', ').html_safe
     end
 
     def get_has_been_assigned_functions(issue)
@@ -140,9 +140,6 @@ module PluginLimitedVisibility
 end
 
 module QueriesHelper
-
-  prepend PluginLimitedVisibility::QueriesHelperPatch
-
   unless instance_methods.include?(:retrieve_query_with_limited_visibility)
     # Add 'authorized_viewers' filter if not present
     def retrieve_query_with_limited_visibility(klass=IssueQuery, use_session=true)
@@ -164,7 +161,8 @@ module QueriesHelper
     alias_method :retrieve_query, :retrieve_query_with_limited_visibility
     # we don't use prepend here because the helper is included in many controllers
   end
-
 end
 
+QueriesHelper.prepend PluginLimitedVisibility::QueriesHelperPatch
 ActionView::Base.prepend QueriesHelper
+IssuesController.prepend QueriesHelper

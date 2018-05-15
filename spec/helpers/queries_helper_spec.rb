@@ -13,5 +13,21 @@ describe QueriesHelper, type: :helper do
       expect(value).to include contractor_role.name
       expect(value).to include project_office_role.name
     end
+
+    it "should return a String with assigned users and functions" do
+      user = User.first
+      user2 = User.second
+
+      value = column_value(QueryColumn.new(:has_been_assigned_to), nil, user)
+      expect(value).to be_a_kind_of ActiveSupport::SafeBuffer
+      expect(value).to eq link_to_user(user)
+
+      value = column_value(QueryColumn.new(:has_been_assigned_to), nil, [user, user2])
+      expect(value).to include link_to_user(user)
+      expect(value).to include link_to_user(user2)
+
+      value = column_value(QueryColumn.new(:has_been_assigned_to), nil, contractor_role)
+      expect(value).to eq contractor_role.name
+    end
   end
 end

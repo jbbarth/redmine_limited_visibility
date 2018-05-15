@@ -32,6 +32,10 @@ describe IssueQuery do
       expect(query.available_filters).to include 'assigned_to_function_id'
     end
 
+    it 'has a new has_been_assigned_to column' do
+      expect(IssueQuery.available_columns.find { |column| column.name == :has_been_assigned_to }).to_not be_nil
+    end
+
     describe 'assigned_to_member_with_function_id filter' do
 
       let(:contractor_role) { Function.where(name: "Contractors").first_or_create }

@@ -33,6 +33,7 @@ ActionDispatch::Callbacks.to_prepare do
 
   require_dependency 'redmine_limited_visibility/controllers/issues_controller_patch'
 
+  require_dependency 'redmine_limited_visibility/controllers/members_controller_patch'
   require_dependency 'redmine_limited_visibility/models/member_patch'
 
   require_dependency 'redmine_limited_visibility/models/user_patch'
@@ -40,6 +41,6 @@ ActionDispatch::Callbacks.to_prepare do
   if Redmine::Plugin.installed?(:redmine_organizations)
     require_dependency 'redmine_limited_visibility/models/organization_patch'
     require_dependency 'redmine_limited_visibility/models/project_patch'
-    require_dependency 'redmine_limited_visibility/controllers/organizations_controller_patch'
+    require_dependency 'redmine_limited_visibility/controllers/organizations_memberships_controller_patch'
   end
 end

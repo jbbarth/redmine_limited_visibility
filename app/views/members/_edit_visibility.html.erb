@@ -1,0 +1,25 @@
+<% organization_functions = @member.principal.organization ? @member.principal.organization.default_functions_by_project(@project) : []  %>
+<%= form_for(@member, :url => "/members/#{@member.id}/update_functions?project_id=#{@project.id}",
+             :as => :membership,
+             :remote => request.xhr?,
+             :method => :patch) do |f| %>
+  <p>
+    <% @functions.each do |function| %>
+      <label>
+        <%= check_box_tag('membership[function_ids][]',
+                          function.id, @member.functions.to_a.include?(function),
+                          :id => nil,
+                          :disabled => organization_functions.detect {|f| f.id == function.id}) %> <%= function %>
+      </label><br/>
+    <% end %>
+  </p>
+  <%= hidden_field_tag 'membership[function_ids][]', '', :id => nil %>
+  <p>
+    <%= submit_tag l(:button_save), :class => "small" %>
+    <%= link_to_function l(:button_cancel),
+                         "$('.member-#{@member.id}-roles').show();
+                         $('#member-#{@member.id}-form').empty();
+                         $('#member-#{@member.id}-visibility-form').empty();
+                         return false;" if request.xhr? %>
+  </p>
+<% end %>

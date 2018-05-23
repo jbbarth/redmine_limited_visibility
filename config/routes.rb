@@ -9,4 +9,6 @@ RedmineApp::Application.routes.draw do
     end
   end
   resources :functional_roles, only: [:update]
+  patch '/organizations/memberships/:id/update_functions', to: "organizations/memberships#update_functions"
+  patch '/members/:id/update_functions', to: "members#update_functions"
 end

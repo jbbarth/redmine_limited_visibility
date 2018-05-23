@@ -5,6 +5,24 @@ class Member < ActiveRecord::Base
   has_many :member_functions, :dependent => :destroy
   has_many :functions, :through => :member_functions
 
+  def set_functional_roles(ids)
+    ids = (ids || []).collect(&:to_i) - [0]
+    organization_function_ids = self.principal.organization ? self.principal.organization.default_functions_by_project(self.project).map(&:id) : []
+    self.function_ids = ids | organization_function_ids
+  end
+
+  def function_ids=(arg)
+    ids = (arg || []).collect(&:to_i) - [0]
+    new_function_ids = ids - function_ids
+    # Add new functions
+    new_function_ids.each {|id| member_functions << MemberFunction.new(:function_id => id, :member => self) }
+    # Remove functions (Rails' #function_ids= will not trigger MemberFunction#on_destroy)
+    member_functions_to_destroy = member_functions.select {|mr| !ids.include?(mr.function_id)}
+    if member_functions_to_destroy.any?
+      member_functions_to_destroy.each(&:destroy)
+    end
+  end
+
   # Creates memberships for principal with the attributes
   # * project_ids : one or more project ids
   # * role_ids : ids of the roles to give to each membership

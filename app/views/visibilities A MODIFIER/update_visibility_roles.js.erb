@@ -1,5 +1,0 @@
-if ($('#tab-content-visibility').is(":visible")) {
-  $('#tab-content-visibility').html('<%= escape_javascript(render partial: 'projects/visibility') %>');
-}
-hideOnLoad();
-$("#member-<%= @member.id %>").effect("highlight");

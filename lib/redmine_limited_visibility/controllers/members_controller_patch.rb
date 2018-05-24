@@ -1,10 +1,6 @@
 require_dependency 'members_controller'
 
 class MembersController
-
-  before_action :authorize, except: [:update_functions]
-  require_sudo_mode :create, :update, :destroy, :update_functions
-
   def edit
     @roles = Role.givable.to_a
     @functions = Function.available_functions_for(@project).sorted
@@ -48,14 +44,19 @@ class MembersController
     end
   end
 
-  def update_functions
+  def update
     if params[:membership]
-      @member.set_functional_roles((params[:membership][:function_ids] || []).collect(&:to_i) - [0])
+      @member.set_editable_role_ids(params[:membership][:role_ids])
+
+      ## START PATCH
+      @member.set_functional_roles(params[:membership][:function_ids])
+      ## END PATCH
+
     end
     saved = @member.save
     respond_to do |format|
       format.html { redirect_to_settings_in_projects }
-      format.js {render :update}
+      format.js
       format.api {
         if saved
           render_api_ok

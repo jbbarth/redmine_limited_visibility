@@ -1,0 +1,51 @@
+<p class="manage_members_shown">
+  <label><%= l(:label_member_management) %></label>
+
+  <span style="display: inline-block;vertical-align: top;margin-right: 2em;">
+    <label class="block">
+    <%= radio_button_tag 'role[all_roles_managed]', 1, @role.all_roles_managed?, :id => 'role_all_roles_managed_on',
+                         :data => {:disables => '.role_managed_role input'} %>
+      <%= l(:label_member_management_all_roles) %>
+    </label>
+    <label class="block">
+      <%= radio_button_tag 'role[all_roles_managed]', 0, !@role.all_roles_managed?, :id => 'role_all_roles_managed_off',
+                           :data => {:enables => '.role_managed_role input'} %>
+      <%= l(:label_member_management_selected_roles_only) %>:
+    </label>
+    <% Role.givable.sorted.each do |role| %>
+      <label class="block role_managed_role" style="padding-left:2em;">
+        <%= check_box_tag 'role[managed_role_ids][]', role.id, @role.managed_roles.to_a.include?(role), :id => nil %>
+        <%= role.name %>
+      </label>
+    <% end %>
+    <%= hidden_field_tag 'role[managed_role_ids][]', '' %>
+  </span>
+
+  <span style="display: inline-block;vertical-align: top;">
+    <label class="block">
+      <%= hidden_field_tag 'role[functions_managed]', false %>
+      <%= check_box_tag 'role[functions_managed]', 1, @role.functions_managed?, :id => 'role_functions_managed_checkbox',
+                        :data => {:enables => '#role_all_functions_managed_on, #role_all_functions_managed_off, .role_managed_function input'} %>
+      <%= l(:label_member_management_functions) %>
+    </label>
+    <label class="block" style="padding-left:2em;">
+    <%= radio_button_tag 'role[all_functions_managed]', 1, @role.all_functions_managed?, :id => 'role_all_functions_managed_on',
+                         :data => {:disables => '.role_managed_function input'} %>
+      <%= l(:label_member_management_all_functions) %>
+    </label>
+    <label class="block" style="padding-left:2em;">
+      <%= radio_button_tag 'role[all_functions_managed]', 0, !@role.all_functions_managed?, :id => 'role_all_functions_managed_off',
+                           :data => {:enables => '.role_managed_function input'} %>
+      <%= l(:label_member_management_selected_functions_only) %>:
+    </label>
+    <span style="max-height: 300px;overflow: scroll;display: inline-block;">
+      <% Function.sorted.each do |function| %>
+        <label class="block role_managed_function" style="padding-left:4em;">
+          <%= check_box_tag 'role[managed_function_ids][]', function.id, @role.managed_functions.to_a.include?(function), :id => nil %>
+          <%= function.name %>
+        </label>
+      <% end %>
+      <%= hidden_field_tag 'role[managed_function_ids][]', '' %>
+    </span>
+  </span>
+</p>

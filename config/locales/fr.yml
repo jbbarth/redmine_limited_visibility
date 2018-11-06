@@ -26,3 +26,6 @@ fr:
   show_silent_roles: "Voir les rôles silencieux"
   hide_silent_roles: "Cacher les rôles silencieux"
   field_see_all_issues: "Les utilisateurs ayant cette fonction voient toutes les demandes par défault"
+  label_member_management_all_functions: "Tous les rôles fonctionnels"
+  label_member_management_selected_functions_only: "Ces rôles fonctionnels uniquement"
+  label_member_management_functions: "Autoriser la modification des rôles fonctionnels"

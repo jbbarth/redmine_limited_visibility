@@ -12,10 +12,9 @@ class Organization < ActiveRecord::Base
     organization_functions.includes(:function).where("project_id = ?", project.id).map(&:function).reject{|f| f.blank?}.sort_by { |f| f.position}.uniq
   end
 
-  def delete_all_organization_functions(project_id, excluded = [])
-    organization_functions.where(project_id: project_id).each do |f|
-      next if excluded.include?(f)
-      f.try(:destroy) if f.id
+  def delete_all_organization_functions(project_id, excluded_functions = [])
+    organization_functions.where(project_id: project_id).where.not(function_id: excluded_functions.map(&:id)).each do |organization_function|
+      organization_function.try(:destroy) if organization_function.id
     end
   end
 

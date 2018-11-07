@@ -2,7 +2,7 @@ FIELDSET_WITH_FUNCTIONS = <<FIELDSET_WITH_FUNCTIONS
 <fieldset class="box">
 <legend><%= toggle_checkboxes_link('.functions-selection input') %><%= l(:label_functional_roles) %></legend>
   <div class="functions-selection">
-    <% Function.available_functions_for(@project).each do |function| %>
+    <% User.current.managed_functions(@project).each do |function| %>
       <label><%= check_box_tag 'membership[function_ids][]', function.id, false, :id => nil %> <%= function %></label>
     <% end %>
   </div>

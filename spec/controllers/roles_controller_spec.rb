@@ -47,6 +47,7 @@ describe RolesController, type: :controller do
             :name => 'RoleWithManagement',
             :all_roles_managed => '0',
             :managed_role_ids => ['2', '3', ''],
+            :functions_managed => '1',
             :all_functions_managed => '0',
             :managed_function_ids => ['1', '3', '']
         }
@@ -54,6 +55,7 @@ describe RolesController, type: :controller do
       created_role = Role.find_by_name("RoleWithManagement")
       assert_equal false, created_role.all_roles_managed
       assert_equal [2, 3], created_role.managed_role_ids.sort
+      assert_equal true, created_role.functions_managed
       assert_equal false, created_role.all_functions_managed
       assert_equal [1, 3], created_role.managed_function_ids.sort
     end

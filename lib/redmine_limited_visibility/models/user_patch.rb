@@ -56,4 +56,13 @@ class User < Principal
     return @projects_without_function
   end
 
+  # Returns the functions that the user is allowed to manage for the given project
+  def managed_functions(project)
+    if admin?
+      @managed_functions ||= Function.to_a
+    else
+      membership(project).try(:managed_functions) || []
+    end
+  end
+
 end

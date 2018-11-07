@@ -59,7 +59,7 @@ class User < Principal
   # Returns the functions that the user is allowed to manage for the given project
   def managed_functions(project)
     if admin?
-      @managed_functions ||= Function.to_a
+      @managed_functions ||= Function.available_functions_for(project)
     else
       membership(project).try(:managed_functions) || []
     end

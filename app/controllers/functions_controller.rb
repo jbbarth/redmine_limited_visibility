@@ -1,8 +1,8 @@
 class FunctionsController < ApplicationController
   layout 'admin'
 
-  before_filter :require_admin, :except => [:available_functions_per_project, :visible_functions_per_tracker, :activated_functions_per_tracker]
-  before_filter :find_function, :only => [:edit, :update, :destroy]
+  before_action :require_admin, :except => [:available_functions_per_project, :visible_functions_per_tracker, :activated_functions_per_tracker]
+  before_action :find_function, :only => [:edit, :update, :destroy]
 
   def new
     @function = Function.new(params[:function])
@@ -24,11 +24,20 @@ class FunctionsController < ApplicationController
   end
 
   def update
-    if @function.update_attributes(params[:function])
-      flash[:notice] = l(:notice_successful_update)
-      redirect_to roles_path
+    @function.safe_attributes = params[:function]
+    if @function.save
+      respond_to do |format|
+        format.html {
+          flash[:notice] = l(:notice_successful_update)
+          redirect_to roles_path(:page => params[:page])
+        }
+        format.js { head 200 }
+      end
     else
-      render :action => 'edit'
+      respond_to do |format|
+        format.html { render :action => 'edit' }
+        format.js { head 422 }
+      end
     end
   end
 

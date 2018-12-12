@@ -16,6 +16,8 @@ Issue.prepend RedmineLimitedVisibility::PrependedIssuePatch
 module RedmineLimitedVisibility
   module IssuePatch
 
+    include Redmine::SafeAttributes
+
     def self.included(base)
       base.class_eval do
         unloadable

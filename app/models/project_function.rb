@@ -1,4 +1,6 @@
 class ProjectFunction < ActiveRecord::Base
+  include Redmine::SafeAttributes
+
   belongs_to :project
   belongs_to :function
 
@@ -7,7 +9,7 @@ class ProjectFunction < ActiveRecord::Base
   validates_uniqueness_of :project_id, scope: [:function_id]
   validates_presence_of :project, :function
 
-  attr_accessible :function_id, :project_id, :authorized_viewers
+  safe_attributes :function_id, :project_id, :authorized_viewers
 
   def authorized_viewer_ids
     "#{authorized_viewers}".split("|").reject(&:blank?).map(&:to_i)

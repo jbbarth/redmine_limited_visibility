@@ -54,7 +54,7 @@
           %>
           <% functions = @project.functions.present? ? @project.functions : Function.active_by_default %>
           <% functions.sorted.each do |function| %>
-            <tr class="<%= cycle('odd', 'even') %> visibility-<%= function.name.parameterize %>">
+            <tr class="visibility-<%= function.name.parameterize %>">
               <td class="name">
                 <%= content_tag('span', h(function.name)) %>
               </td>
@@ -107,7 +107,7 @@
         %>
         <% functions = @project.functions.present? ? @project.functions : Function.active_by_default %>
         <% functions.sorted.each do |function| %>
-          <tr class="<%= cycle('odd', 'even') %> visibility-<%= function.name.parameterize %>">
+          <tr class="visibility-<%= function.name.parameterize %>">
             <td class="name">
               <%= content_tag('span', h(function.name)) %>
             </td>
@@ -154,7 +154,7 @@
              end
           %>
           <% @project.functions.sorted.each do |function| %>
-            <tr class="<%= cycle('odd', 'even') %> visibility-<%= function.name.parameterize %>">
+            <tr class="visibility-<%= function.name.parameterize %>">
               <td class="name">
                 <%= content_tag('span', h(function.name)) %>
               </td>

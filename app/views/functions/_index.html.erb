@@ -15,9 +15,8 @@
       </tr>
     </thead>
     <tbody>
-    <% reset_cycle %>
     <% for role in @functional_roles %>
-      <tr class="item <%= cycle("odd", "even") %>">
+      <tr class="item">
         <td class="name"><%= content_tag('span', link_to(h(role.name), edit_function_path(role))) %></td>
         <td class="buttons">
           <%= reorder_handle(role) %>

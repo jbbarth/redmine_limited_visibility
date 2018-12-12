@@ -1,4 +1,4 @@
-class CreateMemberFunctions < ActiveRecord::Migration
+class CreateMemberFunctions < ActiveRecord::Migration[4.2]
   def self.up
     create_table "member_functions", :force => true do |t|
       t.integer "member_id", :null => false

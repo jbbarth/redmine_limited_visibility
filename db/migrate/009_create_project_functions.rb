@@ -1,4 +1,4 @@
-class CreateProjectFunctions < ActiveRecord::Migration
+class CreateProjectFunctions < ActiveRecord::Migration[4.2]
   def self.up
     drop_table :project_functions if ActiveRecord::Base.connection.table_exists? 'project_functions'
     create_table "project_functions", :force => true do |t|

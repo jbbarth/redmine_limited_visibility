@@ -1,4 +1,4 @@
-class AddAuthorizedViewersToIssues < ActiveRecord::Migration
+class AddAuthorizedViewersToIssues < ActiveRecord::Migration[4.2]
   def self.up
     add_column :issues, :authorized_viewers, :text
   end

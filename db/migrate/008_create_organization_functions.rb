@@ -1,4 +1,4 @@
-class CreateOrganizationFunctions < ActiveRecord::Migration
+class CreateOrganizationFunctions < ActiveRecord::Migration[4.2]
   def self.up
     drop_table :organization_functions if ActiveRecord::Base.connection.table_exists? 'organization_functions'
     create_table :organization_functions do |t|

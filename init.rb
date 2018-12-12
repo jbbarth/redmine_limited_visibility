@@ -19,7 +19,7 @@ end
 
 # Custom patches
 require_dependency 'redmine_limited_visibility/hooks'
-ActionDispatch::Callbacks.to_prepare do
+ActiveSupport::Reloader.to_prepare do
   unless Rails.env.test? #Avoid breaking core tests (specially csv core tests including ALL columns)
     require_dependency 'redmine_limited_visibility/helpers/queries_helper_patch'
     require_dependency 'redmine_limited_visibility/models/issue_query_patch'

@@ -1,4 +1,4 @@
-class CreateFunctionsTable < ActiveRecord::Migration
+class CreateFunctionsTable < ActiveRecord::Migration[4.2]
   def self.up
     create_table :functions, :force => true do |t|
       t.column :name, :string, :limit => 30, :default => "", :null => false

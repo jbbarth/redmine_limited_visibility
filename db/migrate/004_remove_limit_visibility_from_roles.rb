@@ -1,4 +1,4 @@
-class RemoveLimitVisibilityFromRoles < ActiveRecord::Migration
+class RemoveLimitVisibilityFromRoles < ActiveRecord::Migration[4.2]
   def self.up
     remove_column :roles, :limit_visibility
     remove_column :roles, :authorized_viewers

@@ -7,8 +7,12 @@ class Member < ActiveRecord::Base
 
   def set_functional_roles(ids)
     ids = (ids || []).collect(&:to_i) - [0]
-    organization_function_ids = self.principal.organization ? self.principal.organization.default_functions_by_project(self.project).map(&:id) : []
-    self.function_ids = ids | organization_function_ids
+    if self.principal && principal.is_a?(User) && self.principal.organization
+      organization_function_ids = self.principal.organization.default_functions_by_project(self.project).map(&:id)
+      self.function_ids = ids | organization_function_ids
+    else
+      self.function_ids = ids
+    end
   end
 
   def function_ids=(arg)

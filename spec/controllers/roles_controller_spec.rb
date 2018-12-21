@@ -11,7 +11,7 @@ describe RolesController, type: :controller do
   describe "GET 'index'" do
     it "should be successful" do
       get 'index'
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(assigns(:functional_roles)).to_not be_nil
       expect(assigns(:roles)).to_not be_nil
     end
@@ -20,22 +20,22 @@ describe RolesController, type: :controller do
   describe "creating a role" do
     it "should increment the Role count" do
       expect do
-        post :create, role: {name: "NewRole"}
+        post :create, params: {role: {name: "NewRole"}}
       end.to change(Role, :count).by(1)
     end
 
     it "should redirect to roles index" do
-      post :create, role: {name: "NewRole"}
+      post :create, params: {role: {name: "NewRole"}}
       expect(response).to redirect_to(roles_path)
     end
   end
 
   describe "creating or updating a role" do
     it "should allow permissions for this Role" do
-      post :create, role: {name: "NewRole", permissions: ["edit_project", "manage_members", "create_issue_templates", ""]}
+      post :create, params: {role: {name: "NewRole", permissions: ["edit_project", "manage_members", "create_issue_templates", ""]}}
       created_role = Role.find_by_name("NewRole")
       expect(created_role.permissions).to_not eq([])
-      put :update, {id: created_role.id, role: {name: "UpdatedRole", permissions: ["edit_project", "manage_members", "create_issue_templates", ""]}}
+      put :update, params: {id: created_role.id, role: {name: "UpdatedRole", permissions: ["edit_project", "manage_members", "create_issue_templates", ""]}}
       updated_role = Role.find_by_name("UpdatedRole")
       expect(updated_role).to_not be_nil
       expect(updated_role.permissions).to_not eq([])
@@ -43,14 +43,14 @@ describe RolesController, type: :controller do
 
     it "should create with managed roles and functions" do
       expect do
-        post :create, :role => {
+        post :create, params: {:role => {
             :name => 'RoleWithManagement',
             :all_roles_managed => '0',
             :managed_role_ids => ['2', '3', ''],
             :functions_managed => '1',
             :all_functions_managed => '0',
             :managed_function_ids => ['1', '3', '']
-        }
+        }}
       end.to change(Role, :count).by(1)
       created_role = Role.find_by_name("RoleWithManagement")
       assert_equal false, created_role.all_roles_managed

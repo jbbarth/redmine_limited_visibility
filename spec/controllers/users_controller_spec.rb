@@ -16,8 +16,8 @@ describe UsersController, type: :controller do
 
   describe "GET 'edit'" do
     it "should display the user functional roles per project" do
-      get 'edit', id: user.id# , tab: 'memberships'
-      expect(response).to be_success
+      get 'edit', params: {id: user.id} # , tab: 'memberships'
+      expect(response).to be_successful
       assert_select "#tab-content-memberships table.memberships"
       assert_select "#tab-content-memberships table.memberships th", {text: 'Roles'}
       assert_select "#tab-content-memberships table.memberships th", {text: translate(:label_functional_roles)}

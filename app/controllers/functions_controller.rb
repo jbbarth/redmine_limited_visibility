@@ -10,7 +10,8 @@ class FunctionsController < ApplicationController
   end
 
   def create
-    @function = Function.new(params[:function])
+    @function = Function.new
+    @function.safe_attributes = params[:function]
     if request.post? && @function.save
       flash[:notice] = l(:notice_successful_create)
       redirect_to roles_path

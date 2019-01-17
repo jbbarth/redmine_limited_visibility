@@ -5,7 +5,8 @@ class FunctionsController < ApplicationController
   before_action :find_function, :only => [:edit, :update, :destroy]
 
   def new
-    @function = Function.new(params[:function])
+    @function = Function.new
+    @function.safe_attributes = params[:function]
     @functional_roles = Function.sorted.all
   end
 

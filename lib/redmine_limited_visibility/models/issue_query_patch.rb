@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 require_dependency 'issue_query'
 
 class IssueQuery < Query

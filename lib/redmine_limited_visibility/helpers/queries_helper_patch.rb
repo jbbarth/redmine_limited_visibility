@@ -142,8 +142,8 @@ end
 module QueriesHelper
   unless instance_methods.include?(:retrieve_query_with_limited_visibility)
     # Add 'authorized_viewers' filter if not present
-    def retrieve_query_with_limited_visibility(klass=IssueQuery, use_session=true)
-      retrieve_query_without_limited_visibility(klass, use_session)
+    def retrieve_query_with_limited_visibility(klass=IssueQuery, use_session=true, options={})
+      retrieve_query_without_limited_visibility(klass, use_session, options)
 
       if @project.blank? || @project.module_enabled?("limited_visibility")
         should_see_all = []

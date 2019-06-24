@@ -35,8 +35,10 @@
   <div class="functional-roles-selection two-columns">
     <% functions.each do |function| %>
       <div>
-        <%= check_box_tag 'membership[function_ids][]', function.id, false, :id => nil %>
-        <%= h function %>
+        <%= label_tag do %>
+          <%= check_box_tag 'membership[function_ids][]', function.id, false, :id => nil %>
+          <%= h(function) %>
+        <% end %>
       </div>
     <% end %>
   </div>

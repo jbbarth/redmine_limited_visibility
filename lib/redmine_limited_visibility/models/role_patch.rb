@@ -8,6 +8,7 @@ class Role < ActiveRecord::Base
 
   safe_attributes 'functions_managed',
                   'all_functions_managed',
-                  'managed_function_ids'
+                  'managed_function_ids',
+                  'hidden_on_overview'
 
 end

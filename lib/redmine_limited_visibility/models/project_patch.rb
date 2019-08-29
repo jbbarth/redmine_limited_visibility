@@ -60,6 +60,17 @@ class Project
     hash
   end
 
+  # Returns a hash of project users grouped by function
+  def users_by_function
+    members.includes(:user, :functions).inject({}) do |h, m|
+      m.functions.each do |r|
+        h[r] ||= []
+        h[r] << m.user
+      end
+      h
+    end
+  end
+
   # Copies members from +project+
   def copy_members(project)
 

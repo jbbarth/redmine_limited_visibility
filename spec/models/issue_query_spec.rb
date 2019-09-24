@@ -9,6 +9,10 @@ def assert_query_result(expected, query)
 end
 
 describe IssueQuery do
+
+  fixtures :users, :roles, :functions, :projects, :members, :member_roles, :issues, :issue_statuses, :project_functions, :project_function_trackers,
+           :trackers, :enumerations, :custom_fields, :enabled_modules, :organizations, :organization_functions, :organization_roles
+
   describe 'filters and columns' do
     it 'contains a new "mine" operator' do
       expect(IssueQuery.operators).to include 'mine'

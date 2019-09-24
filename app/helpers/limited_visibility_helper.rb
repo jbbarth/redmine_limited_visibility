@@ -65,7 +65,7 @@ module LimitedVisibilityHelper
   # Returns a string for users/groups option tags
   def assignable_options_for_select(issue, users, selected=nil)
     s = ''
-    if @issue.project.module_enabled?("limited_visibility")
+    if @issue.project.present? && @issue.project.module_enabled?("limited_visibility")
       functional_roles_ids = Function.available_functions_for(issue.project).sorted.pluck(:id)
       functional_roles_ids.each do |function_id|
         s << content_tag('option', "#{Function.find(function_id).name}", :value => "function-#{function_id}", :selected => (option_value_selected?(function_id, selected) || function_id == selected))

@@ -24,7 +24,7 @@ Deface::Override.new :virtual_path => 'members/_new_form',
                      :replace => "erb[loud]:contains(\"render_principals_for_new_members(@project)\")",
                      :text => <<EOF
 <%
-   if User.current.membership(@project).managed_only_his_organization?
+   if User.current.managed_only_his_organization?(@project)
      organization = User.current.organization
    else
      organization = nil

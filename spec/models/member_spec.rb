@@ -1,6 +1,9 @@
 require File.dirname(__FILE__) + '/../spec_helper'
 
 describe Member do
+
+  fixtures :users, :roles, :functions, :projects, :members, :member_roles
+
   it 'should return NO function for role without functions_managed' do
     member = Member.new
     member.roles << Role.generate!(:permissions => [:manage_members], :functions_managed => false)

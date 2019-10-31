@@ -1,4 +1,4 @@
-<% if !Redmine::Plugin.installed?(:redmine_scn) || (Redmine::Plugin.installed?(:redmine_scn) && User.current.can_see_detailed_project_homepage?(@project)) %>
+<% if User.current.respond_to?(:can_see_detailed_project_homepage?) && User.current.can_see_detailed_project_homepage?(@project) %>
 
 <% @users_by_function_and_organization = @project.users_by_function_and_organization -%>
 

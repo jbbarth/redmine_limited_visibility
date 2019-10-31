@@ -1,3 +1,5 @@
+<% if !Redmine::Plugin.installed?(:redmine_scn) || (Redmine::Plugin.installed?(:redmine_scn) && User.current.can_see_detailed_project_homepage?(@project)) %>
+
 <% @users_by_function_and_organization = @project.users_by_function_and_organization -%>
 
 <% if @users_by_function_and_organization.any? -%>
@@ -18,3 +20,5 @@
   <% end -%></p>
 </div>
 <% end -%>
+
+<% end %>

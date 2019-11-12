@@ -1,24 +1,34 @@
 <% if User.current.respond_to?(:can_see_detailed_project_homepage?) && User.current.can_see_detailed_project_homepage?(@project) %>
 
-<% @users_by_function_and_organization = @project.users_by_function_and_organization -%>
+  <% @users_by_function_and_organization = @project.users_by_function_and_organization %>
 
-<% if @users_by_function_and_organization.any? -%>
-<div class="members box">
-  <h3><%=l(:label_member_plural)%></h3>
-  <p><% @users_by_function_and_organization.keys.sort.each do |function| -%>
-    <%=h function %>:
-    <%= @users_by_function_and_organization[function].keys.sort_by(&:name).map do |org|
-      if org.new_record?
-          @users_by_function_and_organization[function][org].map{|u| link_to_user u}.join(", ").html_safe
-      else
-        link_to_organization(org, {:link_ancestors=>false, :fullname=>true}) +
-          content_tag(:span, " (#{@users_by_function_and_organization[function][org].map{|u| link_to_user u}.join(", ")})".html_safe,
-                      :class => "organization-members")
-      end
-    end.join(", ").html_safe -%>
-    <br />
-  <% end -%></p>
-</div>
-<% end -%>
+  <% if @users_by_function_and_organization.any? %>
+    <div class="members box">
+
+      <h3><%= l(:label_member_plural) %></h3>
+
+      <p>
+        <% @users_by_function_and_organization.keys.sort.each do |function| %>
+        <div class="function">
+          <div class="function_name"><%= h function %></div>
+          <div class="organizations">
+            <% @users_by_function_and_organization[function].keys.sort_by(&:name).map do |org| %>
+              <div class="organization">
+                <%= if org.new_record?
+                      @users_by_function_and_organization[function][org].map {|u| link_to_user u}.join(", ").html_safe
+                    else
+                      link_to_organization(org, {:link_ancestors => false, :fullname => true}) +
+                          content_tag(:span, " : #{@users_by_function_and_organization[function][org].map {|u| link_to_user u}.join(", ")}".html_safe,
+                                      :class => "organization-members")
+                    end.html_safe %>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+      </p>
+
+    </div>
+  <% end %>
 
 <% end %>

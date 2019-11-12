@@ -43,3 +43,7 @@ table.organizations th { text-align: left; padding-left: 50px; }
     -moz-columns: 2;
     columns: 2;
 }
+
+.members.box .function {display: flex;}
+.members.box .function_name {font-weight: bold;margin-right: 20px;text-align: right;min-width: 160px;}
+.members.box .organization {width:auto;}

@@ -1,4 +1,4 @@
-<% if @issue.project.module_enabled?("limited_visibility")
+<% if @issue.project.module_enabled?("limited_visibility") && User.current.allowed_to?(:can_see_issues_visibility, @project)
 
     config_functions = ProjectFunctionTracker.joins(:project_function).includes(:project_function).where("project_id = ? AND tracker_id = ?", @issue.project_id, @issue.tracker_id)
     hidden_functions = config_functions.reject{ |f| f.visible == true }.map{ |c| c.function } if config_functions.present?

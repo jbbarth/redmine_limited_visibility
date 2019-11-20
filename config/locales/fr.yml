@@ -17,7 +17,7 @@ fr:
   field_active_by_default: "Activé par défaut dans tous les projets"
   permission_change_issues_visibility: "Modifier la visibilité des demandes"
   permission_see_issues_visibility: "Voir la visibilité des demandes"
-  permission_use_issues_visibility_filter: "Désactiver le filtre par visibilité sur les demandes"
+  permission_use_issues_visibility_filter: "Voir le filtre Visibilité sur les demandes"
   permission_manage_functional_roles_by_project: "Gérer les rôles fonctionnels par projet"
   project_module_limited_visibility: "Visibilité limitée des demandes"
   field_assigned_to_function: "Assigné au groupe"

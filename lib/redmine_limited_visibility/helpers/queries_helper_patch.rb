@@ -146,13 +146,18 @@ module QueriesHelper
       retrieve_query_without_limited_visibility(klass, use_session, options)
 
       if @project.blank? || @project.module_enabled?("limited_visibility")
-        should_see_all = []
-        User.current.members.map(&:functions).each do |functions|
-          functions.map(&:see_all_issues).each do |param|
-            should_see_all << param
+        should_see_all = false
+
+        if @project.present?
+          member = User.current.members.where(project: @project).first
+          should_see_all = true if member && member.functions.detect(&:see_all_issues)
+        else
+          User.current.members.map(&:functions).each do |functions|
+            should_see_all = true if functions.detect(&:see_all_issues)
           end
         end
-        see_all_issues = true if User.current.admin? || should_see_all.include?(true)
+
+        see_all_issues = true if User.current.admin? || should_see_all
         @query.filters.merge!({ 'authorized_viewers' => { :operator => (see_all_issues ? "*" : "mine"), :values => [""] } }) if @query.is_a?(IssueQuery) && !@query.filters.include?('authorized_viewers')
       end
       @query

@@ -1,4 +1,4 @@
-<% if @project.present? && !User.current.allowed_to?(:can_see_issues_visibility, @project) %>
+<% if @project.present? && !User.current.allowed_to?(:use_issues_visibility_filter, @project) %>
   <%= javascript_tag do %>
     $(document).ready(function(){
         $('#tr_authorized_viewers').css('display', 'none');

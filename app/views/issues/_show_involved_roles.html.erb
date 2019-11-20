@@ -1,4 +1,4 @@
-<% if @issue.project.module_enabled?("limited_visibility") && User.current.allowed_to?(:can_see_issues_visibility, @project) %>
+<% if @issue.project.module_enabled?("limited_visibility") && User.current.allowed_to?(:see_issues_visibility, @project) %>
 
   <% viewers = function_ids_for_current_viewers(@issue) %>
   <% @functions = Function.available_functions_for(@project).sorted %>

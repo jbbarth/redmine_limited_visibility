@@ -2,7 +2,7 @@ require_dependency 'issues_controller'
 
 class IssuesController < ApplicationController
 
-  prepend_before_action :set_assigned_to_function_id, :only => [:create, :update]
+  prepend_before_action :set_assigned_to_function_id, :only => [:create, :update, :new, :edit]
 
   before_action :set_previous_tracker_id, :only => [:new]
 

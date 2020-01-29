@@ -4,12 +4,12 @@ describe RedmineLimitedVisibility::IssuePatch do
 
   fixtures :users, :roles, :projects, :members, :member_roles, :issues, :issue_statuses, :trackers, :enumerations, :custom_fields, :enabled_modules
 
-  let(:issue) { Issue.new }
-  let(:issue_4) { Issue.find(4) }
-  let(:contractor_role) { Function.where(name: "Contractors").first_or_create }
-  let(:project_office_role) { Function.where(name: "Project Office").first_or_create }
-  let(:issue_with_authorized_viewers) { issue_4.update_attributes!(:authorized_viewers => "|#{contractor_role.id}|"); issue_4 }
-  let(:issue_without_authorized_viewers) { issue_4.update_attributes!(:authorized_viewers => "||"); issue_4 }
+  let(:issue) {Issue.new}
+  let(:issue_4) {Issue.find(4)}
+  let(:contractor_role) {Function.where(name: "Contractors").first_or_create}
+  let(:project_office_role) {Function.where(name: "Project Office").first_or_create}
+  let(:issue_with_authorized_viewers) {issue_4.update_attributes!(:authorized_viewers => "|#{contractor_role.id}|"); issue_4}
+  let(:issue_without_authorized_viewers) {issue_4.update_attributes!(:authorized_viewers => "||"); issue_4}
 
   describe "#authorized_viewers" do
     it "has a authorized_viewers column" do
@@ -19,7 +19,7 @@ describe RedmineLimitedVisibility::IssuePatch do
     it "is a safe attribute" do
       # avoid loading too many dependencies
       allow(issue).to receive(:new_statuses_allowed_to).and_return(IssueStatus.all)
-      issue.safe_attributes = { "authorized_viewers" => "All of them" }
+      issue.safe_attributes = {"authorized_viewers" => "All of them"}
       expect(issue.authorized_viewers).to eq "All of them"
     end
   end
@@ -48,18 +48,22 @@ describe RedmineLimitedVisibility::IssuePatch do
       issue.project.enable_module!('limited_visibility')
       not_involved_function = project_office_role
 
-      member = Member.where(user_id: 2, project_id: issue.project_id).first
-      unless member
-        member = Member.new(user_id: 2, project_id: issue.project_id)
-      end
-      member.functions << not_involved_function
-      member.save!
+      member2 = Member.find_or_new(issue.project, User.find(2))
+      member2.functions << not_involved_function
+      member2.save!
+
+      member3 = Member.find_or_new(issue.project, User.find(3))
+      member3.roles << Role.find(2)
+      member3.functions << not_involved_function
+      member3.save!
 
       notified = issue.notified_users
       expect(notified).to_not be_nil
-      expect(notified.size).to eq 0
+      expect(notified.size).to eq 1 # Only the author is notified
+      expect(notified).to include issue.author
       expect(notified).to_not include User.anonymous
-      expect(notified).to_not include User.find(2) # member with different function
+      expect(notified).to include User.find(2) # member with different function, but author
+      expect(notified).to_not include User.find(3) # member with different function
     end
 
     it 'SHOULD notify users if their functions are not involved BUT module is DISABLED for the project' do
@@ -93,6 +97,7 @@ describe RedmineLimitedVisibility::IssuePatch do
       expect(notified).to_not include User.find(3) # not a member of the project
       expect(notified).to_not include User.find(8) # member of project 2 but mail_notification = false
     end
+
   end
 
   # Test compatibility with the redmine multiprojects_issue plugin
@@ -136,25 +141,25 @@ describe RedmineLimitedVisibility::IssuePatch do
   end
 
   describe "#involved_users" do
-    let(:issue) { Issue.new }
-    let(:project) { Project.find(1) }
+    let(:issue) {Issue.new}
+    let(:project) {Project.find(1)}
 
     it "returns users 'involved' in this issue, who have at least one function in the authorized_viewer_ids functions" do
       allow(issue).to receive(:authorized_viewer_ids).and_return([contractor_role.id, project_office_role.id])
       issue.project = Project.find(1)
-      members = Member.where(project_id:1, user_id: [2,3,5]).all
+      members = Member.where(project_id: 1, user_id: [2, 3, 5]).all
       members.each do |member|
         MemberFunction.where(member_id: member.id, function_id: contractor_role.id).first_or_create
       end
 
       users = issue.involved_users(issue.project)
       expect(users.map(&:class).uniq).to eq [User]
-      expect(users.map(&:id)).to eq [2,3,5]
+      expect(users.map(&:id)).to eq [2, 3, 5]
     end
   end
 
   describe "#authorized_viewer_ids" do
-    let(:issue) { Issue.new }
+    let(:issue) {Issue.new}
 
     it "transforms the #authorized_viewers string into an array of ids" do
       allow(issue).to receive(:authorized_viewers).and_return("|3|5|99|")

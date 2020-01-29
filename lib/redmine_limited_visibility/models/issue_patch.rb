@@ -4,7 +4,8 @@ module RedmineLimitedVisibility
   module PrependedIssuePatch
     def notified_users
       if authorized_viewer_ids.present?
-        super & involved_users(self.project)
+        owners = [author, assigned_to, previous_assignee].compact.uniq
+        super & (involved_users(self.project) | owners)
       else
         super
       end

@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/../spec_helper'
+require 'spec_helper'
 
 require 'redmine_limited_visibility/controllers/roles_controller_patch'
 require 'redmine_limited_visibility/models/role_patch'

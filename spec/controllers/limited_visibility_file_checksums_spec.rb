@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/../spec_helper'
+require 'spec_helper'
 
 describe "LimitedVisibilityFileChecksums" do
   def assert_checksum(expected, filename)

@@ -54,7 +54,8 @@ class Member < ActiveRecord::Base
         end
         if Redmine::Plugin.installed?(:redmine_limited_visibility)
           all_functions_ids = Function.all.collect(&:id)
-          function_ids_by_project = function_ids | OrganizationFunction.where(organization_id: principal.organization_id, project_id: project_id).all.map {|f| all_functions_ids.include?(f.function_id) ? f.function_id : nil}
+          function_ids_by_project = function_ids
+          function_ids_by_project |= OrganizationFunction.where(organization_id: principal.organization_id, project_id: project_id).all.map {|f| all_functions_ids.include?(f.function_id) ? f.function_id : nil} if Redmine::Plugin.installed?(:redmine_organizations)
           project = Project.where('id = ?', project_id).first
           function_ids_by_project.each do |function_id|
             if project.functions.present? && !project.functions.map(&:id).include?(function_id.to_i)

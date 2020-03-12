@@ -51,18 +51,20 @@
 
   <br>
 
-  <label><%= l(:label_organizations_management) %></label>
-  <span style="display: inline-block;vertical-align: top;margin-right: 2em;">
-    <label class="block">
-    <%= radio_button_tag 'role[all_organizations_managed]', 1, @role.all_organizations_managed?, :id => 'role_all_organizations_managed_on',
-                         :data => {:disables => '.role_managed_organization input'} %>
-      <%= l(:label_organizations_management_all_organizations) %>
-    </label>
-    <label class="block">
-      <%= radio_button_tag 'role[all_organizations_managed]', 0, !@role.all_organizations_managed?, :id => 'role_all_organizations_managed_off',
-                           :data => {:enables => '.role_managed_organization input'} %>
-      <%= l(:label_organizations_management_current_organization_only) %>
-    </label>
-  </span>
+  <% if Redmine::Plugin.installed?(:redmine_organizations) %>
+    <label><%= l(:label_organizations_management) %></label>
+    <span style="display: inline-block;vertical-align: top;margin-right: 2em;">
+      <label class="block">
+      <%= radio_button_tag 'role[all_organizations_managed]', 1, @role.all_organizations_managed?, :id => 'role_all_organizations_managed_on',
+                           :data => {:disables => '.role_managed_organization input'} %>
+        <%= l(:label_organizations_management_all_organizations) %>
+      </label>
+      <label class="block">
+        <%= radio_button_tag 'role[all_organizations_managed]', 0, !@role.all_organizations_managed?, :id => 'role_all_organizations_managed_off',
+                             :data => {:enables => '.role_managed_organization input'} %>
+        <%= l(:label_organizations_management_current_organization_only) %>
+      </label>
+    </span>
+  <% end %>
 
 </p>

@@ -4,7 +4,7 @@ Redmine::Plugin.register :redmine_limited_visibility do
   author 'Jean-Baptiste BARTH'
   description 'This is a plugin for Redmine'
   requires_redmine :version_or_higher => '3.3.0'
-  version '3.4.4'
+  version '4.1.0'
   url 'https://github.com/jbbarth/redmine_limited_visibility'
   author_url 'jeanbaptiste.barth@gmail.com'
   requires_redmine_plugin :redmine_base_rspec, :version_or_higher => '0.0.4' if Rails.env.test?

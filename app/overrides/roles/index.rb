@@ -6,6 +6,13 @@ Deface::Override.new :virtual_path  => 'roles/index',
 <% for role in @roles %>
   <tr <%= role.builtin? ? 'builtin' : 'givable' %>">
     <td class="name"><%= content_tag(role.builtin? ? 'em' : 'span', link_to(role.name, edit_role_path(role))) %></td>
+    <td>
+      <% unless role.builtin? || role.workflow_rules.exists? %>
+        <span class="icon icon-warning">
+          <%= l(:text_role_no_workflow) %> (<%= link_to l(:button_edit), workflows_edit_path(:role_id => role) %>)
+        </span>
+      <% end %>
+    </td>
     <td class="buttons">
       <%= reorder_handle(role) unless role.builtin? %>
       <%= link_to l(:button_copy), new_role_path(:copy => role), :class => 'icon icon-copy' %>

@@ -23,12 +23,13 @@ Deface::Override.new :virtual_path => 'members/_new_form',
                      :name => "filter_new_members_by_organization",
                      :replace => "erb[loud]:contains(\"render_principals_for_new_members(@project)\")",
                      :text => <<EOF
-<%
-   if User.current.managed_only_his_organization?(@project)
-     organization = User.current.organization
-   else
-     organization = nil
-   end
+<% if Redmine::Plugin.installed?(:redmine_organizations)
+     if User.current.managed_only_his_organization?(@project)
+       organization = User.current.organization
+     else
+       organization = nil
+     end
+  end
 %>
 <%= render_principals_for_new_members(@project, 100, organization) %>
 EOF

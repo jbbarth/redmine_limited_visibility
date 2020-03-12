@@ -1,5 +1,5 @@
 <div class="contextual">
-  <%= form_tag({:action => "add_block"}, :remote => true, :id => "block-form") do %>
+  <%= form_tag({:action => "add_block"}, :remote => true, :id => "block-form", authenticity_token: true) do %>
     <%= label_tag('block-select', l(:button_add)) %>:
     <%= block_select_tag(@user) %>
   <% end %>
@@ -7,9 +7,9 @@
 
 <h2><%=l(:label_my_page)%></h2>
 
-<div id="my-page">
+<div id="my-page" class="splitcontent">
 <% @groups.each do |group| %>
-  <div id="list-<%= group %>" class="block-receiver">
+  <div id="list-<%= group %>" class="block-receiver splitcontent<%= group %>">
     <%= render_blocks(@blocks[group], @user) %>
   </div>
 <% end %>

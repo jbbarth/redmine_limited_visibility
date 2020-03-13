@@ -4,7 +4,7 @@ Deface::Override.new :virtual_path  => 'roles/index',
                      :replace_contents       => "tbody",
                      :text => <<COPY_FROM_CORE_INDEX_VIEW
 <% for role in @roles %>
-  <tr <%= role.builtin? ? 'builtin' : 'givable' %>">
+  <tr class='<%= role.builtin? ? 'builtin' : 'givable' %>'">
     <td class="name"><%= content_tag(role.builtin? ? 'em' : 'span', link_to(role.name, edit_role_path(role))) %></td>
     <td>
       <% unless role.builtin? || role.workflow_rules.exists? %>

@@ -11,7 +11,11 @@ end
 describe IssueQuery do
 
   fixtures :users, :roles, :functions, :projects, :members, :member_roles, :issues, :issue_statuses, :project_functions, :project_function_trackers,
-           :trackers, :enumerations, :custom_fields, :enabled_modules, :organizations, :organization_functions, :organization_roles
+           :trackers, :enumerations, :custom_fields, :enabled_modules
+
+  if Redmine::Plugin.installed?(:redmine_organizations)
+    fixtures :organizations, :organization_functions, :organization_roles
+  end
 
   describe 'filters and columns' do
     it 'contains a new "mine" operator' do

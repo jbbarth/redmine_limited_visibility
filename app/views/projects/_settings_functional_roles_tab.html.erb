@@ -3,15 +3,15 @@
 
 <%= form_for(:functions,
              :method => :put,
-             :url => { :controller => 'functions',
-                       :action => 'available_functions_per_project',
-                       :project_id => @project.id },
-             :html => { :id => "functions-form" }) do %>
+             :url => {:controller => 'functions',
+                      :action => 'available_functions_per_project',
+                      :project_id => @project.id},
+             :html => {:id => "functions-form"}) do %>
 
   <fieldset class="box">
     <p>
       <label><%= l(:text_select_project_functional_roles) %></label>
-      <%= select_tag :function_ids, options_for_select(Function.sorted.collect{|f| ["#{f.name}#{" (#{members_per_function[f.id]} membres)" if members_per_function[f.id].present?}", f.id]}, Function.sorted.select{|f| @project.functions.present? ? @project.functions.include?(f) : f.active_by_default }.map(&:id)), {:multiple => true} %>
+      <%= select_tag :function_ids, options_for_select(Function.sorted.collect { |f| ["#{f.name}#{" (#{members_per_function[f.id]} membres)" if members_per_function[f.id].present?}", f.id] }, Function.sorted.select { |f| @project.functions.present? ? @project.functions.include?(f) : f.active_by_default }.map(&:id)), {:multiple => true} %>
     </p>
     <p>
       <label>Les visibilités par rôle seront pré-remplies en fonction </label>
@@ -29,9 +29,9 @@
 
     <%= form_for(:functions,
                  :method => :put,
-                 :url => { :controller => 'functions',
-                           :action => 'visible_functions_per_tracker',
-                           :project_id => @project.id},
+                 :url => {:controller => 'functions',
+                          :action => 'visible_functions_per_tracker',
+                          :project_id => @project.id},
                  :html => {:id => "visibilities-form"}) do %>
       <div class="autoscroll">
         <table class="list visibilities">
@@ -47,7 +47,7 @@
           </thead>
           <tbody>
           <% visible_functions_per_tracker = {}
-             @project.trackers.each { |t|  visible_functions_per_tracker[t.id] = []; }
+             @project.trackers.each { |t| visible_functions_per_tracker[t.id] = []; }
              ProjectFunctionTracker.joins(:project_function).includes(:project_function).where("project_id = ?", @project.id).each do |r|
                visible_functions_per_tracker[r.tracker_id] << r.project_function.function_id if visible_functions_per_tracker[r.tracker_id] && r.visible
              end
@@ -82,9 +82,9 @@
 <fieldset class="box">
   <%= form_for(:functions,
                :method => :put,
-               :url => { :controller => 'functions',
-                         :action => 'activated_functions_per_tracker',
-                         :project_id => @project.id},
+               :url => {:controller => 'functions',
+                        :action => 'activated_functions_per_tracker',
+                        :project_id => @project.id},
                :html => {:id => "autocheck-form"}) do %>
     <div class="autoscroll">
       <table class="list visibilities" id="autocheck_functions_per_tracker">
@@ -100,7 +100,7 @@
         </thead>
         <tbody>
         <% checked_functions_per_tracker = {}, {}
-           @project.trackers.each { |t|  checked_functions_per_tracker[t.id] = [] }
+           @project.trackers.each { |t| checked_functions_per_tracker[t.id] = [] }
            ProjectFunctionTracker.joins(:project_function).includes(:project_function).where("project_id = ?", @project.id).each do |r|
              checked_functions_per_tracker[r.tracker_id] << r.project_function.function_id if checked_functions_per_tracker[r.tracker_id] && r.checked
            end
@@ -130,7 +130,7 @@
         <% else %>
           <thead>
           <tr>
-            <th style="width: 200px;white-space: pre-line;vertical-align: middle;">Rôle de l'utilisateur >></th>
+            <th style="width: 200px;white-space: pre-line;vertical-align: middle;">Rôle de l'utilisateur</th>
             <% @project.functions.sorted.all.each do |function| %>
               <th style="width: 100px;vertical-align: middle;text-align: left;">
                 <%= content_tag('span', h(function.name)) %>
@@ -142,26 +142,21 @@
           <% checked_functions_per_user_functions = {}
              @project.functions.each { |t| checked_functions_per_user_functions[t.id] = [] }
              @project.project_functions.each do |pf|
-               if pf.authorized_viewer_ids.present?
-                 pf.authorized_viewer_ids.each do |function_id|
-                   checked_functions_per_user_functions[pf.function_id] << function_id if checked_functions_per_user_functions[pf.function_id] && function_id.present?
-                 end
-               else
-                 pf.function.authorized_viewer_ids.each do |function_id|
-                   checked_functions_per_user_functions[pf.function_id] << function_id if checked_functions_per_user_functions[pf.function_id] && function_id.present?
-                 end
+               authorized_viewer_ids = pf.authorized_viewer_ids.present? ? pf.authorized_viewer_ids : pf.function.authorized_viewer_ids
+               authorized_viewer_ids.each do |function_id|
+                 checked_functions_per_user_functions[pf.function_id] << function_id if checked_functions_per_user_functions[pf.function_id] && function_id.present?
                end
              end
           %>
-          <% @project.functions.sorted.each do |function| %>
-            <tr class="visibility-<%= function.name.parameterize %>">
+          <% @project.functions.sorted.each do |row_function| %>
+            <tr class="visibility-<%= row_function.name.parameterize %>">
               <td class="name">
-                <%= content_tag('span', h(function.name)) %>
+                <%= content_tag('span', h(row_function.name)) %>
               </td>
-              <% @project.functions.sorted.all.each do |f| %>
+              <% @project.functions.sorted.all.each do |col_function| %>
                 <td style="text-align: left;">
                   <label style="display: block;" class="autocheck_checkbox">
-                    <%= check_box_tag "function_activation_per_user_function[#{f.id}][]", function.id, (checked_functions_per_user_functions[f.id].include?(function.id)), :id => nil, :class => "function-#{function.id}" %>
+                    <%= check_box_tag "function_activation_per_user_function[#{row_function.id}][]", col_function.id, (checked_functions_per_user_functions[row_function.id].include?(col_function.id)), :id => nil, :class => "function-#{col_function.id}" %>
                     Coché
                   </label>
                 </td>
@@ -180,9 +175,9 @@
 
 <%= form_for(:functions,
              :method => :put,
-             :url => { :controller => 'functions',
-                       :action => 'copy_functions_settings_from_project',
-                       :project_id => @project.id }) do %>
+             :url => {:controller => 'functions',
+                      :action => 'copy_functions_settings_from_project',
+                      :project_id => @project.id}) do %>
   <h2 style="margin-top: 10px;">Copier les paramètres d'un autre projet</h2>
   <fieldset class="box">
     <p>
@@ -193,7 +188,7 @@
                ("<option value=''>Sélectionner un projet</option>" +
                    '<option value="" disabled="disabled">---</option>').html_safe
            options << project_tree_options_for_select(projects) do |p|
-             { :value => p.id }
+             {:value => p.id}
            end
            options = options.gsub('&nbsp;&#187;', '&nbsp;').html_safe %>
         <%= select_tag :project_from, options %>
@@ -210,14 +205,14 @@
 
 
 <script type="text/javascript">
-  $(function() {
-    $('select#function_ids').select2({
-      containerCss: {width: '600px', minwidth: '600px'},
-      width: 'style'
+    $(function () {
+        $('select#function_ids').select2({
+            containerCss: {width: '600px', minwidth: '600px'},
+            width: 'style'
+        });
+        $('#project_from').select2({
+            containerCss: {width: '300px', minwidth: '300px'},
+            width: 'style'
+        });
     });
-    $('#project_from').select2({
-        containerCss: {width: '300px', minwidth: '300px'},
-        width: 'style'
-    });
-  });
 </script>

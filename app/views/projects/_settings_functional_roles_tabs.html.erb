@@ -1,0 +1,6 @@
+<ul class="navigation">
+  <li class="<%= "active" if params[:nav] == 'general' || params[:nav].blank? %>"><%= link_to 'Rôles activés', url_for(tab: 'functional_roles', nav: 'general') %></li>
+  <li class="<%= "active" if params[:nav] == 'defaults' %>"><%= link_to 'Valeurs par défaut', url_for(tab: 'functional_roles', nav: 'defaults') %></li>
+  <li class="<%= "active" if params[:nav] == 'silent' %>"><%= link_to 'Rôles silencieux', url_for(tab: 'functional_roles', nav: 'silent') %></li>
+  <li class="<%= "active" if params[:nav] == 'init' %>"><%= link_to 'Ré-initialisation', url_for(tab: 'functional_roles', nav: 'init') %></li>
+</ul>

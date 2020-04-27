@@ -1,0 +1,24 @@
+<%= form_for(:functions,
+             :method => :put,
+             :url => {:controller => 'functions',
+                      :action => 'available_functions_per_project',
+                      :project_id => @project.id},
+             :html => {:id => "functions-form"}) do %>
+
+  <fieldset class="box">
+    <p>
+      <label><%= l(:text_select_project_functional_roles) %></label>
+      <%= select_tag :function_ids, options_for_select(Function.sorted.collect { |f| ["#{f.name}#{" (#{members_per_function[f.id]} membres)" if members_per_function[f.id].present?}", f.id] }, Function.sorted.select { |f| @project.functions.present? ? @project.functions.include?(f) : f.active_by_default }.map(&:id)), {:multiple => true} %>
+    </p>
+    <p><%= submit_tag l(:button_save) %></p>
+  </fieldset>
+<% end %>
+
+<script type="text/javascript">
+    $(function () {
+        $('select#function_ids').select2({
+            containerCss: {width: '600px', minwidth: '600px'},
+            width: 'style'
+        });
+    });
+</script>

@@ -1,0 +1,111 @@
+<h2 style="margin-top: 10px;"><%= "Valeurs par défaut :" %></h2>
+
+<%= form_for(:functions,
+             :method => :put,
+             :url => {:controller => 'functions',
+                      :action => 'available_functions_per_project',
+                      :project_id => @project.id},
+             :html => {:id => "functions-form"}) do %>
+
+  <fieldset class="box">
+    <p>
+      <label>Les visibilités par rôle seront pré-remplies en fonction </label>
+      <%= select_tag :autocheck_mode, options_for_select({"du rôle de l'utilisateur" => '1', "du tracker de la demande" => '2'}, @project.autochecked_functions_mode || '1') %>
+    </p>
+    <p><%= submit_tag l(:button_save) %></p>
+  </fieldset>
+<% end %>
+
+<fieldset class="box">
+  <%= form_for(:functions,
+               :method => :put,
+               :url => {:controller => 'functions',
+                        :action => 'activated_functions_per_tracker',
+                        :project_id => @project.id},
+               :html => {:id => "autocheck-form"}) do %>
+    <div class="autoscroll">
+      <table class="list visibilities" id="autocheck_functions_per_tracker">
+        <thead>
+        <tr>
+          <th style="width: 200px;white-space: pre-line;vertical-align: middle;"></th>
+          <% @project.trackers.sorted.all.each do |function| %>
+            <th style="width: 100px;vertical-align: middle;text-align: left;">
+              <%= content_tag('span', h(function.name)) %>
+            </th>
+          <% end %>
+        </tr>
+        </thead>
+        <tbody>
+        <% checked_functions_per_tracker = {}, {}
+           @project.trackers.each { |t| checked_functions_per_tracker[t.id] = [] }
+           ProjectFunctionTracker.joins(:project_function).includes(:project_function).where("project_id = ?", @project.id).each do |r|
+             checked_functions_per_tracker[r.tracker_id] << r.project_function.function_id if checked_functions_per_tracker[r.tracker_id] && r.checked
+           end
+        %>
+        <% functions = @project.functions.present? ? @project.functions : Function.active_by_default %>
+        <% functions.sorted.each do |function| %>
+          <tr class="visibility-<%= function.name.parameterize %>">
+            <td class="name">
+              <%= content_tag('span', h(function.name)) %>
+            </td>
+            <% @project.trackers.sorted.all.each do |tracker| %>
+              <td style="text-align: left;">
+                <label style="display: block;" class="autocheck_checkbox">
+                  <%= check_box_tag "function_activation_per_tracker[#{tracker.id}][]", function.id, (checked_functions_per_tracker[tracker.id].include?(function.id)), :id => nil, :class => "function-#{function.id}" %>
+                  Coché
+                </label>
+              </td>
+            <% end %>
+          </tr>
+        <% end %>
+        </tbody>
+      </table>
+
+      <table class="list visibilities" id="autocheck_functions_per_function">
+        <% if @project.functions.empty? %>
+          <p>Veuillez tout d'abord confirmer les rôles fonctionnels actifs pour ce projet</p>
+        <% else %>
+          <thead>
+          <tr>
+            <th style="width: 200px;white-space: pre-line;vertical-align: middle;">Rôle de l'utilisateur</th>
+            <% @project.functions.sorted.all.each do |function| %>
+              <th style="width: 100px;vertical-align: middle;text-align: left;">
+                <%= content_tag('span', h(function.name)) %>
+              </th>
+            <% end %>
+          </tr>
+          </thead>
+          <tbody>
+          <% checked_functions_per_user_functions = {}
+             @project.functions.each { |t| checked_functions_per_user_functions[t.id] = [] }
+             @project.project_functions.each do |pf|
+               authorized_viewer_ids = pf.authorized_viewer_ids.present? ? pf.authorized_viewer_ids : pf.function.authorized_viewer_ids
+               authorized_viewer_ids.each do |function_id|
+                 checked_functions_per_user_functions[pf.function_id] << function_id if checked_functions_per_user_functions[pf.function_id] && function_id.present?
+               end
+             end
+          %>
+          <% @project.functions.sorted.each do |row_function| %>
+            <tr class="visibility-<%= row_function.name.parameterize %>">
+              <td class="name">
+                <%= content_tag('span', h(row_function.name)) %>
+              </td>
+              <% @project.functions.sorted.all.each do |col_function| %>
+                <td style="text-align: left;">
+                  <label style="display: block;" class="autocheck_checkbox">
+                    <%= check_box_tag "function_activation_per_user_function[#{row_function.id}][]", col_function.id, (checked_functions_per_user_functions[row_function.id].include?(col_function.id)), :id => nil, :class => "function-#{col_function.id}" %>
+                    Coché
+                  </label>
+                </td>
+              <% end %>
+            </tr>
+          <% end %>
+          </tbody>
+        <% end %>
+      </table>
+    </div>
+    <p><%= check_all_links 'autocheck-form' %></p>
+    <p><%= submit_tag l(:button_save) %></p>
+  <% end %>
+
+</fieldset>

@@ -47,3 +47,25 @@ table.organizations th { text-align: left; padding-left: 50px; }
 .members.box .function {display: flex;}
 .members.box .function_name {font-weight: bold;margin-right: 20px;text-align: right;min-width: 160px;}
 .members.box .organization {width:auto;}
+
+.limited_visibility_project_settings ul.navigation {
+    list-style: none;
+    display: inline-flex;
+    flex-wrap: wrap;
+    padding: inherit;
+    font-size: 1.2em;
+}
+.limited_visibility_project_settings ul.navigation a {
+    padding: 0 16px 8px;
+    border-bottom: 1px solid lightgrey;
+    margin-right: 8px;
+}
+.limited_visibility_project_settings ul.navigation a, .limited_visibility_project_settings ul.navigation a:hover {
+    text-decoration: none;
+}
+.limited_visibility_project_settings ul.navigation .active a {
+    border-bottom: 4px solid #229e43;
+}
+.limited_visibility_project_settings ul.navigation a:hover {
+    border-color: #229e43;
+}

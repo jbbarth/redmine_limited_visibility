@@ -13,14 +13,14 @@ describe "FileChecksums" do
   end
 
   it "should repeat any change in my/page" do
-    # my/page is completely overriden, and any future change should be copied to the plugin
+    # my/page is completely overridden, and any future change should be copied to the plugin
     assert_checksum %w(3e32d220ab995585eadcc4f575b3d640), "app/views/my/page.html.erb"
   end
 
   it "should break if issues and projects api are updated" do
-    # issues & projects API are completely overriden, and any future change should be copied to the plugin
+    # issues & projects API are completely overridden, and any future change should be copied to the plugin
     assert_checksum %w(7ffc3d91fd7a41532030ffa477e9e018), "app/views/projects/index.api.rsb"
-    assert_checksum %w(0cd927b8c3ce725dcf235f53c69b4788), "app/views/projects/show.api.rsb"
+    assert_checksum %w(793015fe562e10cd3c8922e49366b90c), "app/views/projects/show.api.rsb"
     assert_checksum %w(143e12b99ab1796616f17c740d50724c), "app/views/issues/index.api.rsb"
     assert_checksum %w(015cf9545f9d4078106b30311ded7f9b), "app/views/issues/show.api.rsb"
   end

@@ -20,7 +20,7 @@ module Redmine
                       cv = object.visible_custom_field_values.detect {|v| v.custom_field_id == column.custom_field.id}
                       show_value(cv, false)
                     else
-                      value = object.send(column.name)
+                      value = column.value_object(object)
                       case column.name
                       when :subject
                         value = "  " * level + value

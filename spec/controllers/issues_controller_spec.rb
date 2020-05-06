@@ -37,7 +37,7 @@ describe IssuesController, type: :controller do
     expect(assigns(:query).filters).to include 'authorized_viewers'
   end
 
-  it 'do not adds an "authorized viewers filter" to requests if module is not enable for the selected project' do
+  it 'does not add an "authorized viewers filter" to requests if module is not enable for the selected project' do
     q = IssueQuery.create!(name: "new-query", user: User.find(2), visibility: 2, project: @project)
     @project.enabled_module_names -= ['limited_visibility']
     expect(q.filters).to_not include 'authorized_viewers'
@@ -90,19 +90,35 @@ describe IssuesController, type: :controller do
     expect(assigns(:issues)).to include issue2
   end
 
-  it 'assigned the issue either to a user or to a functional role' do
+  it 'assigned the issue to a user' do
     issue = Issue.first
 
-    # Assignation to a user
     put :update, params: {id: issue.id, issue: {assigned_to_id: "#{User.current.id}"}}
+
     issue.reload
     expect(issue.assigned_to_function_id).to be_nil
     expect(issue.assigned_to_id).to eq User.current.id
+  end
 
-    # Assignation to a functional role
+  it 'assigned the issue to a functional role' do
+    issue = Issue.first
+
     put :update, params: {id: issue.id, issue: {assigned_to_id: "function-#{contractor_role.id}"}}
+
     issue.reload
     expect(issue.assigned_to_function_id).to eq contractor_role.id
+    expect(issue.assigned_to_id).to be_nil
+  end
+
+  it 'does NOT assigned the issue to a functional role if module is not enable' do
+    issue = Issue.first
+    @project.enabled_module_names -= ['limited_visibility']
+    expect(issue.assigned_to_id).to be_nil
+
+    put :update, params: {id: issue.id, issue: {assigned_to_id: "function-#{contractor_role.id}"}}
+
+    issue.reload
+    expect(issue.assigned_to_function_id).to be_nil
     expect(issue.assigned_to_id).to be_nil
   end
 

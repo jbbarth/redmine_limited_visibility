@@ -1,3 +1,6 @@
+<% @project.functions ||= Function.active_by_default %>
+<% members_per_function = @project.members_per_function %>
+
 <%= form_for(:functions,
              :method => :put,
              :url => {:controller => 'functions',

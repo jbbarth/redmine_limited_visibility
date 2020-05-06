@@ -1,7 +1,5 @@
-<% @project.functions ||= Function.active_by_default %>
-<% members_per_function = @project.members_per_function %>
-
 <div class="limited_visibility_project_settings">
+
   <%= render 'projects/settings_functional_roles_tabs' %>
 
   <% case params[:nav] %>
@@ -12,6 +10,7 @@
   <% when 'init' %>
     <%= render 'projects/tab_copy_configuration' %>
   <% else %>
-    <%= render 'projects/tab_activated_functions', members_per_function: members_per_function %>
+    <%= render 'projects/tab_activated_functions' %>
   <% end %>
+
 </div>

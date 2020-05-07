@@ -23,7 +23,9 @@ class IssuesController < ApplicationController
     end
 
     def forbid_assignation_to_function_if_module_is_not_enabled
-      unless @issue.project.module_enabled?("limited_visibility")
+      project = @project if @project.present?
+      project = @issue.project if project.blank? && @issue.present?
+      if project.present? && !project.module_enabled?("limited_visibility")
         @issue.assigned_to_function_id = ''
         params[:issue][:assigned_to_function_id] = '' if params[:issue]
       end

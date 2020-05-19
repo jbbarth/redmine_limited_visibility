@@ -88,10 +88,12 @@ class FunctionsController < ApplicationController
   end
 
   def available_functions_per_project
-    functions = Function.find(params[:function_ids].reject(&:empty?))
     project = Project.find(params[:project_id])
-    project.autochecked_functions_mode = params[:autocheck_mode]
-    project.functions = functions
+    if params[:function_ids].present?
+      functions = Function.where(id: params[:function_ids])
+      project.functions = functions
+    end
+    project.autochecked_functions_mode = params[:autocheck_mode] if params[:autocheck_mode]
     project.save
     respond_to do |format|
       format.html { redirect_to :controller => 'projects', :action => 'settings', :id => project.id, :tab => 'functional_roles' }

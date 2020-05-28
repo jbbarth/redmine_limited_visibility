@@ -53,7 +53,7 @@ class Project
 
   def members_per_function
     hash = {}
-    self.memberships.includes(:member_functions).each do |m|
+    self.members.includes(:member_functions).each do |m|
       m.member_functions.each do |f|
         hash[f.function_id] = 0 if hash[f.function_id].blank?
         hash[f.function_id] += 1

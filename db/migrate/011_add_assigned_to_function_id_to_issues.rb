@@ -5,6 +5,6 @@ class AddAssignedToFunctionIdToIssues < ActiveRecord::Migration[4.2]
   end
 
   def self.down
-    remove_column :issues, :assigned_to_id
+    remove_column :issues, :assigned_to_function_id
   end
 end

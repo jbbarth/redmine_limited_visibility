@@ -25,7 +25,7 @@ class Organization < ActiveRecord::Base
   def users_with(project:, functions:)
     users.joins(:members => :member_functions)
         .where("users.status = ? AND members.project_id = ? AND function_id IN (?)", User::STATUS_ACTIVE, project.id, functions.map(&:id))
-        .sorted
+        .sorted.uniq
   end
 
   def default_functions_by_project(project)

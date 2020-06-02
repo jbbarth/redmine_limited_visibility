@@ -45,6 +45,14 @@ class Function < ActiveRecord::Base
     User.joins(:members => :member_functions).where("function_id = ? AND project_id = ?", self.id, project.id).active.order("lastname ASC")
   end
 
+  def users_by_project_and_organization(project, organization)
+    User.joins(:members => :member_functions)
+        .where("function_id = ?", self.id)
+        .where("project_id = ?", project.id)
+        .where("organization_id = ?", organization.id)
+        .active.order("lastname ASC")
+  end
+
   def self.functions_from_authorized_viewers(authorized_viewers)
     Function.where(:id => "#{authorized_viewers}".split("|")).sorted
   end

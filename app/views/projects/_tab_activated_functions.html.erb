@@ -9,10 +9,20 @@
              :html => {:id => "functions-form"}) do %>
 
   <fieldset class="box">
-    <p>
-      <label><%= l(:text_select_project_functional_roles) %></label>
-      <%= select_tag :function_ids, options_for_select(Function.sorted.collect { |f| ["#{f.name}#{" (#{members_per_function[f.id]} membres)" if members_per_function[f.id].present?}", f.id] }, Function.sorted.select { |f| @project.functions.present? ? @project.functions.include?(f) : f.active_by_default }.map(&:id)), {:multiple => true} %>
-    </p>
+    <h2><%= l(:text_select_project_functional_roles) %></h2>
+
+    <ul style="list-style: none;">
+      <% Function.sorted.each do |function| %>
+        <% activated = function.is_activated?(project: @project) %>
+        <li>
+          <label>
+            <%= check_box_tag 'function_ids[]', function.id, activated %>
+            <%= "#{function.name}#{" (#{members_per_function[function.id].to_i} membres)" if activated}" %>
+          </label>
+        </li>
+      <% end %>
+    </ul>
+
     <p><%= submit_tag l(:button_save) %></p>
   </fieldset>
 <% end %>

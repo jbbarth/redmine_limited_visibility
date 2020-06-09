@@ -13,7 +13,7 @@ fr:
   label_my_page_my_roles: "Voir uniquement les demandes impliquant mes rôles"
   label_visibilities_report: "Synthèse des visibilités"
   label_technical_role_plural: "Rôles techniques"
-  text_select_project_functional_roles: "Rôles fonctionnels activés pour ce projet :"
+  text_select_project_functional_roles: "Rôles fonctionnels activés pour ce projet"
   field_active_by_default: "Activé par défaut dans tous les projets"
   permission_change_issues_visibility: "Modifier la visibilité des demandes"
   permission_see_issues_visibility: "Voir la visibilité des demandes"

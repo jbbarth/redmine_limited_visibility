@@ -13,7 +13,7 @@ en:
   label_my_page_my_roles: "Only show issues where my roles are involved"
   label_visibilities_report: "Visibilities report"
   label_technical_role_plural: "Technical roles"
-  text_select_project_functional_roles: "Select functional roles to enable for this project:"
+  text_select_project_functional_roles: "Select functional roles to enable for this project"
   field_active_by_default: "Active by default for all projects"
   permission_change_issues_visibility: "Change issues visibility"
   permission_manage_functional_roles_by_project: "Manager functional roles by project"

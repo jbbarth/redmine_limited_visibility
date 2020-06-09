@@ -57,6 +57,10 @@ class Function < ActiveRecord::Base
     Function.where(:id => "#{authorized_viewers}".split("|")).sorted
   end
 
+  def is_activated?(project:)
+    project.functions.present? ? project.functions.include?(self) : self.active_by_default
+  end
+
   private
 
     def set_own_visibility

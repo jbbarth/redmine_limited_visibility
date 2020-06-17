@@ -96,7 +96,7 @@ class FunctionsController < ApplicationController
     project.autochecked_functions_mode = params[:autocheck_mode] if params[:autocheck_mode]
     project.save
     respond_to do |format|
-      format.html { redirect_to :controller => 'projects', :action => 'settings', :id => project.id, :tab => 'functional_roles' }
+      format.html { redirect_to :controller => 'projects', :action => 'settings', :id => project.id, :tab => 'functional_roles', nav: params[:nav] }
       format.js
     end
   end
@@ -106,7 +106,7 @@ class FunctionsController < ApplicationController
     project = Project.find(params[:project_id])
     set_function_params_per_project_and_tracker(context, project, params)
     respond_to do |format|
-      format.html { redirect_to :controller => 'projects', :action => 'settings', :id => project.id, :tab => 'functional_roles' }
+      format.html { redirect_to :controller => 'projects', :action => 'settings', :id => project.id, :tab => 'functional_roles', nav: params[:nav] }
       format.js
     end
   end
@@ -116,7 +116,7 @@ class FunctionsController < ApplicationController
     project = Project.find(params[:project_id])
     set_function_params_per_project_and_tracker(context, project, params)
     respond_to do |format|
-      format.html { redirect_to :controller => 'projects', :action => 'settings', :id => project.id, :tab => 'functional_roles' }
+      format.html { redirect_to :controller => 'projects', :action => 'settings', :id => project.id, :tab => 'functional_roles', nav: params[:nav] }
       format.js
     end
   end

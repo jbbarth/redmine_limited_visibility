@@ -2,9 +2,11 @@
 
 <%= form_for(:functions,
              :method => :put,
-             :url => {:controller => 'functions',
-                      :action => 'available_functions_per_project',
-                      :project_id => @project.id},
+             :url => {controller: 'functions',
+                      action: 'available_functions_per_project',
+                      project_id: @project.id,
+                      nav: 'defaults'
+             },
              :html => {:id => "functions-form"}) do %>
 
   <fieldset class="box">
@@ -19,9 +21,11 @@
 <fieldset class="box">
   <%= form_for(:functions,
                :method => :put,
-               :url => {:controller => 'functions',
-                        :action => 'activated_functions_per_tracker',
-                        :project_id => @project.id},
+               :url => {controller: 'functions',
+                        action: 'activated_functions_per_tracker',
+                        project_id: @project.id,
+                        nav: 'defaults'
+               },
                :html => {:id => "autocheck-form"}) do %>
     <div class="autoscroll">
       <% functions = @project.functions.present? ? @project.functions : Function.active_by_default %>

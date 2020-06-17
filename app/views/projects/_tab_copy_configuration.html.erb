@@ -2,7 +2,9 @@
              :method => :put,
              :url => {:controller => 'functions',
                       :action => 'copy_functions_settings_from_project',
-                      :project_id => @project.id}) do %>
+                      :project_id => @project.id,
+                      :nav => 'init'
+             }) do %>
   <h2 style="margin-top: 10px;">Copier les paramètres d'un autre projet</h2>
   <fieldset class="box">
     <p>

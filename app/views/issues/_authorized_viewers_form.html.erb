@@ -1,14 +1,18 @@
 <% if @issue.project.module_enabled?("limited_visibility")
 
-    config_functions = ProjectFunctionTracker.joins(:project_function).includes(:project_function).where("project_id = ? AND tracker_id = ?", @issue.project_id, @issue.tracker_id)
-    hidden_functions = config_functions.reject{ |f| f.visible == true }.map{ |c| c.function } if config_functions.present?
+     config_functions = ProjectFunctionTracker.joins(:project_function).includes(:project_function).where("project_id = ? AND tracker_id = ?", @issue.project_id, @issue.tracker_id)
+     hidden_functions = config_functions.reject { |f| f.visible == true }.map { |c| c.function } if config_functions.present?
 
-    if @issue.project.autochecked_functions_mode == '2'
-      viewers = function_ids_for_current_tracker(@issue, @previous_tracker_id)
-    else
-      #autocheck based on current user functions per default
-      viewers = function_ids_for_current_viewers(@issue)
-    end
+     if @issue.new_record? && Redmine::Plugin.installed?(:redmine_templates) && @issue.issue_template.present?
+       viewers = @issue.issue_template.authorized_viewer_ids
+     else
+       if @issue.project.autochecked_functions_mode == '2'
+         viewers = function_ids_for_current_tracker(@issue, @previous_tracker_id)
+       else
+         #autocheck based on current user functions per default
+         viewers = function_ids_for_current_viewers(@issue)
+       end
+     end
 %>
 
   <% if User.current.admin? || User.current.allowed_to?(:change_issues_visibility, @project) %>
@@ -21,18 +25,18 @@
 
   <% if Setting['plugin_redmine_limited_visibility']['must_have_at_least_one_visible_function'] == 'true' %>
     <script>
-      $(function() {
-        $('#issue-form').submit(function(e) {
-          e.preventDefault();
-          var form = this;
-          if ($('.role.involved').not('.disabled').not('.hidden_function').length == 0) {
-            alert('<%= l('alert_cant_remove_all_visibility_roles') %>');
-            return false;
-          }else{
-            form.submit(); // submit bypassing the jQuery bound event
-          }
-        });
-      })
+        $(function () {
+            $('#issue-form').submit(function (e) {
+                e.preventDefault();
+                var form = this;
+                if ($('.role.involved').not('.disabled').not('.hidden_function').length == 0) {
+                    alert('<%= l('alert_cant_remove_all_visibility_roles') %>');
+                    return false;
+                } else {
+                    form.submit(); // submit bypassing the jQuery bound event
+                }
+            });
+        })
     </script>
   <% end %>
 

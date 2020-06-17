@@ -3,7 +3,7 @@
      config_functions = ProjectFunctionTracker.joins(:project_function).includes(:project_function).where("project_id = ? AND tracker_id = ?", @issue.project_id, @issue.tracker_id)
      hidden_functions = config_functions.reject { |f| f.visible == true }.map { |c| c.function } if config_functions.present?
 
-     if @issue.new_record? && Redmine::Plugin.installed?(:redmine_templates) && @issue.issue_template.present?
+     if @issue.new_record? && Redmine::Plugin.installed?(:redmine_templates) && @issue.issue_template.present? && @issue.issue_template.authorized_viewer_ids.present?
        viewers = @issue.issue_template.authorized_viewer_ids
      else
        if @issue.project.autochecked_functions_mode == '2'

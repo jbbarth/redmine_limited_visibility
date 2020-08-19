@@ -11,5 +11,6 @@ module RedmineLimitedVisibility
         javascript_include_tag('limited_visibility.js', plugin: 'redmine_limited_visibility')
     end
 
+
   end
 end

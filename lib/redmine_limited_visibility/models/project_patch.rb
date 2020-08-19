@@ -8,6 +8,47 @@ class Project
 
   has_many :organization_functions if Redmine::Plugin.installed?(:redmine_organizations)
 
+  after_save :remove_inherited_member_functions, :add_inherited_member_functions,
+             :if => Proc.new { |project| project.saved_change_to_parent_id? }
+
+  # Add patches to core method
+  def update_inherited_members
+    if parent
+      if inherit_members? && !inherit_members_before_last_save
+        remove_inherited_member_roles
+        remove_inherited_member_functions # PATCH
+        add_inherited_member_roles
+        add_inherited_member_functions # PATCH
+      elsif !inherit_members? && inherit_members_before_last_save
+        remove_inherited_member_roles
+        remove_inherited_member_functions # PATCH
+      end
+    end
+  end
+
+  def remove_inherited_member_functions
+    member_functions = MemberFunction.where(:member_id => membership_ids).to_a
+    member_function_ids = member_functions.map(&:id)
+    member_functions.each do |member_function|
+      if member_function.inherited_from && !member_function_ids.include?(member_function.inherited_from)
+        member_function.destroy
+      end
+    end
+  end
+
+  def add_inherited_member_functions
+    if inherit_members? && parent
+      parent.memberships.each do |parent_member|
+        member = Member.find_or_new(self.id, parent_member.user_id)
+        parent_member.member_functions.each do |parent_member_function|
+          member.member_functions << MemberFunction.new(:function => parent_member_function.function, :inherited_from => parent_member_function.id)
+        end
+        member.save!
+      end
+      memberships.reset
+    end
+  end
+
   if Redmine::Plugin.installed?(:redmine_organizations)
     # Builds a nested hash of users sorted by function and organization
     # => { Function(1) => { Org(1) => [ User(1), User(2), ... ] } }
@@ -31,7 +72,7 @@ class Project
             user[:organization] || dummy_org
           end
           hsh.each do |org, users_hsh|
-            hsh[org] = users_hsh.map {|h| h[:user]}.sort
+            hsh[org] = users_hsh.map { |h| h[:user] }.sort
           end
           memo[function] = hsh
           memo
@@ -78,8 +119,8 @@ class Project
 
     # Copy users first, then groups to handle members with inherited and given roles
     members_to_copy = []
-    members_to_copy += project.memberships.select {|m| m.principal.is_a?(User)}
-    members_to_copy += project.memberships.select {|m| !m.principal.is_a?(User)}
+    members_to_copy += project.memberships.select { |m| m.principal.is_a?(User) }
+    members_to_copy += project.memberships.select { |m| !m.principal.is_a?(User) }
 
     members_to_copy.each do |member|
       new_member = Member.new

@@ -17,7 +17,7 @@
         <li>
           <label>
             <%= check_box_tag 'function_ids[]', function.id, activated %>
-            <%= "#{function.name}#{" (#{members_per_function[function.id].to_i} membres)" if activated}" %>
+            <%= "#{function.name}#{" (#{members_per_function[function.id].to_i} membres)"}" %>
           </label>
         </li>
       <% end %>

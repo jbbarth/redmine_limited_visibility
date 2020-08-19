@@ -7,6 +7,7 @@ class IssuesController < ApplicationController
 
   before_action :set_previous_tracker_id, :only => [:new]
 
+
   private
     def set_assigned_to_function_id
       if params[:issue].present?

@@ -21,10 +21,10 @@ module RedmineLimitedVisibility
 
     def self.included(base)
       base.class_eval do
-        unloadable
 
         belongs_to :assigned_function, class_name: "Function",
                 foreign_key: "assigned_to_function_id"
+
 
         safe_attributes "authorized_viewers", "assigned_to_function_id"
 

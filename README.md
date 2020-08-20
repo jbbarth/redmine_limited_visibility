@@ -36,7 +36,7 @@ Test status
 [1]: https://travis-matrix-badges.herokuapp.com/repos/jbbarth/redmine_limited_visibility/branches/master/1
 [2]: https://travis-matrix-badges.herokuapp.com/repos/jbbarth/redmine_limited_visibility/branches/master/2
 [3]: https://travis-matrix-badges.herokuapp.com/repos/jbbarth/redmine_limited_visibility/branches/master/3
-[5]: https://travis-ci.com/jbbarth/redmine_limited_visibility
+[5]: https://travis-ci.org/jbbarth/redmine_limited_visibility
 
 Contributing
 ------------

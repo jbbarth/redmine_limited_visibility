@@ -65,4 +65,15 @@ class User < Principal
     end
   end
 
+  # Return user's roles for project
+  def functions_for_project(project)
+    # No function on archived projects
+    return [] if project.nil? || project.archived?
+    if membership = membership(project)
+      membership.functions.to_a
+    else
+      []
+    end
+  end
+
 end

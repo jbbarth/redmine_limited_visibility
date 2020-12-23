@@ -14,6 +14,7 @@ class FunctionsController < ApplicationController
     @function = Function.new
     @function.safe_attributes = params[:function]
     if request.post? && @function.save
+      @function.update_private_notes_group(params[:function][:private_notes_group]) if params[:function][:private_notes_group].present?
       flash[:notice] = l(:notice_successful_create)
       redirect_to roles_path
     else
@@ -28,6 +29,7 @@ class FunctionsController < ApplicationController
   def update
     @function.safe_attributes = params[:function]
     if @function.save
+      @function.update_private_notes_group(params[:function][:private_notes_group]) if params[:function][:private_notes_group].present?
       respond_to do |format|
         format.html {
           flash[:notice] = l(:notice_successful_update)

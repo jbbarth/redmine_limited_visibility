@@ -26,3 +26,5 @@ en:
   show_silent_roles: "Show silent roles"
   hide_silent_roles: "Hide silent roles"
   field_see_all_issues: "Users with this function can see all issues by default"
+  functions_to_share_private_notes_with: "Private notes group"
+  text_private_notes_explanation: "Limit private notes visibility to these roles"

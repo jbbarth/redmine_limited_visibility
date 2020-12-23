@@ -34,3 +34,5 @@ fr:
   label_organizations_management: "Gestion des membres par organisation"
   label_organizations_management_current_organization_only: "Uniquement les membres de son organisation (et les sous-organisations)"
   label_organizations_management_all_organizations: "Tous les membres de toutes les organisations"
+  functions_to_share_private_notes_with: "Partage des notes privées"
+  text_private_notes_explanation: "Limiter le partage à ces rôles"

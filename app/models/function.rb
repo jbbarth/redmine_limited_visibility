@@ -61,12 +61,22 @@ class Function < ActiveRecord::Base
     project.functions.present? ? project.functions.include?(self) : self.active_by_default
   end
 
-  private
-
-    def set_own_visibility
-      reload
-      if !authorized_viewers.present? || !authorized_viewers.split('|').include?(self.id)
-        update_attribute(:authorized_viewers, "#{authorized_viewers.present? ? authorized_viewers : "|"}#{self.id}|")
+  def update_private_notes_group(functions_ids)
+    grouped_functions = [self] | Function.where(id: functions_ids)
+    grouped_functions.each do |group|
+      PrivateNotesGroup.where(group_id: group.id).where("function_id NOT IN (?)", grouped_functions.map(&:id)).delete_all
+      (grouped_functions - [group]).each do |f|
+        PrivateNotesGroup.find_or_create_by(group_id: group.id, function_id: f.id)
       end
     end
+  end
+
+  private
+
+  def set_own_visibility
+    reload
+    if !authorized_viewers.present? || !authorized_viewers.split('|').include?(self.id)
+      update_attribute(:authorized_viewers, "#{authorized_viewers.present? ? authorized_viewers : "|"}#{self.id}|")
+    end
+  end
 end

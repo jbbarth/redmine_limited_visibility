@@ -18,3 +18,28 @@
     </fieldset>
   </div>
 </div>
+
+<% if Redmine::Plugin.installed?(:redmine_comments) %>
+  <div class="comments_tab">
+    <h3><%= l(:functions_to_share_private_notes_with) %></h3>
+    <div class="box tabular" id="private_notes">
+      <fieldset>
+        <p>
+          <label><%= l(:text_private_notes_explanation) %></label>
+          <%= select_tag "function[private_notes_group]",
+                         options_for_select(
+                           Function.sorted.where.not(id: @function.id).map { |f| [f.name, f.id] },
+                           PrivateNotesGroup.where(group_id: @function.id).map(&:function_id)
+                         ), multiple: true %>
+        </p>
+      </fieldset>
+    </div>
+  </div>
+  <%= javascript_tag do %>
+    $(function() {
+    if ((typeof $().select2) === 'function') {
+    $('#function_private_notes_group').select2();
+    }
+    });
+  <% end %>
+<% end %>

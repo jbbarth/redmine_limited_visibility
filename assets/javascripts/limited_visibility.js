@@ -47,18 +47,16 @@ $(function() {
 
 //disable last role so user cannot cut visibility to himself
 function disable_role_which_cant_be_removed() {
-  /* Temporary disable this feature # client do not want it for now
   //disable last remaining role
-  if ($('#involved-roles-form .role.involved.mine').length !== 1) {
-    $('#involved-roles-form .role.mine').removeClass('disabled');
+  if ($('#involved-roles-form .role.involved').length !== 1) {
+    $('#involved-roles-form .role').removeClass('disabled');
   } else {
-    $('#involved-roles-form .role.involved.mine').addClass('disabled');
+    $('#involved-roles-form .role.involved').addClass('disabled');
   }
   //disable current role if any
   if ($('#current-role').length == 1) {
     $('[data-role-id='+$('#current-role').val()+']').addClass('disabled')
   }
-  */
 }
 
 function update_assigned_to_options() {

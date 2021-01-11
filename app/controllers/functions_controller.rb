@@ -29,11 +29,11 @@ class FunctionsController < ApplicationController
   def update
     @function.safe_attributes = params[:function]
     if @function.save
-      @function.update_private_notes_group(params[:function][:private_notes_group]) if params[:function][:private_notes_group].present?
+      @function.update_private_notes_group(params[:function][:private_notes_group])
       respond_to do |format|
         format.html {
           flash[:notice] = l(:notice_successful_update)
-          redirect_to roles_path(:page => params[:page])
+          redirect_to edit_function_path(@function)
         }
         format.js { head 200 }
       end

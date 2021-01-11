@@ -26,11 +26,33 @@
       <fieldset>
         <p>
           <label><%= l(:text_private_notes_explanation) %></label>
-          <%= select_tag "function[private_notes_group]",
-                         options_for_select(
-                           Function.sorted.where.not(id: @function.id).map { |f| [f.name, f.id] },
-                           PrivateNotesGroup.where(group_id: @function.id).map(&:function_id)
-                         ), multiple: true %>
+
+          <% private_note_group_functions = PrivateNotesGroup.where(group_id: @function.id).map(&:function_id) %>
+
+          <span style="display: inline-block;vertical-align: top;">
+          <label class="block" style="padding-left:2em;">
+          <%= radio_button_tag 'function[private_notes_group][]', 1, private_note_group_functions.empty?,
+                               :id => 'role_all_functions_managed_on',
+                               :data => { :disables => '.role_managed_function input' } %>
+            <%= l(:label_can_share_private_note_with_all_roles) %>
+          </label>
+          <label class="block" style="padding-left:2em;">
+            <%= radio_button_tag 'function[private_notes_group][]', 0, private_note_group_functions.present?,
+                                 :id => 'role_all_functions_managed_off',
+                                 :data => { :enables => '.role_managed_function input' } %>
+            <%= l(:label_limit_private_note_visibility_to_these_roles) %>:
+          </label>
+          <span style="max-height: 300px;overflow: scroll;display: inline-block;">
+            <% Function.sorted.where.not(id: @function.id).each do |f| %>
+              <label class="block role_managed_function" style="padding-left:4em;">
+                <%= check_box_tag 'function[private_notes_group][]', f.id, private_note_group_functions.include?(f.id), :id => nil %>
+                <%= f.name %>
+              </label>
+            <% end %>
+            <%= hidden_field_tag 'function[private_notes_group][]', '' %>
+          </span>
+        </span>
+
         </p>
       </fieldset>
     </div>

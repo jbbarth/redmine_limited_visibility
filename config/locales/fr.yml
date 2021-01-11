@@ -35,4 +35,6 @@ fr:
   label_organizations_management_current_organization_only: "Uniquement les membres de son organisation (et les sous-organisations)"
   label_organizations_management_all_organizations: "Tous les membres de toutes les organisations"
   functions_to_share_private_notes_with: "Partage des notes privées"
-  text_private_notes_explanation: "Limiter le partage à ces rôles"
+  text_private_notes_explanation: "Visibilité des notes privées"
+  label_limit_private_note_visibility_to_these_roles: "Limiter le partage des notes privées à ces rôles"
+  label_can_share_private_note_with_all_roles: "Les notes privées peuvent être partagées avec tous les rôles"

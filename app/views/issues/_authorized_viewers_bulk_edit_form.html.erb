@@ -1,0 +1,4 @@
+<% if User.current.admin? || User.current.allowed_to?(:change_issues_visibility, @project) %>
+  <%= render "functions/select_involved_roles", viewers: [], current_user_visibility_roles: [] %>
+  <%= hidden_field_tag "issue[authorized_viewers]", "", :id => "authorized_viewers" %>
+<% end %>

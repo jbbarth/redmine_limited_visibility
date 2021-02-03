@@ -72,7 +72,10 @@ module PluginLimitedVisibility
         end
       end
     end
-
+    
+    def hidden_functions_for_tracker(issue)
+        hidden_functions = ProjectFunctionTracker.joins(:project_function).includes(:project_function).where("project_id = ? AND tracker_id = ? AND visible != ?", issue.project_id, issue.tracker_id, true).map{ |c| c.function }
+    end
   end
 end
 

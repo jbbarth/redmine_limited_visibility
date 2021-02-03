@@ -2,6 +2,7 @@
 
 <div class="settings box tabular">
   <p><%= f.text_field :name, :required => true %></p>
+  <p><%= f.text_field :description %></p>
   <p><%= f.check_box :hidden_on_overview %></p>
   <p><%= f.check_box :active_by_default %></p>
   <p><%= f.check_box :see_all_issues %></p>
@@ -44,7 +45,7 @@
           </label>
           <span style="max-height: 300px;overflow: scroll;display: inline-block;">
             <% Function.sorted.where.not(id: @function.id).each do |f| %>
-              <label class="block role_managed_function" style="padding-left:4em;">
+              <label class="block role_managed_function" style="padding-left:4em;cursor: pointer" title="<%= f.description %>">
                 <%= check_box_tag 'function[private_notes_group][]', f.id, private_note_group_functions.include?(f.id), :id => nil %>
                 <%= f.name %>
               </label>

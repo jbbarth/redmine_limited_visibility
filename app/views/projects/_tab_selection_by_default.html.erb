@@ -92,7 +92,7 @@
           <% @project.functions.sorted.each do |row_function| %>
             <tr class="visibility-<%= row_function.name.parameterize %>">
               <td class="name">
-                <%= content_tag('span', h(row_function.name)) %>
+                <%= content_tag('span', h(row_function.name), :title => row_function.description, :style =>"cursor: pointer") %>
               </td>
               <% @project.functions.sorted.all.each do |col_function| %>
                 <td style="text-align: left;">

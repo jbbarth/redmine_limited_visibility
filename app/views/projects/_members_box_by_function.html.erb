@@ -10,7 +10,7 @@
       <p>
         <% @users_by_function_and_organization.keys.sort_by(&:position).each do |function| %>
         <div class="function">
-          <div class="function_name"><%= h function %></div>
+          <div class="function_name" title="<%= function.description %>" style="cursor: pointer"><%= h function %></div>
           <div class="organizations">
             <% @users_by_function_and_organization[function].keys.sort_by(&:name).map do |org| %>
               <div class="organization">

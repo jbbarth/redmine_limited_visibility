@@ -1,4 +1,4 @@
-<h2 style="margin-top: 10px;"><%= "Rôles silencieux par tracker :" %></h2>
+<h2 style="margin-top: 10px;"><%= l(:label_silent_roles_by_tracker) %></h2>
 <fieldset class="box">
   <% if @project.functions.empty? %>
     <p>Veuillez tout d'abord confirmer les rôles fonctionnels actifs pour ce projet</p>
@@ -35,7 +35,7 @@
           <% functions.sorted.each do |function| %>
             <tr class="visibility-<%= function.name.parameterize %>">
               <td class="name">
-                <%= content_tag('span', h(function.name)) %>
+                <%= content_tag('span', h(function.name), :title => function.description, :style =>"cursor: pointer") %>
               </td>
               <% @project.trackers.sorted.find_each do |tracker| %>
                 <td style="text-align: left;">

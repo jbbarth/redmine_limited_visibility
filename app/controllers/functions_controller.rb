@@ -4,6 +4,11 @@ class FunctionsController < ApplicationController
   before_action :require_admin, :except => [:available_functions_per_project, :visible_functions_per_tracker, :activated_functions_per_tracker]
   before_action :find_function, :only => [:edit, :update, :destroy]
 
+  def index
+    @issue = Issue.find(params[:issue_id])
+    @project = @issue.project
+    @functions = Function.all_functions_for(@project)
+  end
   def new
     @function = Function.new
     @function.safe_attributes = params[:function]

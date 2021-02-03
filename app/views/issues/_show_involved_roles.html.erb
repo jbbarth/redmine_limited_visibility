@@ -3,28 +3,35 @@
   <% viewers = function_ids_for_current_viewers(@issue) %>
   <% @functions = Function.available_functions_for(@project).sorted %>
 
-  <% hidden_functions = ProjectFunctionTracker.joins(:project_function).includes(:project_function).where("project_id = ? AND tracker_id = ? AND visible != ?", @issue.project_id, @issue.tracker_id, true).map{ |c| c.function } %>
+  <% hidden_functions = hidden_functions_for_tracker(@issue) %>
 
-
-     <hr/>
+  <hr/>
   <div id='current_involved_roles_list' class='involved-roles' style='display: flex;'>
-    <label id="label_involved_roles"><%= l("field_authorized_viewers") %></label>
+    <label id="label_involved_roles"><%= l("field_authorized_viewers") %>
+      <span style="margin-top:5px;margin-left:5px;">      
+        <%= link_to l(:label_functional_roles),
+                {:controller => 'functions', :action => 'index', :issue_id => @issue},
+                :class => 'icon-only icon-roles',
+                :remote => true,
+                :method => 'get' %>
+        </span>        
+    </label>
     <span id="list_of_involved_roles_per_issue">
-    <% (@functions-hidden_functions).each do |function| %>
-      <% styles = "disabled" + (viewers.include?(function.id) || @issue.authorized_viewers.blank? ? " involved" : "") %>
-      <%= render "functions/visibility_role", :function => function, :styles => styles %>
-    <% end %>
-
-      <% hidden_functions.each_with_index do |function, index| %>
-        <%= link_to_function l('show_silent_roles'),
-                             "$(this).closest('div').find('.hidden_function').toggle();toggle_name(this);return false;",
-                             :class => 'toggle-hidden-functions',
-                             :style => ''  if index==0  %>
-        <%= '<BR>'.html_safe if index==0 %>
-        <% styles = viewers.include?(function.id) ? 'involved ' : '' %>
-        <% styles << ' hidden_function' %>
+      <% (@functions-hidden_functions).each do |function| %>
+        <% styles = "disabled" + (viewers.include?(function.id) || @issue.authorized_viewers.blank? ? " involved" : "") %>
         <%= render "functions/visibility_role", :function => function, :styles => styles %>
-  <% end %>
+      <% end %>
+
+        <% hidden_functions.each_with_index do |function, index| %>
+          <%= link_to_function l('show_silent_roles'),
+                               "$(this).closest('div').find('.hidden_function').toggle();toggle_name(this);return false;",
+                               :class => 'toggle-hidden-functions',
+                               :style => ''  if index==0  %>
+          <%= '<BR>'.html_safe if index==0 %>
+          <% styles = viewers.include?(function.id) ? 'involved ' : '' %>
+          <% styles << ' hidden_function' %>
+          <%= render "functions/visibility_role", :function => function, :styles => styles %>
+        <% end %>
 
     </span>
   </div>

@@ -29,7 +29,7 @@ class FunctionsController < ApplicationController
   def update
     @function.safe_attributes = params[:function]
     if @function.save
-      @function.update_private_notes_group(params[:function][:private_notes_group])
+      @function.update_private_notes_group(params[:function][:private_notes_group]) if Redmine::Plugin.installed?(:redmine_comments)
       respond_to do |format|
         format.html {
           flash[:notice] = l(:notice_successful_update)
@@ -94,6 +94,8 @@ class FunctionsController < ApplicationController
     if params[:function_ids].present?
       functions = Function.where(id: params[:function_ids])
       project.functions = functions
+    else
+      project.functions.clear  
     end
     project.autochecked_functions_mode = params[:autocheck_mode] if params[:autocheck_mode]
     project.save

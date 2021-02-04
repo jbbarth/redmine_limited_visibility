@@ -1,7 +1,7 @@
 <h2 style="margin-top: 10px;"><%= l(:label_silent_roles_by_tracker) %></h2>
 <fieldset class="box">
   <% if @project.functions.empty? %>
-    <p>Veuillez tout d'abord confirmer les rôles fonctionnels actifs pour ce projet</p>
+    <p><%= l(:label_confirm_the_active_fuctional_roles_for_this_project_first)%></p>
   <% else %>
 
     <%= form_for(:functions,

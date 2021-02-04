@@ -47,12 +47,12 @@
              checked_functions_per_tracker[r.tracker_id] << r.project_function.function_id if checked_functions_per_tracker[r.tracker_id] && r.checked
            end
         %>
-        <% @project.trackers.sorted.all.each do |tracker| %>
+        <% @project.trackers.sorted.find_each do |tracker| %>
           <tr class="visibility-<%= tracker.name.parameterize %>">
             <td class="name">
               <%= content_tag('span', h(tracker.name)) %>
             </td>
-            <% functions.sorted.all.each do |function| %>
+            <% functions.sorted.find_each do |function| %>
               <td style="text-align: center;">
                 <label style="display: block;" class="autocheck_checkbox">
                   <%= check_box_tag "function_activation_per_tracker[#{tracker.id}][]", function.id, (checked_functions_per_tracker[tracker.id].include?(function.id)), :id => nil, :class => "function-#{function.id}" %>
@@ -72,7 +72,7 @@
           <thead>
           <tr>
             <th style="width: 200px;white-space: pre-line;vertical-align: middle;">Rôle de l'utilisateur</th>
-            <% @project.functions.sorted.all.each do |function| %>
+            <% @project.functions.sorted.find_each do |function| %>
               <th style="width: 100px;vertical-align: middle;text-align: left;">
                 <%= content_tag('span', h(function.name)) %>
               </th>
@@ -94,7 +94,7 @@
               <td class="name">
                 <%= content_tag('span', h(row_function.name)) %>
               </td>
-              <% @project.functions.sorted.all.each do |col_function| %>
+              <% @project.functions.sorted.find_each do |col_function| %>
                 <td style="text-align: left;">
                   <label style="display: block;" class="autocheck_checkbox">
                     <%= check_box_tag "function_activation_per_user_function[#{row_function.id}][]", col_function.id, (checked_functions_per_user_functions[row_function.id].include?(col_function.id)), :id => nil, :class => "function-#{col_function.id}" %>

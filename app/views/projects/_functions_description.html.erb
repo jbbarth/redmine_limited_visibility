@@ -1,6 +1,6 @@
 <div class="modal" id="functions_description">
 	<h3 class="title"><%= l(:label_functions_activated_description) %></h3>
-	<% if functions.any? {|t| t.description.present? } %>
+	<% if functions.any? %>
       <dl>
       <% functions.each do |function| %>
         <dt><%= content_tag 'a', function.name, :href =>  edit_function_path(function) %></dt>

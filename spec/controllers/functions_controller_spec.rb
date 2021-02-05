@@ -1,9 +1,13 @@
 require 'spec_helper'
 
 describe FunctionsController, type: :controller do
-  fixtures :users, :functions, :projects, :trackers, :projects_trackers, :project_functions, :project_function_trackers
+  include ApplicationHelper  
+  render_views
 
+  fixtures :users, :functions, :projects, :trackers, :projects_trackers, :project_functions, :project_function_trackers, :issues,
+  :members 
   before do
+    set_language_if_valid('en')
     @request.session[:user_id] = 1
   end
 
@@ -21,15 +25,24 @@ describe FunctionsController, type: :controller do
   end
 
   describe "creating or updating a 'functional' role" do
+    it "should save  a new function" do
+      post :create, params: {function: {name: "newFunction", description: "testDescription", authorized_viewers: "|17|18|", hidden_on_overview: false}}
+      created_function = Function.all.last
+      expect(created_function.name).to eq("newFunction")
+      expect(created_function.description).to eq("testDescription")      
+    end
+
     it "should save or update a new function" do
-      post :create, params: {function: {name: "NewFunction", authorized_viewers: "|17|18|", hidden_on_overview: false}}
+      post :create, params: {function: {name: "NewFunction", description: "NewDescription", authorized_viewers: "|17|18|", hidden_on_overview: false}}
       created_function = Function.find_by_name("NewFunction")
       #test put method
-      put :update, params: {id: created_function.id, function: {name: "UpdatedFunction", authorized_viewers: "|17|18|"}}
+      put :update, params: {id: created_function.id, function: {name: "UpdatedFunction", description: "UpdatedDescription", authorized_viewers: "|17|18|"}}
       expect(created_function.reload.name).to eq "UpdatedFunction"
+      expect(created_function.reload.description).to eq "UpdatedDescription"
       #test patch method (new default method used by Rails to update)
-      patch :update, params: {id: created_function.id, function: {name: "UpdatedFunctionViaPatchMethod", hidden_on_overview: true, active_by_default: false}}
+      patch :update, params: {id: created_function.id, function: {name: "UpdatedFunctionViaPatchMethod", description: "UpdatedDesViaPatchMethod", hidden_on_overview: true, active_by_default: false}}
       expect(created_function.reload.name).to eq "UpdatedFunctionViaPatchMethod"
+      expect(created_function.reload.description).to eq "UpdatedDesViaPatchMethod"
       expect(created_function.hidden_on_overview).to eq true
       expect(created_function.active_by_default).to eq false
     end
@@ -84,4 +97,79 @@ describe FunctionsController, type: :controller do
       end.to change(current_available_functions.reload, :count).by(2)
     end
   end
+
+  describe "popup modal of all roles on the project per tracker" do
+    it "should return content_type javascript" do     
+      get :index, :params => {:issue_id => 1}, :xhr => true
+      assert_response :success
+      expect(response).to render_template("functions/index")
+      expect(response.content_type).to eq("text/javascript")
+      assert_match /ajax-modal/, response.body
+    end
+
+    it "should listing all the descriptions of the roles" do
+      #set a description in the first two functions 
+      Function.find(1).update_attribute :description , 'desforfunction1'
+      Function.find(2).update_attribute :description , 'desforfunction2'
+      get :index, :params => {:issue_id => 1}, :xhr => true
+      expect(response.body).to include("function1")
+      expect(response.body).to include("function2")
+      expect(response.body).to include("desforfunction1")
+      expect(response.body).to include("desforfunction2")
+    end
+
+    it "should show a legend on the color codes " do
+      get :index, :params => {:issue_id => 1}, :xhr => true
+      assert_response :success     
+      expect(response.body).to include("<i class=fa-icon-ok>")
+      expect(response.body).to include("<i class=fa-icon-remove>")
+      expect(response.body).to include("Active role in this project with members")
+      expect(response.body).to include("Active role in this project without members")
+      expect(response.body).to include("Silent role for this tracker")
+      expect(response.body).to include("Inactive role in this project with members")
+      expect(response.body).to include("Inactive role in this project with members")
+    end
+
+    it "should appear functions with the appropriate color  " do
+      get :index, :params => {:issue_id => 1}, :xhr => true
+      assert_response :success     
+      #here, we use data-role-id, To avoid confusion between style of the color codes and style span of function
+      expect(response.body).to include('class=\"role disabled involved no-member\" data-role-id=')
+      expect(response.body).to include('class=\"role disabled quiet no-member\" data-role-id=')
+    end
+
+     it "should appear functions with the appropriate color when member_function existed" do
+      fun_mem = MemberFunction.new
+      fun_mem.member = Project.find(1).members.first
+      fun_mem.function = Project.find(1).functions.first
+      fun_mem.save
+      fun_mem = MemberFunction.new
+      fun_mem.member = Project.find(1).members.first
+      fun_mem.function = Project.find(1).functions.second
+      fun_mem.save
+      get :index, :params => {:issue_id => 1}, :xhr => true
+      assert_response :success    
+      #here, we use data-role-id, To avoid confusion between style of the color codes and style span of function
+      expect(response.body).not_to include('class=\"role disabled involved no-member\" data-role-id=')
+      expect(response.body).not_to include('class=\"role disabled quiet no-member\" data-role-id=')
+    end
+
+    it "should appear functions with the appropriate color when member_function existed and silent role not existed" do
+      fun_mem = MemberFunction.new
+      fun_mem.member = Project.find(1).members.first
+      fun_mem.function = Project.find(1).functions.first
+      fun_mem.save
+      fun_mem = MemberFunction.new
+      fun_mem.member = Project.find(1).members.first
+      fun_mem.function = Project.find(1).functions.second
+      fun_mem.save
+      
+      ProjectFunctionTracker.all.first.update_attribute :visible , true
+      get :index, :params => {:issue_id => 1}, :xhr => true
+      assert_response :success      
+      expect(response.body).not_to include('class=\"role disabled quiet\" data-role-id=')
+    end
+     
+  end
+
 end

@@ -55,4 +55,10 @@ describe Function do
       expect(Function.functions_from_authorized_viewers("   |foo|bar=1||")).to eq []
     end
   end
+
+  describe "all_functions_for_project" do
+    it "return all functions related to this project" do
+      expect(Function.all_functions_for(Project.find(1)).count).to eq(2)
+    end
+  end
 end

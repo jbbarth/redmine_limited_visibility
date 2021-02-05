@@ -1,7 +1,7 @@
 class FunctionsController < ApplicationController
   layout 'admin'
 
-  before_action :require_admin, :except => [:available_functions_per_project, :visible_functions_per_tracker, :activated_functions_per_tracker]
+  before_action :require_admin, :except => [:index, :available_functions_per_project, :visible_functions_per_tracker, :activated_functions_per_tracker]
   before_action :find_function, :only => [:edit, :update, :destroy]
 
   def index

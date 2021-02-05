@@ -12,6 +12,7 @@
         <%= link_to l(:label_functional_roles),
                 {:controller => 'functions', :action => 'index', :issue_id => @issue},
                 :class => 'icon-only icon-roles',
+                :title => l(:label_functional_roles),
                 :remote => true,
                 :method => 'get' %>
         </span>

@@ -4,6 +4,8 @@ require 'redmine_limited_visibility/models/issue_query_patch'
 require 'redmine_limited_visibility/helpers/queries_helper_patch'
 
 describe IssuesController, type: :controller do
+  render_views
+
   fixtures :users, :roles, :projects, :members, :member_roles, :issues, :issue_statuses, :trackers, :enumerations, :custom_fields, :enabled_modules
 
   let(:contractor_role) {Function.where(name: "Contractors").first_or_create}
@@ -171,4 +173,13 @@ describe IssuesController, type: :controller do
       end
     end
   end
+
+  describe "GET /issues" do
+    it 'should issue#show show icon of popup modal of all roles on the project per tracker' do
+      get :show, params: {id: 1}
+      expect(response.body).to include("icon-only icon-roles")
+      assert_select "a[class='icon-only icon-roles']"
+    end
+  end
+
 end

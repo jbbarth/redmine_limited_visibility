@@ -1,5 +1,5 @@
 override = %(
-	<%= content_tag 'a', l(:label_open_functions_activated_description), :class => 'icon-only icon-roles', :title => l(:label_open_functions_activated_description), :onclick => "showModal('functions_description', '500px'); return false;", :href => '#' %>
+	<%= content_tag 'a', l(:label_open_functions_activated_description), :class => 'icon-only icon-help', :title => l(:label_open_functions_activated_description), :onclick => "showModal('functions_description', '500px'); return false;", :href => '#' %>
 	
 	<%= render partial: 'projects/functions_description', locals: {functions: @project.functions} %>
 )

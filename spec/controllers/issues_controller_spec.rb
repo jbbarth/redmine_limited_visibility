@@ -182,4 +182,12 @@ describe IssuesController, type: :controller do
     end
   end
 
+  describe "GET /issues" do
+    it 'should issue#new show icon of popup modal of all roles on the project per tracker' do
+      get :new
+      expect(response.body).to include("icon-only icon-roles")
+      assert_select "a[class='icon-only icon-roles']"
+    end
+  end
+
 end

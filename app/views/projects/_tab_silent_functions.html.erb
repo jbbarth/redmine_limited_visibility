@@ -26,10 +26,12 @@
           </thead>
           <tbody>
           <% visible_functions_per_tracker = {}
-             @project.trackers.each { |t| visible_functions_per_tracker[t.id] = []; }
-             ProjectFunctionTracker.joins(:project_function).includes(:project_function).where("project_id = ?", @project.id).each do |r|
-               visible_functions_per_tracker[r.tracker_id] << r.project_function.function_id if visible_functions_per_tracker[r.tracker_id] && r.visible
+            if ProjectFunctionTracker.joins(:project_function).includes(:project_function).where("project_id = ?", @project.id).count > 0
+              @project.trackers.each { |t| visible_functions_per_tracker[t.id] = []; }             
+              ProjectFunctionTracker.joins(:project_function).includes(:project_function).where("project_id = ?", @project.id).each do |r|
+                visible_functions_per_tracker[r.tracker_id] << r.project_function.function_id if visible_functions_per_tracker[r.tracker_id] && r.visible
              end
+            end            
           %>
           <% functions = @project.functions.present? ? @project.functions : Function.active_by_default %>
           <% functions.sorted.each do |function| %>
@@ -40,7 +42,7 @@
               <% @project.trackers.sorted.all.each do |tracker| %>
                 <td style="text-align: left;">
                   <label>
-                    <%= check_box_tag "function_visibility[#{tracker.id}][]", function.id, (visible_functions_per_tracker[tracker.id].include?(function.id) || visible_functions_per_tracker[tracker.id].blank?), :id => nil, :class => "function-#{function.id}" %>
+                    <%= check_box_tag "function_visibility[#{tracker.id}][]", function.id, (visible_functions_per_tracker.empty? || visible_functions_per_tracker[tracker.id].include?(function.id) ), :id => nil, :class => "function-#{function.id}" %>
                     Visible
                   </label>
                 </td>

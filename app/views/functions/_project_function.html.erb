@@ -1,5 +1,5 @@
 <h3 class="title"><%= l(:label_functional_roles) %></h3>
-<% hidden_functions = hidden_functions_for_tracker(@issue) %>
+<% hidden_functions = hidden_functions_for_tracker(@project, @tracker) %>
 <div> 
   <% if @functions.empty? %>
     <p class="nodata"><%= l(:label_no_data) %></p>

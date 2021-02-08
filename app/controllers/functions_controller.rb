@@ -5,8 +5,8 @@ class FunctionsController < ApplicationController
   before_action :find_function, :only => [:edit, :update, :destroy]
 
   def index
-    @issue = Issue.find(params[:issue_id])
-    @project = @issue.project
+    @project = Project.find(params[:project_id])
+    @tracker = Tracker.find(params[:tracker_id])
     @functions = Function.all_functions_for(@project)
   end
   def new
@@ -110,9 +110,9 @@ class FunctionsController < ApplicationController
     end
   end
 
-  def visible_functions_per_tracker
+  def visible_functions_per_tracker    
     context = :visibility
-    project = Project.find(params[:project_id])
+    project = Project.find(params[:project_id])    
     set_function_params_per_project_and_tracker(context, project, params)
     respond_to do |format|
       format.html { redirect_to :controller => 'projects', :action => 'settings', :id => project.id, :tab => 'functional_roles', nav: params[:nav] }

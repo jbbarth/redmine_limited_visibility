@@ -9,5 +9,5 @@ RedmineApp::Application.routes.draw do
     end
   end
   resources :functional_roles, only: [:update]
-  get 'issues/:issue_id/functions', :controller => 'functions', :action => 'index' ,:as => 'project_functions_index'
+  get 'issues/functions(/:project_id/:tracker_id)', :controller => 'functions', :action => 'index' ,:as => 'project_functions_index'
 end

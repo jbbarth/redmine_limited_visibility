@@ -111,7 +111,7 @@ describe FunctionsController, type: :controller do
 
   describe "popup modal of all roles on the project per tracker" do
     it "should return content_type javascript" do     
-      get :index, :params => {:issue_id => 1}, :xhr => true
+      get :index, :params => {:project_id => 1, :tracker_id => 1}, :xhr => true
       assert_response :success
       expect(response).to render_template("functions/index")
       expect(response.content_type).to eq("text/javascript")
@@ -122,7 +122,7 @@ describe FunctionsController, type: :controller do
       #set a description in the first two functions 
       Function.find(1).update_attribute :description , 'desforfunction1'
       Function.find(2).update_attribute :description , 'desforfunction2'
-      get :index, :params => {:issue_id => 1}, :xhr => true
+      get :index, :params => {:project_id => 1, :tracker_id => 1}, :xhr => true
       expect(response.body).to include("function1")
       expect(response.body).to include("function2")
       expect(response.body).to include("desforfunction1")
@@ -130,7 +130,7 @@ describe FunctionsController, type: :controller do
     end
 
     it "should show a legend on the color codes " do
-      get :index, :params => {:issue_id => 1}, :xhr => true
+      get :index, :params => {:project_id => 1, :tracker_id => 1}, :xhr => true
       assert_response :success     
       expect(response.body).to include("<i class=fa-icon-ok>")
       expect(response.body).to include("<i class=fa-icon-remove>")
@@ -142,7 +142,7 @@ describe FunctionsController, type: :controller do
     end
 
     it "should appear functions with the appropriate color  " do
-      get :index, :params => {:issue_id => 1}, :xhr => true
+      get :index, :params => {:project_id => 1, :tracker_id => 1}, :xhr => true
       assert_response :success     
       #here, we use data-role-id, To avoid confusion between style of the color codes and style span of function
       expect(response.body).to include('class=\"role disabled involved no-member\" data-role-id=')
@@ -158,7 +158,7 @@ describe FunctionsController, type: :controller do
       fun_mem.member = Project.find(1).members.first
       fun_mem.function = Project.find(1).functions.second
       fun_mem.save
-      get :index, :params => {:issue_id => 1}, :xhr => true
+      get :index, :params => {:project_id => 1, :tracker_id => 1}, :xhr => true
       assert_response :success    
       #here, we use data-role-id, To avoid confusion between style of the color codes and style span of function
       expect(response.body).not_to include('class=\"role disabled involved no-member\" data-role-id=')
@@ -176,7 +176,7 @@ describe FunctionsController, type: :controller do
       fun_mem.save
       
       ProjectFunctionTracker.all.first.update_attribute :visible , true
-      get :index, :params => {:issue_id => 1}, :xhr => true
+      get :index, :params => {:project_id => 1, :tracker_id => 1}, :xhr => true
       assert_response :success      
       expect(response.body).not_to include('class=\"role disabled quiet\" data-role-id=')
     end

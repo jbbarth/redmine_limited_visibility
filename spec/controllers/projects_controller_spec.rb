@@ -55,7 +55,7 @@ describe ProjectsController, :type => :controller do
       get :show, :params => {
           :id =>1
         }
-      assert_select "a[class='icon-only icon-roles']"
+      assert_select "a[class='icon-only icon-help']"
       expect(response.body).to include('showModal')
       expect(response.body).to include("function1")
       expect(response.body).to include("function2")

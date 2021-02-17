@@ -99,6 +99,8 @@ class FunctionsController < ApplicationController
     if params[:function_ids].present?
       functions = Function.where(id: params[:function_ids])
       project.functions = functions
+    else
+      project.functions.clear  
     end
     project.autochecked_functions_mode = params[:autocheck_mode] if params[:autocheck_mode]
     project.save

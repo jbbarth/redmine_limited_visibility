@@ -152,7 +152,7 @@ module QueriesHelper
           member = User.current.members.where(project: @project).first
           should_see_all = true if member && member.functions.detect(&:see_all_issues)
         else
-          User.current.members.map(&:functions).each do |functions|
+          User.current.members.includes(:functions).map(&:functions).each do |functions|
             should_see_all = true if functions.detect(&:see_all_issues)
           end
         end

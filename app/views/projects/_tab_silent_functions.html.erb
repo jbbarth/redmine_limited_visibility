@@ -26,9 +26,10 @@
           </thead>
           <tbody>
           <% visible_functions_per_tracker = {}
-            if ProjectFunctionTracker.joins(:project_function).includes(:project_function).where("project_id = ?", @project.id).count > 0
+            @Pro_Func_tracker = ProjectFunctionTracker.joins(:project_function).includes(:project_function).where("project_id = ?", @project.id)            
+            if @Pro_Func_tracker.count > 0
               @project.trackers.each { |t| visible_functions_per_tracker[t.id] = []; }             
-              ProjectFunctionTracker.joins(:project_function).includes(:project_function).where("project_id = ?", @project.id).each do |r|
+              @Pro_Func_tracker.each do |r|
                 visible_functions_per_tracker[r.tracker_id] << r.project_function.function_id if visible_functions_per_tracker[r.tracker_id] && r.visible
              end
             end            

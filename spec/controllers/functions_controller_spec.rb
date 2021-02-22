@@ -72,7 +72,7 @@ describe FunctionsController, type: :controller do
     it "updates autocheck_mode without changing functions" do
       expect do
         put :available_functions_per_project, params: { project_id: 2, autocheck_mode: "2" }
-      end.to change(ProjectFunction, :count).by(-3)
+      end.not_to change(ProjectFunction, :count)
       expect(project.reload.autochecked_functions_mode).to eq "2"
     end
 

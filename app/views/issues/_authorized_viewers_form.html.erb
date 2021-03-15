@@ -22,7 +22,7 @@
      end
 %>
 
-  <% if User.current.admin? || User.current.allowed_to?(:change_issues_visibility, @project) %>
+  <% if User.current.admin? || User.current.allowed_to?(:change_issues_visibility, @issue.project) %>
     <%= render "functions/select_involved_roles", viewers: viewers, current_user_visibility_roles: functional_roles_for_current_user(@issue.project), hidden_functions: hidden_functions %>
   <% end %>
 
@@ -46,5 +46,8 @@
         })
     </script>
   <% end %>
+  <script>
+      disable_role_which_cant_be_removed(); //disable eventual last remaining role
+  </script>
 
 <% end %>

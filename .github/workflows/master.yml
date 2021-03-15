@@ -76,6 +76,7 @@ jobs:
           libicu-dev
           libpq-dev
           ghostscript
+          gsfonts
 
       - name: Allow imagemagick to read PDF files
         run: |

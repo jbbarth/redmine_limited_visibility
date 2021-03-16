@@ -1,0 +1,12 @@
+<% if action_name == 'new' %>
+  <%= f.select :tracker_id, trackers_options_for_select(@issue), {:required => true},
+               :onchange => "updateIssueAndResetVisibilityFrom('#{escape_javascript update_issue_form_path(@project, @issue)}', this)",
+               :title => @issue.tracker.description %>
+<% else %>
+  <%= f.select :tracker_id, trackers_options_for_select(@issue), {:required => true},
+               :onchange => "updateIssueFrom('#{escape_javascript update_issue_form_path(@project, @issue)}', this)",
+               :title => @issue.tracker.description %>
+<% end %>
+
+
+

@@ -4,7 +4,7 @@ class Function < ActiveRecord::Base
   unloadable
   acts_as_positioned
 
-  safe_attributes :name, :position, :authorized_viewers, :move_to, :hidden_on_overview, :active_by_default, :see_all_issues
+  safe_attributes :name, :position, :authorized_viewers, :move_to, :hidden_on_overview, :active_by_default, :see_all_issues, :description
 
   has_many :member_functions, :dependent => :destroy
   has_many :members, :through => :member_functions
@@ -79,4 +79,17 @@ class Function < ActiveRecord::Base
       update_attribute(:authorized_viewers, "#{authorized_viewers.present? ? authorized_viewers : "|"}#{self.id}|")
     end
   end
+
+  def self.all_functions_for(project)
+    members = project.memberships
+    all_function = []
+    members.each do |member|      
+      functions = member.functions.to_a
+      functions.each do |function|
+        all_function.push(function)
+      end
+    end    
+    (all_function + available_functions_for(project).to_a).uniq
+  end
+
 end

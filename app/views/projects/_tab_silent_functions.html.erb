@@ -1,7 +1,7 @@
-<h2 style="margin-top: 10px;"><%= "Rôles silencieux par tracker :" %></h2>
+<h2 style="margin-top: 10px;"><%= l(:label_silent_roles_by_tracker) %></h2>
 <fieldset class="box">
   <% if @project.functions.empty? %>
-    <p>Veuillez tout d'abord confirmer les rôles fonctionnels actifs pour ce projet</p>
+    <p><%= l(:label_confirm_the_active_fuctional_roles_for_this_project_first)%></p>
   <% else %>
 
     <%= form_for(:functions,
@@ -26,21 +26,24 @@
           </thead>
           <tbody>
           <% visible_functions_per_tracker = {}
-             @project.trackers.each { |t| visible_functions_per_tracker[t.id] = []; }
-             ProjectFunctionTracker.joins(:project_function).includes(:project_function).where("project_id = ?", @project.id).each do |r|
-               visible_functions_per_tracker[r.tracker_id] << r.project_function.function_id if visible_functions_per_tracker[r.tracker_id] && r.visible
+            @Pro_Func_tracker = ProjectFunctionTracker.joins(:project_function).includes(:project_function).where("project_id = ?", @project.id)            
+            if @Pro_Func_tracker.count > 0
+              @project.trackers.each { |t| visible_functions_per_tracker[t.id] = []; }             
+              @Pro_Func_tracker.each do |r|
+                visible_functions_per_tracker[r.tracker_id] << r.project_function.function_id if visible_functions_per_tracker[r.tracker_id] && r.visible
              end
+            end            
           %>
           <% functions = @project.functions.present? ? @project.functions : Function.active_by_default %>
           <% functions.sorted.each do |function| %>
             <tr class="visibility-<%= function.name.parameterize %>">
               <td class="name">
-                <%= content_tag('span', h(function.name)) %>
+                <%= content_tag('span', h(function.name), :title => function.description, :style =>"cursor: pointer") %>
               </td>
               <% @project.trackers.sorted.each do |tracker| %>
                 <td style="text-align: left;">
                   <label>
-                    <%= check_box_tag "function_visibility[#{tracker.id}][]", function.id, (visible_functions_per_tracker[tracker.id].include?(function.id) || visible_functions_per_tracker[tracker.id].blank?), :id => nil, :class => "function-#{function.id}" %>
+                    <%= check_box_tag "function_visibility[#{tracker.id}][]", function.id, (visible_functions_per_tracker.empty? || visible_functions_per_tracker[tracker.id].include?(function.id) ), :id => nil, :class => "function-#{function.id}" %>
                     Visible
                   </label>
                 </td>

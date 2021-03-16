@@ -1,9 +1,14 @@
 class FunctionsController < ApplicationController
   layout 'admin'
 
-  before_action :require_admin, :except => [:available_functions_per_project, :visible_functions_per_tracker, :activated_functions_per_tracker]
+  before_action :require_admin, :except => [:index, :available_functions_per_project, :visible_functions_per_tracker, :activated_functions_per_tracker]
   before_action :find_function, :only => [:edit, :update, :destroy]
 
+  def index
+    @project = Project.find(params[:project_id])
+    @tracker = Tracker.find(params[:tracker_id])
+    @functions = Function.all_functions_for(@project)
+  end
   def new
     @function = Function.new
     @function.safe_attributes = params[:function]
@@ -93,7 +98,7 @@ class FunctionsController < ApplicationController
     project = Project.find(params[:project_id])
     if params[:function_ids].present?
       functions = Function.where(id: params[:function_ids])
-      project.functions = functions
+      project.functions = functions    
     end
     project.autochecked_functions_mode = params[:autocheck_mode] if params[:autocheck_mode]
     project.save
@@ -103,9 +108,9 @@ class FunctionsController < ApplicationController
     end
   end
 
-  def visible_functions_per_tracker
+  def visible_functions_per_tracker    
     context = :visibility
-    project = Project.find(params[:project_id])
+    project = Project.find(params[:project_id])    
     set_function_params_per_project_and_tracker(context, project, params)
     respond_to do |format|
       format.html { redirect_to :controller => 'projects', :action => 'settings', :id => project.id, :tab => 'functional_roles', nav: params[:nav] }

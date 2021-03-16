@@ -1,4 +1,4 @@
-<h2 style="margin-top: 10px;"><%= "Valeurs par défaut :" %></h2>
+<h2 style="margin-top: 10px;"><%= l(:label_default_values) + " :" %></h2>
 
 <%= form_for(:functions,
              :method => :put,
@@ -11,8 +11,8 @@
 
   <fieldset class="box">
     <p>
-      <label>Les visibilités par rôle seront pré-remplies en fonction </label>
-      <%= select_tag :autocheck_mode, options_for_select({ "du rôle de l'utilisateur" => '1', "du tracker de la demande" => '2' }, @project.autochecked_functions_mode || '1') %>
+      <label><%= l(:label_visibility_will_be_pre_filled_according)%></label>
+      <%= select_tag :autocheck_mode, options_for_select({l(:label_of_role_of_user) => '1', l(:label_of_tracker_of_demand) => '2'}, @project.autochecked_functions_mode || '1') %>
     </p>
     <p><%= submit_tag l(:button_save) %></p>
   </fieldset>
@@ -67,11 +67,11 @@
 
       <table class="list visibilities" id="autocheck_functions_per_function">
         <% if @project.functions.empty? %>
-          <p>Veuillez tout d'abord confirmer les rôles fonctionnels actifs pour ce projet</p>
+          <p><%= l(:label_confirm_the_active_fuctional_roles_for_this_project_first)%></p>
         <% else %>
           <thead>
           <tr>
-            <th style="width: 200px;white-space: pre-line;vertical-align: middle;">Rôle de l'utilisateur</th>
+            <th style="width: 200px;white-space: pre-line;vertical-align: middle;"><%= l(:label_user_role)%></th>
             <% @project.functions.sorted.each do |function| %>
               <th style="width: 100px;vertical-align: middle;text-align: left;">
                 <%= content_tag('span', h(function.name)) %>
@@ -92,7 +92,7 @@
           <% @project.functions.sorted.each do |row_function| %>
             <tr class="visibility-<%= row_function.name.parameterize %>">
               <td class="name">
-                <%= content_tag('span', h(row_function.name)) %>
+                <%= content_tag('span', h(row_function.name), :title => row_function.description, :style =>"cursor: pointer") %>
               </td>
               <% @project.functions.sorted.each do |col_function| %>
                 <td style="text-align: left;">

@@ -1,5 +1,5 @@
 <%
-   @project ||= @issue.project if @issue
+   @project = @issue.project if @issue
    if @project.present?
      @functions = Function.available_functions_for(@project).sorted
    else
@@ -9,7 +9,17 @@
 %>
 
 <p id=involved-roles-form class=involved-roles>
-  <label><%= l(:label_involved_members) %></label>
+  <label><%= l(:label_involved_members) %>
+    <span style="margin-top:5px;margin-left:5px;">
+      <% if @issue.present? %>      
+      <%= link_to l(:label_functional_roles),
+              {:controller => 'functions', :action => 'index', :project_id => @issue.project.id, :tracker_id => @issue.tracker.id},
+              :class => 'icon-only icon-help',
+              :remote => true,
+              :method => 'get' %>
+      </span>
+      <% end %>
+  </label>
   <% (@functions-hidden_functions).each do |function| %>
     <% styles = viewers.include?(function.id) ? 'involved ' : '' %>
     <% styles << (current_user_visibility_roles.include?(function) ? ' mine' : '') %>

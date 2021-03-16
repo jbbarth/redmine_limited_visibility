@@ -65,9 +65,6 @@ jobs:
         with:
           path: redmine/plugins/${{ env.PLUGIN_NAME }}
 
-      - name: Update package archives
-        run: sudo apt-get update --yes --quiet
-
       - name: Install package dependencies
         run: >
           sudo apt-get install --yes --quiet

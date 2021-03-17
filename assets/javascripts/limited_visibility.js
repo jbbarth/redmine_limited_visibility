@@ -137,9 +137,6 @@ $(function() {
 // Adapt updateIssueFrom core function: reset visibility to default (based on new project or tracker)
 //
 function updateIssueAndResetVisibilityFrom(url, el) {
-
-  console.log('** updateIssueAndResetVisibilityFrom **')
-
   $('#all_attributes input, #all_attributes textarea, #all_attributes select').each(function(){
     $(this).data('valuebeforeupdate', $(this).val());
   });

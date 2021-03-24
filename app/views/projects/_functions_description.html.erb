@@ -3,7 +3,7 @@
 	<% if functions.any? %>
       <dl>
       <% functions.each do |function| %>
-        <dt><%= content_tag 'a', function.name, :href =>  edit_function_path(function) %></dt>
+        <dt><%=function.name %></dt>
         <dd><%= function.description %></dd>
       <% end %>
       </dl>  

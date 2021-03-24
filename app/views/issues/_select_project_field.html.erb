@@ -1,0 +1,7 @@
+<% if action_name == 'new' %>
+  <%= f.select :project_id, project_tree_options_for_select(projects, :selected => @issue.project), { :required => true },
+               :onchange => "updateIssueAndResetVisibilityFrom('#{escape_javascript update_issue_form_path(@project, @issue)}', this)" %>
+<% else %>
+  <%= f.select :project_id, project_tree_options_for_select(projects, :selected => @issue.project), { :required => true },
+               :onchange => "updateIssueFrom('#{escape_javascript update_issue_form_path(@project, @issue)}', this)" %>
+<% end %>

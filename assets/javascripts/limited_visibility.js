@@ -45,6 +45,13 @@ $(function() {
   })
 });
 
+function init_issue_form_with_visibility() {
+  // Update disabled class on last remaining role
+  disable_role_which_cant_be_removed();
+  // Update assigned_to select options so user can't assigned to a role which has no visibility
+  update_assigned_to_options();
+}
+
 //disable last role so user cannot cut visibility to himself
 function disable_role_which_cant_be_removed() {
   //disable last remaining role
@@ -114,11 +121,7 @@ $(function() {
       });
       $('#authorized_viewers').val('|' + authorized.join('|') + '|');
 
-      // Update disabled class
-      disable_role_which_cant_be_removed();
-
-      // Update assigned_to select options so user can't assigned to a role which has no visibility
-      update_assigned_to_options();
+      init_issue_form_with_visibility()
     }
 
   });
@@ -126,9 +129,23 @@ $(function() {
   $("select#autocheck_mode").on("change", toggle_autochecked_checkboxes);
   toggle_autochecked_checkboxes();
 
-  //disable eventual last remaining role
-  disable_role_which_cant_be_removed();
-
-  update_assigned_to_options();
+  init_issue_form_with_visibility()
 
 });
+
+//////
+// Adapt updateIssueFrom core function: reset visibility to default (based on new project or tracker)
+//
+function updateIssueAndResetVisibilityFrom(url, el) {
+  $('#all_attributes input, #all_attributes textarea, #all_attributes select').each(function(){
+    $(this).data('valuebeforeupdate', $(this).val());
+  });
+  if (el) {
+    $("#form_update_triggered_by").val($(el).attr('id'));
+  }
+  return $.ajax({
+    url: url,
+    type: 'post',
+    data: $($("#issue-form")[0].elements).not("#authorized_viewers").serialize()
+  });
+}

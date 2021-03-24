@@ -9,7 +9,7 @@
   <div id='current_involved_roles_list' class='involved-roles' style='display: flex;'>
     <label id="label_involved_roles"><%= l("field_authorized_viewers") %>      
       <%= link_to l(:label_functional_roles),
-              {:controller => 'functions', :action => 'index', :project_id => @issue.project.id, :tracker_id => @issue.tracker.id},
+              {:controller => 'functions', :action => 'index', :issue_id => @issue.id},
               :class => 'icon-only icon-help',
               :title => l(:label_functional_roles),
               :style=>'margin-bottom:3px;margin-left:5px;',

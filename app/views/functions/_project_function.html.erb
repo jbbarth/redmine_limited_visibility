@@ -1,5 +1,5 @@
 <h3 class="title"><%= l(:label_functional_roles) %></h3>
-<% hidden_functions = hidden_functions_for_tracker(@project, @tracker) %>
+<% viewers = function_ids_for_current_viewers(@issue) %>
 <div> 
   <% if @functions.empty? %>
     <p class="nodata"><%= l(:label_no_data) %></p>
@@ -18,12 +18,8 @@
           <tr>
             <td>
               <div class='involved-roles' style='display: flex;'>
-                 <span>                  
-                  <% if hidden_functions.include?(function) %>
-                  <% styles = "disabled" + (Function.available_functions_for(@project).include?(function) ? " quiet" : "" ) %>
-                  <% else %>
-                    <% styles = "disabled" + (Function.available_functions_for(@project).include?(function) ? " involved" : "" ) %>
-                  <% end %>
+                 <span>
+                    <% styles = "disabled" + (viewers.include?(function.id) || @issue.authorized_viewers.blank? ? " involved" : "") %>
                   <%= render "functions/visibility_role", :function => function, :styles => styles %>
                 </span>
               </div>
@@ -52,7 +48,7 @@
               </div>
             </td>
             <td>
-              <%= l(:label_role_activated_with_member_in_this_project) %>
+              <%= l(:label_roles_selected_for_issue_with_members) %>
             </td>                 
             <td>
               <div class='involved-roles' style='display: flex;'>
@@ -64,20 +60,8 @@
               </div>
             </td>
             <td>
-              <%= l(:label_role_activated_without_member_in_this_project) %>
-            </td>                   
-            <td>
-              <div class='involved-roles' style='display: flex;'>
-                <% styles = "disabled" + ( " quiet" ) %>
-                <span class="role <%= styles %>">
-                <span class=status-icon><i class=fa-icon-ok></i><i class=fa-icon-remove></i></span>
-                  <i class="fa-icon-lock"></i>
-                </span>                
-              </div>
+              <%= l(:label_roles_selected_for_issue_without_members) %>
             </td>
-            <td>
-              <%= l(:label_silent_role_for_this_tracker) %>
-            </td>          
             <td>
               <div class='involved-roles' style='display: flex;'>
                 <% styles = "disabled" + ( " " ) %>
@@ -88,7 +72,19 @@
               </div>
             </td>
             <td>
-              <%= l(:label_role_inactive_with_member_in_this_project) %>
+              <%= l(:label_roles_not_selected_for_issue_with_members) %>
+            </td>                  
+            <td>
+              <div class='involved-roles' style='display: flex;'>
+                <% styles = "disabled" + ( " " ) %>
+                <span class="role <%= styles %> <%= 'no-member'%>">
+                <span class=status-icon><i class=fa-icon-ok></i><i class=fa-icon-remove></i></span>
+                  <i class="fa-icon-lock"></i>
+                </span>                
+              </div>
+            </td>
+            <td>
+              <%= l(:label_roles_not_selected_for_issue_without_members) %>
             </td>
           </tr>
         </table>

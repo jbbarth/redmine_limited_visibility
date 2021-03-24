@@ -4,9 +4,9 @@ class FunctionsController < ApplicationController
   before_action :require_admin, :except => [:index, :available_functions_per_project, :visible_functions_per_tracker, :activated_functions_per_tracker]
   before_action :find_function, :only => [:edit, :update, :destroy]
 
-  def index
-    @project = Project.find(params[:project_id])
-    @tracker = Tracker.find(params[:tracker_id])
+  def index    
+    @issue = Issue.find(params[:issue_id])
+    @project = @issue.project
     @functions = Function.all_functions_for(@project)
   end
   def new

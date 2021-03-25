@@ -2,17 +2,17 @@
 
 <%= form_for(:functions,
              :method => :put,
-             :url => {controller: 'functions',
-                      action: 'available_functions_per_project',
-                      project_id: @project.id,
-                      nav: 'defaults'
+             :url => { controller: 'functions',
+                       action: 'available_functions_per_project',
+                       project_id: @project.id,
+                       nav: 'defaults'
              },
-             :html => {:id => "functions-form"}) do %>
+             :html => { :id => "functions-form" }) do %>
 
   <fieldset class="box">
     <p>
       <label>Les visibilités par rôle seront pré-remplies en fonction </label>
-      <%= select_tag :autocheck_mode, options_for_select({"du rôle de l'utilisateur" => '1', "du tracker de la demande" => '2'}, @project.autochecked_functions_mode || '1') %>
+      <%= select_tag :autocheck_mode, options_for_select({ "du rôle de l'utilisateur" => '1', "du tracker de la demande" => '2' }, @project.autochecked_functions_mode || '1') %>
     </p>
     <p><%= submit_tag l(:button_save) %></p>
   </fieldset>
@@ -21,19 +21,19 @@
 <fieldset class="box">
   <%= form_for(:functions,
                :method => :put,
-               :url => {controller: 'functions',
-                        action: 'activated_functions_per_tracker',
-                        project_id: @project.id,
-                        nav: 'defaults'
+               :url => { controller: 'functions',
+                         action: 'activated_functions_per_tracker',
+                         project_id: @project.id,
+                         nav: 'defaults'
                },
-               :html => {:id => "autocheck-form"}) do %>
+               :html => { :id => "autocheck-form" }) do %>
     <div class="autoscroll">
-      <% functions = @project.functions.present? ? @project.functions : Function.active_by_default %>
+      <% functions = @project.functions.present? ? @project.functions.sorted : Function.active_by_default.sorted %>
       <table class="list visibilities" id="autocheck_functions_per_tracker">
         <thead>
         <tr>
           <th style="width: 200px;white-space: pre-line;vertical-align: middle;"></th>
-          <% functions.sorted.each do |function| %>
+          <% functions.each do |function| %>
             <th style="width: 100px;vertical-align: middle;text-align: center;">
               <%= content_tag('span', h(function.name)) %>
             </th>
@@ -52,7 +52,7 @@
             <td class="name">
               <%= content_tag('span', h(tracker.name)) %>
             </td>
-            <% functions.sorted.find_each do |function| %>
+            <% functions.each do |function| %>
               <td style="text-align: center;">
                 <label style="display: block;" class="autocheck_checkbox">
                   <%= check_box_tag "function_activation_per_tracker[#{tracker.id}][]", function.id, (checked_functions_per_tracker[tracker.id].include?(function.id)), :id => nil, :class => "function-#{function.id}" %>

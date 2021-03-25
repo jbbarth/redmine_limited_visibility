@@ -52,8 +52,9 @@ describe ProjectsController, :type => :controller do
       #set a description in the first two functions 
       Function.find(1).update_attribute :description , 'desforfunction1'
       Function.find(2).update_attribute :description , 'desforfunction2'
-      get :show, :params => {
-          :id =>1
+      get :settings, :params => {
+          :id =>1,
+          :tab =>"members"
         }
       assert_select "a[class='icon-only icon-help']"
       expect(response.body).to include('showModal')

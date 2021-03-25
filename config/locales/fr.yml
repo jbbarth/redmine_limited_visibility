@@ -39,7 +39,7 @@ fr:
   label_limit_private_note_visibility_to_these_roles: "Les notes privées ne peuvent être partagées qu'avec ces autres rôles"
   label_can_share_private_note_with_all_roles: "Les notes privées peuvent être partagées avec tous les rôles"
   text_functional_roles_actived: "Rôles fonctionnels activés"
-  label_open_functions_activated_description: "Afficher la description des functions activées"
+  label_open_functions_activated_description: "Afficher la description des rôles fonctionnels activés"
   label_functions_activated_description: "Description des rôles fonctionnels"
   label_roles_selected_for_issue_without_members: "Rôles concernés pour la demande sans membre"
   label_role_inactive_without_member_in_this_project: "Rôle non actif dans ce projet sans membre"

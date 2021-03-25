@@ -11,7 +11,14 @@ if Redmine::Plugin.installed?(:redmine_organizations)
                        :name => 'add-visibility-roles-header',
                        :insert_after => 'th.roles',
                        :text => '<th class="visibility_roles"><%= l("label_functional_roles") %></th>'
-
+  Deface::Override.new :virtual_path  => 'projects/settings/_members',
+                       :insert_after  => "erb[loud]:contains('delete_link membership_path')",
+                       :name          => "show-functions-activated-box",
+                       :text          => <<EOS
+<%= content_tag 'a', l(:label_open_functions_activated_description), :class => 'icon-only icon-help', :title => l(:label_open_functions_activated_description), :onclick => "showModal('functions_description', '500px'); return false;", :href => '#' %>
+<%= render partial: 'projects/functions_description', locals: {functions: @project.functions.sort_by(&:name)} %>
+EOS
+ 
   # Members roles
   Deface::Override.new :virtual_path => 'projects/settings/_members',
                        :name => 'add-visibility-roles-to-members',

@@ -29,12 +29,12 @@ Tests status
 
 |Plugin branch| Redmine Version   | Test Status      |
 |-------------|-------------------|------------------|
-|master       | 4.1.1             | [![Tests 4.1.1][1]][5] |  
-|master       | 4.0.7             | [![Tests 4.0.7][2]][5] |
+|master       | 4.1.2             | [![Tests 4.1.2][1]][5] |  
+|master       | 4.0.8             | [![Tests 4.0.8][2]][5] |
 |master       | master            | [![Tests master][3]][5]|
 
-[1]: https://github.com/jbbarth/redmine_limited_visibility/workflows/Tests%204.1.1/badge.svg
-[2]: https://github.com/jbbarth/redmine_limited_visibility/workflows/Tests%204.0.7/badge.svg
+[1]: https://github.com/jbbarth/redmine_limited_visibility/workflows/Tests%204.1.2/badge.svg
+[2]: https://github.com/jbbarth/redmine_limited_visibility/workflows/Tests%204.0.8/badge.svg
 [3]: https://github.com/jbbarth/redmine_limited_visibility/workflows/Tests%20master/badge.svg
 [5]: https://github.com/jbbarth/redmine_limited_visibility/actions
 

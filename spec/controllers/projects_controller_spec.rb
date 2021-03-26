@@ -62,8 +62,7 @@ describe ProjectsController, :type => :controller do
       expect(response.body).to include("function2")
       expect(response.body).to include("desforfunction1")
       expect(response.body).to include("desforfunction2")
-    end
-  end
+    end  
 
     it "Should contain two links check all and uncheck everything in setting tab functional_roles" do
       @request.session[:user_id] = 1

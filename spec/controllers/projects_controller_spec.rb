@@ -49,21 +49,21 @@ describe ProjectsController, :type => :controller do
 
   describe "GET /projects" do
     it "should project#show show icon View all functions activated description" do
-      if Redmine::Plugin.installed?(:redmine_organizations)
-        #set a description in the first two functions 
-        Function.find(1).update_attribute :description , 'desforfunction1'
-        Function.find(2).update_attribute :description , 'desforfunction2'
-        get :settings, :params => {
-            :id =>1,
-            :tab =>"members"
-          }
-        assert_select "a[class='icon-only icon-help']"
-        expect(response.body).to include('showModal')
-        expect(response.body).to include("function1")
-        expect(response.body).to include("function2")
-        expect(response.body).to include("desforfunction1")
-        expect(response.body).to include("desforfunction2")
-      end
+      @request.session[:user_id] = 1
+      #set a description in the first two functions 
+      Function.find(1).update_attribute :description , 'desforfunction1'
+      Function.find(2).update_attribute :description , 'desforfunction2'      
+
+      get :show, :params => {
+          :id =>1,            
+        }
+                
+      assert_select "a[class='icon-only icon-help']"
+      expect(response.body).to include('showModal')
+      expect(response.body).to include("function1")
+      expect(response.body).to include("function2")
+      expect(response.body).to include("desforfunction1")
+      expect(response.body).to include("desforfunction2")      
     end
   end
 end

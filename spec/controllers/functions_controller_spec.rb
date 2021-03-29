@@ -182,5 +182,13 @@ describe FunctionsController, type: :controller do
     end
      
   end
+  describe "GET /functions/visibilities" do
+    it "Should contain two links check all and uncheck everything in Visibilities report" do      
+      get :visibilities
+
+      assert_select 'a[href=?][onclick=?]', '#', "checkAll('visibilities_form', true); return false;"
+      assert_select 'a[href=?][onclick=?]', '#', "checkAll('visibilities_form', false); return false;"
+    end
+  end
 
 end

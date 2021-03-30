@@ -2,7 +2,7 @@
 
 <div class="settings box tabular">
   <p><%= f.text_field :name, :required => true %></p>
-  <p><%= f.text_field :description %></p>
+  <p><%= f.text_field :description, size: 50 %></p>
   <p><%= f.check_box :hidden_on_overview %></p>
   <p><%= f.check_box :active_by_default %></p>
   <p><%= f.check_box :see_all_issues %></p>

@@ -1,13 +1,13 @@
 <div class="modal" id="functions_description">
-	<h3 class="title"><%= l(:label_functions_activated_description) %></h3>
-	<% if functions.any? %>
-      <dl>
+  <h3 class="title"><%= l(:label_functions_activated_description) %></h3>
+  <% if functions.any? %>
+    <dl>
       <% functions.each do |function| %>
-        <dt><%= content_tag 'a', function.name, :href =>  edit_function_path(function) %></dt>
+        <dt><%= function.name %></dt>
         <dd><%= function.description %></dd>
       <% end %>
-      </dl>  
-	<% else %>  
-		<p class="nodata"><%= l(:label_no_data) %></p>
-	<% end %>
+    </dl>
+  <% else %>
+    <p class="nodata"><%= l(:label_no_data) %></p>
+  <% end %>
 </div>

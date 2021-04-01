@@ -28,11 +28,11 @@ describe ProjectsController, :type => :controller do
   it "creates subproject with inherited member's functions" do
     expect(parent_project.memberships.first.functions).to_not be_empty
 
-    expect { post :create, :params => {:project => {
-        :name => 'inherited',
-        :identifier => 'inherited',
-        :parent_id => parent_project.id,
-        :inherit_members => '1'}}
+    expect { post :create, :params => { :project => {
+      :name => 'inherited',
+      :identifier => 'inherited',
+      :parent_id => parent_project.id,
+      :inherit_members => '1' } }
     }.to change(Project, :count)
 
     project = Project.order('id desc').first
@@ -49,18 +49,33 @@ describe ProjectsController, :type => :controller do
 
   describe "GET /projects" do
     it "should project#show show icon View all functions activated description" do
+      @request.session[:user_id] = 1
       #set a description in the first two functions 
-      Function.find(1).update_attribute :description , 'desforfunction1'
-      Function.find(2).update_attribute :description , 'desforfunction2'
+      Function.find(1).update_attribute :description, 'desforfunction1'
+      Function.find(2).update_attribute :description, 'desforfunction2'
+
       get :show, :params => {
-          :id =>1
-        }
+        :id => 1,
+        :tab => "members"
+      }
       assert_select "a[class='icon-only icon-help']"
       expect(response.body).to include('showModal')
       expect(response.body).to include("function1")
       expect(response.body).to include("function2")
       expect(response.body).to include("desforfunction1")
       expect(response.body).to include("desforfunction2")
+    end
+
+    it "Should contain two links check all and uncheck everything in setting tab functional_roles" do
+      @request.session[:user_id] = 1
+      get :settings, :params => {
+        :id => 1,
+        :tab => "functional_roles",
+        :nav => "general",
+      }
+
+      assert_select 'a[href=?][onclick=?]', '#', "checkAll('functions-form', true); return false;"
+      assert_select 'a[href=?][onclick=?]', '#', "checkAll('functions-form', false); return false;"
     end
   end
 end

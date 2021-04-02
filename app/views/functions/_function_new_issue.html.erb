@@ -1,0 +1,96 @@
+<h3 class="title"><%= l(:label_functional_roles) %></h3> 
+<div> 
+  <% if @functions.empty? %>
+    <p class="nodata"><%= l(:label_no_data) %></p>
+  <% else %>
+  <table style="width:100%;">
+    <tr>
+      <td style="width:75%;">
+        <table class="list">
+          <thead>
+            <tr>
+              <th><%= l(:field_name) %></th>
+              <th><%= l(:field_description) %></th>
+            </tr>
+          </thead>            
+          <% current_user_visibility_roles = functional_roles_for_current_user(@project)%>
+          <% @functions.each do |function| %>
+          <tr>
+            <td>
+              <div class='involved-roles' style='display: flex;'>
+                 <span>             
+                    <% styles = viewers.include?(function.id.to_s) ? 'involved ' : '' %>
+                    <% styles << (current_user_visibility_roles.include?(function) ? ' mine' : '') %>
+                    <%= render "functions/visibility_role", :function => function, :styles => styles %>
+                </span>
+              </div>
+            </td>
+            <td>
+              <div  style='display: flex;'>
+                <%= textilizable(function, :description) %>
+              </div>
+            </td>
+            </tr>
+          <% end %>
+          </table>
+        </td>      
+    </tr>
+    <tr>
+    <td style="width:25%;">
+      <table style="vertical-align: top;">
+        <tr>
+          <td>
+            <div class='involved-roles' style='display: flex;'>
+              <% styles = "disabled" + ( " involved" ) %>
+              <span class="role <%= styles %>">
+              <span class=status-icon><i class=fa-icon-ok></i><i class=fa-icon-remove></i></span>
+                <i class="fa-icon-lock"></i>
+              </span>               
+            </div>
+          </td>
+          <td>
+            <%= l(:label_roles_selected_for_issue_with_members) %>
+          </td>                 
+          <td>
+            <div class='involved-roles' style='display: flex;'>
+              <% styles = "disabled" + ( " involved" ) %>
+              <span class="role <%= styles %> <%= 'no-member'%>">
+              <span class=status-icon><i class=fa-icon-ok></i><i class=fa-icon-remove></i></span>
+              <i class="fa-icon-lock"></i>
+              </span>                
+            </div>
+          </td>
+          <td>
+            <%= l(:label_roles_selected_for_issue_without_members) %>
+          </td>
+          <td>
+            <div class='involved-roles' style='display: flex;'>
+              <% styles = "disabled" + ( " " ) %>
+              <span class="role <%= styles %>">
+              <span class=status-icon><i class=fa-icon-ok></i><i class=fa-icon-remove></i></span>
+                <i class="fa-icon-lock"></i>
+              </span>
+            </div>
+          </td>
+          <td>
+            <%= l(:label_roles_not_selected_for_issue_with_members) %>
+          </td>                  
+          <td>
+            <div class='involved-roles' style='display: flex;'>
+              <% styles = "disabled" + ( " " ) %>
+              <span class="role <%= styles %> <%= 'no-member'%>">
+              <span class=status-icon><i class=fa-icon-ok></i><i class=fa-icon-remove></i></span>
+                <i class="fa-icon-lock"></i>
+              </span>                
+            </div>
+          </td>
+          <td>
+            <%= l(:label_roles_not_selected_for_issue_without_members) %>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+  </table>
+  <% end %>
+</div>

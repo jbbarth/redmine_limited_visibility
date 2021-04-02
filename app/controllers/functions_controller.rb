@@ -10,6 +10,12 @@ class FunctionsController < ApplicationController
     @functions = Function.available_functions_for(@project)
   end
 
+  def index_new_issue      
+    @project = Project.find(params[:project_id])
+    @viewers = params[:viewers].split(',')
+    @functions = Function.available_functions_for(@project).sorted
+  end
+  
   def new
     @function = Function.new
     @function.safe_attributes = params[:function]

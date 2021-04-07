@@ -12,15 +12,14 @@
               <th><%= l(:field_name) %></th>
               <th><%= l(:field_description) %></th>
             </tr>
-          </thead>            
+          </thead>
           <% current_user_visibility_roles = functional_roles_for_current_user(@project)%>
           <% @functions.each do |function| %>
           <tr>
             <td>
               <div class='involved-roles' style='display: flex;'>
-                 <span>             
-                    <% styles = viewers.include?(function.id.to_s) ? 'involved ' : '' %>
-                    <% styles << (current_user_visibility_roles.include?(function) ? ' mine' : '') %>
+                 <span>                  
+                    <% styles = viewers.include?(function.id.to_s) ? 'involved' : '' %>
                     <%= render "functions/visibility_role", :function => function, :styles => styles %>
                 </span>
               </div>
@@ -81,7 +80,7 @@
               <span class="role <%= styles %> <%= 'no-member'%>">
               <span class=status-icon><i class=fa-icon-ok></i><i class=fa-icon-remove></i></span>
                 <i class="fa-icon-lock"></i>
-              </span>                
+              </span>
             </div>
           </td>
           <td>

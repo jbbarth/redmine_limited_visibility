@@ -4,8 +4,15 @@
 
   <% if @users_by_function_and_organization.any? %>
     <div class="members box">
-
-      <h3><%= l(:label_member_plural) %></h3>
+      
+      <h3><%= l(:label_member_plural) %><%= link_to l(:label_open_functions_activated_description), '#', 
+        class: 'icon-only icon-help', 
+        style: "margin-top: -3px;margin-left: 4px;",
+        title: l(:label_open_functions_activated_description),
+        onclick: "showModal('functions_description', '500px'); return false;" %>          
+      </h3>
+      
+      <%= render partial: 'projects/functions_description', locals: {functions: @project.functions.sorted} %>
 
       <p>
         <% @users_by_function_and_organization.keys.sort_by(&:position).each do |function| %>

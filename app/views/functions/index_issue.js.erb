@@ -1,0 +1,2 @@
+$('#ajax-modal').html('<%= escape_javascript(render :partial => 'functions/function_issue', :locals => {:project => @project, :viewers => @viewers}) %>');
+showModal('ajax-modal', '1200px');

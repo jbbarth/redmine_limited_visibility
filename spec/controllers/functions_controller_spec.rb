@@ -109,11 +109,14 @@ describe FunctionsController, type: :controller do
     end
   end
 
-  describe "popup modal of all roles on the project per tracker" do
-    it "should return content_type javascript" do
-      get :index, params: { issue_id: 1 }, :xhr => true
+  describe "popup modal of all roles fonctionnels for show issue" do
+    let!(:issue) { Issue.find(1) }
+    before { issue.update_attributes(authorized_viewers: '|1|') }
+
+    it "should return content_type javascript" do    
+      get :index_issue, params: { project_id: issue.project.id, viewers: issue.authorized_viewer_ids.join(',') }, :xhr => true
       assert_response :success
-      expect(response).to render_template("functions/index")
+      expect(response).to render_template("functions/index_issue")
       expect(response.content_type).to eq("text/javascript")
       assert_match /ajax-modal/, response.body
     end
@@ -122,7 +125,8 @@ describe FunctionsController, type: :controller do
       #set a description in the first two functions 
       Function.find(1).update_attribute :description, 'desforfunction1'
       Function.find(2).update_attribute :description, 'desforfunction2'
-      get :index, params: { issue_id: 1 }, :xhr => true
+
+      get :index_issue, params: { project_id: issue.project.id, viewers: issue.authorized_viewer_ids.join(',') }, :xhr => true
       expect(response.body).to include("function1")
       expect(response.body).to include("function2")
       expect(response.body).to include("desforfunction1")
@@ -130,8 +134,9 @@ describe FunctionsController, type: :controller do
     end
 
     it "should show a legend on the color codes " do
-      get :index, params: { issue_id: 1 }, :xhr => true
+      get :index_issue, params: { project_id: issue.project.id, viewers: issue.authorized_viewer_ids.join(',') }, :xhr => true
       assert_response :success
+
       expect(response.body).to include("<i class=fa-icon-ok>")
       expect(response.body).to include("<i class=fa-icon-remove>")
       expect(response.body).to include(l(:label_roles_selected_for_issue_with_members))
@@ -140,12 +145,12 @@ describe FunctionsController, type: :controller do
       expect(response.body).to include(l(:label_roles_not_selected_for_issue_without_members))
     end
 
-    it "should appear functions with the appropriate color" do
-      get :index, params: { issue_id: 1 }, :xhr => true
+    it "should appear functions with the appropriate color" do      
+     get :index_issue, params: { project_id: issue.project.id, viewers: issue.authorized_viewer_ids.join(',') }, :xhr => true
       assert_response :success
       #here, we use data-role-id, To avoid confusion between style of the color codes and style span of function
-      expect(response.body).to include('class=\"role disabled involved no-member\" data-role-id=')
-      expect(response.body).not_to include('class=\"role disabled involved\" data-role-id=')
+      expect(response.body).to include('class=\"role involved no-member\" data-role-id=')
+      expect(response.body).to include('class=\"role  no-member\" data-role-id=')
     end
 
     it "should appear functions with the appropriate color when member_function existed" do
@@ -157,10 +162,11 @@ describe FunctionsController, type: :controller do
       fun_mem.member = Project.find(1).members.first
       fun_mem.function = Project.find(1).functions.second
       fun_mem.save
-      get :index, params: { issue_id: 1 }, :xhr => true
+
+      get :index_issue, params: { project_id: issue.project.id, viewers: issue.authorized_viewer_ids.join(',') }, :xhr => true
       assert_response :success
       #here, we use data-role-id, To avoid confusion between style of the color codes and style span of function
-      expect(response.body).not_to include('class=\"role disabled involved no-member\" data-role-id=')
+      expect(response.body).not_to include('class=\"role involved no-member\" data-role-id=')
     end
 
     it "should appear functions with the appropriate color when we change authorized viewers for function with members" do
@@ -173,11 +179,12 @@ describe FunctionsController, type: :controller do
       fun_mem.function = Project.find(1).functions.second
       fun_mem.save
 
-      Issue.find(1).update_attribute(:authorized_viewers, '|1|')
+      issue.update_attribute(:authorized_viewers, '|1|2|')
 
-      get :index, :params => { issue_id: 1 }, :xhr => true
+      get :index_issue, params: { project_id: issue.project.id, viewers: issue.authorized_viewer_ids.join(',') }, :xhr => true
       assert_response :success
-      expect(response.body).to include('class=\"role disabled \" data-role-id=')
+      
+      expect(response.body).not_to include('class=\"role  \" data-role-id=')
     end
 
     it "should appear functions with the appropriate color when we change authorized viewers for function without members" do
@@ -185,14 +192,102 @@ describe FunctionsController, type: :controller do
       fun_mem.member = Project.find(1).members.first
       fun_mem.function = Project.find(1).functions.first
       fun_mem.save
-      Issue.find(1).update_attribute(:authorized_viewers, '|1|')
+      issue.update_attribute(:authorized_viewers, '|2|')
 
-      get :index, params: { issue_id: 1 }, :xhr => true
+      get :index_issue, params: { project_id: issue.project.id, viewers: issue.authorized_viewer_ids.join(',') }, :xhr => true
       assert_response :success
-      expect(response.body).to include('class=\"role disabled no-member\" data-role-id=')
+      expect(response.body).to include('class=\"role involved no-member\" data-role-id=')
+      expect(response.body).to include('class=\"role  \" data-role-id=')
     end
 
   end
+
+  describe "popup modal of all roles fonctionnels for (new issue and visibilities according to role of user) should appear functions with the appropriate color" do
+    let!(:project) { Project.find(1) }
+    let!(:issue) { Issue.new }
+
+    before do
+      project.update_attribute(:autochecked_functions_mode, '1')
+      issue.project = project
+      issue.tracker = Tracker.find(1)
+    end
+
+    it "When all functions do not have a member" do     
+      viewers = function_ids_for_current_viewers(issue) 
+      get :index_issue, params: { project_id: project.id, viewers: viewers.join(',') }, :xhr => true
+
+      expect(response.body).to include('class=\"role involved no-member\" data-role-id=')
+      expect(response.body).not_to include('class=\"role  involved\" data-role-id=')
+      expect(response.body).not_to include('class=\"role  \" data-role-id=')
+
+    end
+
+    it "When one function has a member" do
+      fun_mem = MemberFunction.new
+      fun_mem.member = Project.find(1).members.first
+      fun_mem.function = Project.find(1).functions.first
+      fun_mem.save
+
+      viewers = function_ids_for_current_viewers(issue) 
+      get :index_issue, params: { project_id: project.id, viewers: viewers.join(',') }, :xhr => true
+      
+      expect(response.body).to include('class=\"role involved no-member\" data-role-id=')
+      expect(response.body).to include('class=\"role involved \" data-role-id')
+      expect(response.body).not_to include('class=\"role  \" data-role-id=')     
+
+    end
+
+    it "When one function has a member and ProjectFunction has authorized_viewers just for this function" do
+      Project.find(1).members.first.update_attribute(:user_id, 1)
+      fun_mem = MemberFunction.new
+      fun_mem.member = Project.find(1).members.first
+      fun_mem.function = Project.find(1).functions.first
+      fun_mem.save
+      ProjectFunction.first.update_attribute(:authorized_viewers, '|1|')
+      
+      viewers = function_ids_for_current_viewers(issue)
+      get :index_issue, params: { project_id: project.id, viewers: viewers.join(',') }, :xhr => true
+      
+      expect(response.body).to include('class=\"role involved \" data-role-id=')
+      expect(response.body).to include('class=\"role  no-member\" data-role-id=')
+      expect(response.body).not_to include('class=\"role involved no-member\" data-role-id=')
+      expect(response.body).not_to include('class=\"role  \" data-role-id=')
+
+    end
+  end
+
+  describe "popup modal of all roles fonctionnels for (new issue and visibilities according to tracking of issue) should appear functions with the appropriate color" do
+    let!(:project) { Project.find(1) }
+    let!(:issue) { Issue.new }
+
+    before do
+      project.update_attribute(:autochecked_functions_mode, '2')
+      issue.project = project
+      issue.tracker = Tracker.find(1)
+    end
+
+    it "When no function selected for the tracker" do
+      viewers = function_ids_for_current_tracker(issue, 1) 
+      get :index_issue, params: { project_id: project.id, viewers: viewers.join(',') }, :xhr => true
+      
+      expect(response.body).to include('class=\"role  no-member\" data-role-id')
+      expect(response.body).not_to include('class=\"role involved no-member\" data-role-id=')
+      expect(response.body).not_to include('class=\"role  \" data-role-id=')
+      
+    end
+
+    it "When one function selected for the tracker" do      
+      ProjectFunctionTracker.first.update_attribute(:checked, 't')
+      viewers = function_ids_for_current_tracker(issue, 1)
+      get :index_issue, params: { project_id: project.id, viewers: viewers.join(',') }, :xhr => true
+      
+      expect(response.body).to include('class=\"role  no-member\" data-role-id')
+      expect(response.body).to include('class=\"role involved no-member\" data-role-id=')
+      expect(response.body).not_to include('class=\"role  \" data-role-id=')
+      expect(response.body).not_to include('class=\"role involved \" data-role-id=')
+    end
+  end
+
   describe "GET /functions/visibilities" do
     it "Should contain two links check all and uncheck everything in Visibilities report" do
       get :visibilities

@@ -8,6 +8,6 @@ RedmineApp::Application.routes.draw do
       put '/copy_functions_settings_from_project', to: "functions#copy_functions_settings_from_project"
     end
   end
-  resources :functional_roles, only: [:update]
-  get 'issues/functions(/:issue_id)', :controller => 'functions', :action => 'index' ,:as => 'project_functions_index'
+  resources :functional_roles, only: [:update]  
+  get 'issues/functions/:project_id(/*viewers)', :controller => 'functions', :action => 'index_issue' ,:as => 'index_issue_function'
 end

@@ -20,6 +20,7 @@ class Function < ActiveRecord::Base
 
   scope :sorted, lambda { order("#{table_name}.position ASC") }
   scope :active_by_default, -> { where("active_by_default = ?", true) }
+  scope :visible_on_project_overview, -> { where(hidden_on_overview: false) }
 
   def self.available_functions_for(project)
     functions = Function.joins(:project_functions).where("project_id = ?", project.id).sorted if project.present?

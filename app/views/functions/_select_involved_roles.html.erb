@@ -11,14 +11,14 @@
 <p id=involved-roles-form class=involved-roles>
   <label><%= l(:label_involved_members) %>
     <span style="margin-top:5px;margin-left:5px;">
-      <% if @issue.present? %>      
-      <%= link_to l(:label_functional_roles),
-              {:controller => 'functions', :action => 'index', :project_id => @issue.project.id, :tracker_id => @issue.tracker.id},
+      <% if @issue.present? %>
+        <%= link_to l(:label_functional_roles),
+              {:controller => 'functions', :action => 'index_issue', :project_id => @issue.project.id, :viewers => viewers.join(',')},
               :class => 'icon-only icon-help',
               :remote => true,
               :method => 'get' %>
-      </span>
       <% end %>
+    </span>
   </label>
   <% (@functions-hidden_functions).each do |function| %>
     <% styles = viewers.include?(function.id) ? 'involved ' : '' %>

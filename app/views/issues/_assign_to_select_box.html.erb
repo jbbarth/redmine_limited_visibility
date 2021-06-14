@@ -4,5 +4,8 @@
                  assignable_options_for_select(@issue, @issue.assignable_users, @issue.assigned_to || @issue.assigned_to_function_id),
                  :include_blank => true,
                  :required => @issue.required_attribute?('assigned_to_id') %>
+    <% if Rails.env.test? && @issue.assignable_users.include?(User.current) %>
+      <a class="assign-to-me-link<%= ' hidden' if @issue.assigned_to_id == User.current.id %>" href="#" data-id="<%= User.current.id %>"><%= l(:label_assign_to_me) %></a>
+    <% end %>
   </p>
 <% end %>

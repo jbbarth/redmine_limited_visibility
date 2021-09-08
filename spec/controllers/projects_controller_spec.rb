@@ -10,7 +10,7 @@ describe ProjectsController, :type => :controller do
            :enabled_modules, :enumerations, :boards, :messages,
            :attachments, :custom_fields, :custom_values, :time_entries,
            :wikis, :wiki_pages, :wiki_contents, :wiki_content_versions,
-           :functions
+           :functions, :project_functions, :project_function_trackers
 
   let(:parent_project) { Project.find(1) }
   let(:function_1) { Function.find(1) }

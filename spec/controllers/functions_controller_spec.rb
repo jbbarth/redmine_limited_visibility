@@ -5,7 +5,7 @@ describe FunctionsController, type: :controller do
   render_views
 
   fixtures :users, :functions, :projects, :trackers, :projects_trackers, :project_functions, :project_function_trackers, :issues,
-           :members
+           :members, :issue_statuses
   before do
     set_language_if_valid('en')
     @request.session[:user_id] = 1

@@ -1,23 +1,23 @@
-<% if User.current.respond_to?(:can_see_detailed_project_homepage?) && User.current.can_see_detailed_project_homepage?(@project) %>
+<% if !User.current.respond_to?(:can_see_detailed_project_homepage?) || User.current.can_see_detailed_project_homepage?(@project) %>
 
-  <% @users_by_function_and_organization = @project.users_by_function_and_organization %>
+  <div class="members box">
 
-  <% if @users_by_function_and_organization.any? %>
-    <div class="members box">
+    <h3>
+      <%= l(:label_member_plural) %>
+      <%= link_to l(:label_open_functions_activated_description), '#',
+                  class: 'icon-only icon-help',
+                  style: "margin-top: -3px;margin-left: 4px;",
+                  title: l(:label_open_functions_activated_description),
+                  onclick: "showModal('functions_description', '500px'); return false;" %>
+    </h3>
 
-      <h3>
-        <%= l(:label_member_plural) %>
-        <%= link_to l(:label_open_functions_activated_description), '#',
-                    class: 'icon-only icon-help',
-                    style: "margin-top: -3px;margin-left: 4px;",
-                    title: l(:label_open_functions_activated_description),
-                    onclick: "showModal('functions_description', '500px'); return false;" %>
-      </h3>
+    <%= render partial: 'projects/functions_description', locals: { functions: @project.functions.visible_on_project_overview.sorted } %>
 
-      <%= render partial: 'projects/functions_description', locals: { functions: @project.functions.visible_on_project_overview.sorted } %>
-
-      <p>
-        <% @users_by_function_and_organization.keys.sort_by(&:position).each do |function| %>
+    <% if Redmine::Plugin.installed?(:redmine_organizations) %>
+      <% @users_by_function_and_organization = @project.users_by_function_and_organization %>
+      <% if @users_by_function_and_organization.any? %>
+        <p>
+          <% @users_by_function_and_organization.keys.sort_by(&:position).each do |function| %>
           <div class="function">
             <div class="function_name" title="<%= function.description %>" style="cursor: pointer"><%= h function %></div>
             <div class="organizations">
@@ -35,9 +35,10 @@
             </div>
           </div>
         <% end %>
-      </p>
+        </p>
+      <% end %>
+    <% end %>
 
-    </div>
-  <% end %>
+  </div>
 
 <% end %>

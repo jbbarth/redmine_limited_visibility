@@ -5,12 +5,12 @@ class RolesController < ApplicationController
   def index
     respond_to do |format|
       format.html {
-        @functional_roles = Function.sorted
-        @role_pages, @roles = paginate Role.sorted, per_page: 25
+        @functional_roles = Function.sorted.to_a
+        @roles = Role.sorted.to_a
         render action: "index", layout: false if request.xhr?
       }
       format.api {
-        @roles = Role.givable.all
+        @roles = Role.givable.to_a
       }
     end
   end

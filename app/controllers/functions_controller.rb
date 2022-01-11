@@ -1,15 +1,20 @@
 class FunctionsController < ApplicationController
   layout 'admin'
 
-  before_action :require_admin, :except => [:index, :available_functions_per_project, :visible_functions_per_tracker, :activated_functions_per_tracker]
+  before_action :require_admin, :except => [:index,
+                                            :available_functions_per_project,
+                                            :visible_functions_per_tracker,
+                                            :activated_functions_per_tracker,
+                                            :index_issue
+  ]
   before_action :find_function, :only => [:edit, :update, :destroy]
 
   def index_issue
-    @project = Project.find(params[:project_id])    
-    @viewers =  params[:viewers].present? ? params[:viewers].split(',') : []
+    @project = Project.find(params[:project_id])
+    @viewers = params[:viewers].present? ? params[:viewers].split(',') : []
     @functions = Function.available_functions_for(@project).sorted
   end
-  
+
   def new
     @function = Function.new
     @function.safe_attributes = params[:function]

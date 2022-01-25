@@ -1,3 +1,11 @@
+# empty the code of javascript and copy it again in the view authorized_viewers_form, because of it will be broken by Deface::Override
+Deface::Override.new :virtual_path  => 'issues/_form',
+                     :name          => 'empty_code_javascript',
+                     :insert_top    => "erb[loud]:contains('javascript_tag')",
+                     :text          =>  <<STR_TEST
+''
+
+STR_TEST
 Deface::Override.new :virtual_path  => 'issues/_form',
                      :name          => 'add-authorized-viewers-in-issues-new',
                      :insert_before => "erb[silent]:contains(\"if @issue.safe_attribute? 'subject'\")",

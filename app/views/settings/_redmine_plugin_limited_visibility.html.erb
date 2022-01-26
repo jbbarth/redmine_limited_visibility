@@ -20,3 +20,13 @@
   </tr>
   </tbody>
 </table>
+
+<fieldset>
+  <div style="min-width: 300px;">Projets utilisant encore la configuration par défaut :</div>
+  <div>
+    <% projects = EnabledModule.where(name: 'limited_visibility').map(&:project) %>
+    <% projects.select { |p| p.functions.blank? && p.active? }.each do |p| %>
+      <span class="list_templates_projects_names"><%= link_to_project(p) %></span>
+    <% end %>
+  </div>
+</fieldset>

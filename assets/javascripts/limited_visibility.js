@@ -83,22 +83,25 @@ function update_assigned_to_options() {
   // Hide assignable users if their functions are disabled
   $('#issue_assigned_to_id option').each(function(){
     var user_option = $(this)
-    if(user_option.attr('functional_roles') && $('#involved-roles-form .role').length>0){
-      // Chrome does not support option <style="display: none;">
-      // so we cannot just user_option.hide()
-      if (user_option.parent().prop('tagName') === 'SELECT') {
-        user_option.wrap('<span style="display: none;" />')
-      }
 
-      $('#involved-roles-form .role').each(function() {
-        var element = $(this);
-        if (element.hasClass('involved')) {
-          if (user_option.attr('functional_roles').split(',').indexOf(element.data('role-id').toString()) >= 0){
-            // cannot just user_option.show()
-            user_option.unwrap('span')
-          }
+    if(user_option.attr('selected') != 'selected'){
+        if(user_option.attr('functional_roles') && $('#involved-roles-form .role').length>0){
+            // Chrome does not support option <style="display: none;">
+            // so we cannot just user_option.hide()
+            if (user_option.parent().prop('tagName') === 'SELECT') {
+                user_option.wrap('<span style="display: none;" />')
+            }
+
+            $('#involved-roles-form .role').each(function() {
+                var element = $(this);
+                if (element.hasClass('involved')) {
+                    if (user_option.attr('functional_roles').split(',').indexOf(element.data('role-id').toString()) >= 0){
+                        // cannot just user_option.show()
+                        user_option.unwrap('span')
+                    }
+                }
+            })
         }
-      })
     }
   })
 }

@@ -124,6 +124,43 @@ describe IssuesController, type: :controller do
     expect(issue.assigned_to_id).to be_nil
   end
 
+  it 'requires :change_issue_visibility permission when changing issue visibility' do
+    @request.session[:user_id] = 2 # jsmith - Manager (no change_issue_visibility permission)
+    user = User.current = User.find(2)
+    issue = Issue.first
+    project = issue.project
+    issue.update!(authorized_viewers: "|10|12|")
+
+    expect(user.allowed_to?(:change_issues_visibility, project)).to be_falsey
+    expect {
+      put :update, params: {id: issue.id, issue: { authorized_viewers: "|12|13|" }}
+    }.not_to change { 
+      issue.reload.authorized_viewer_ids
+    }
+    
+    Role.find_by_name("Manager").add_permission!(:change_issues_visibility)
+    user.allowed_to?(:change_issues_visibility, project)
+
+    expect(user.reload.allowed_to?(:change_issues_visibility, project)).to be_truthy
+    expect {
+      put :update, params: {id: issue.id, issue: { authorized_viewers: "|12|13|" }}
+    }.to change { 
+      issue.reload.authorized_viewer_ids
+    }.from([10, 12]).to([12,13])
+  end
+
+  it 'requires no extra permission when changing authorized viewers as an admin' do
+    issue = Issue.first
+    project = issue.project
+
+    expect(User.current.reload.allowed_to?(:change_issues_visibility, project)).to be_truthy
+    expect {
+      put :update, params: {id: issue.id, issue: { authorized_viewers: "|#{contractor_role.id}|" }}
+    }.to change { 
+      issue.reload.authorized_viewer_ids
+    }.from([]).to([contractor_role.id])
+  end
+
   # Test compatibility with the redmine multiprojects_issue plugin
   if Redmine::Plugin.installed?(:redmine_multiprojects_issue)
     describe 'multiprojects_issues' do

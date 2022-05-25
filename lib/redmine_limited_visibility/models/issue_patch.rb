@@ -25,8 +25,8 @@ module RedmineLimitedVisibility
         belongs_to :assigned_function, class_name: "Function",
                 foreign_key: "assigned_to_function_id"
 
-
-        safe_attributes "authorized_viewers", "assigned_to_function_id"
+        safe_attributes "assigned_to_function_id"
+        safe_attributes "authorized_viewers", :if => lambda { |issue, user| user.admin? || user.allowed_to?(:change_issues_visibility, issue.project) }
 
         def involved_users(project)
           if project.module_enabled?("limited_visibility")

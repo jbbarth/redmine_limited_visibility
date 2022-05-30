@@ -12,6 +12,10 @@ describe ProjectsController, :type => :controller do
            :wikis, :wiki_pages, :wiki_contents, :wiki_content_versions,
            :functions, :project_functions, :project_function_trackers
 
+  if Redmine::Plugin.installed?(:redmine_organizations)
+    fixtures :organizations, :organization_functions, :organization_roles
+  end
+
   let(:parent_project) { Project.find(1) }
   let(:function_1) { Function.find(1) }
   # let(:first_parent_member) { parent_project.memberships.first }
@@ -76,6 +80,47 @@ describe ProjectsController, :type => :controller do
 
       assert_select 'a[href=?][onclick=?]', '#', "checkAll('functions-form', true); return false;"
       assert_select 'a[href=?][onclick=?]', '#', "checkAll('functions-form', false); return false;"
+    end
+  end
+
+  describe "copy a project" do
+    let(:source_project) { Project.find(1) }
+
+    it "copy all members" do
+      @request.session[:user_id] = 1 # admin
+      post :copy, :params => {
+        :id => source_project.id,
+        :project => {
+          :name => 'test project',
+          :identifier => 'test-project'
+        },
+        :only => %w(members)
+      }
+      new_pro = Project.last
+
+      expect(new_pro.members.count).to eq(source_project.members.count)
+      expect(new_pro.project_functions.count).to eq(0)
+      expect(new_pro.organization_functions.count).to eq(0)
+    end
+
+    it "copy all functions and organizations of members" do
+      @request.session[:user_id] = 1 # admin
+      post :copy, :params => {
+        :id => source_project.id,
+        :project => {
+          :name => 'test project',
+          :identifier => 'test-project'
+        },
+        :only => %w(members functions functions_organizations_of_members)
+      }
+
+      new_pro = Project.last
+
+      expect(new_pro.members.count).to eq(source_project.members.count)
+      expect(new_pro.project_functions.count).to eq(source_project.project_functions.count)
+      if Redmine::Plugin.installed?(:redmine_organizations)
+        expect(new_pro.organization_functions.count).to eq(source_project.organization_functions.count)
+      end
     end
   end
 end

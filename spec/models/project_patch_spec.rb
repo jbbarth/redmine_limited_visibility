@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Project do
 
   fixtures :users, :roles, :projects, :members, :member_roles, :issues, :issue_statuses,
-           :trackers, :enumerations, :custom_fields, :enabled_modules
+            :trackers, :enumerations, :custom_fields, :enabled_modules
 
   if Redmine::Plugin.installed?(:redmine_organizations)
     fixtures :organizations, :organization_functions, :organization_roles
@@ -23,7 +23,6 @@ describe Project do
 
       expect(@project.memberships.size).to eq @source_project.memberships.size
       expect(@project.organization_functions.size).to eq @source_project.organization_functions.size
-      expect(@project.organization_roles.size).to eq @source_project.organization_roles.size
 
       @project.memberships.each do |membership|
         assert membership

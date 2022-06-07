@@ -52,3 +52,5 @@ en:
   label_copy_settings_from_another_project: "Copy settings from another project"
   label_select_project: "Select a project"
   label_no_other_project_configured_for_moment: "No other project is configured for the moment"
+  label_functions_organizations_of_members: "Functions and organizations of members"
+  label_functions_of_members: "Functions of members"

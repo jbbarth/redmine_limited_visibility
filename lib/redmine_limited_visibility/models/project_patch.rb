@@ -9,7 +9,7 @@ class Project
   has_many :organization_functions if Redmine::Plugin.installed?(:redmine_organizations)
 
   after_save :remove_inherited_member_functions, :add_inherited_member_functions,
-             :if => Proc.new { |project| project.saved_change_to_parent_id? }
+              :if => Proc.new { |project| project.saved_change_to_parent_id? }
 
   # Add patches to core method
   def update_inherited_members
@@ -114,54 +114,65 @@ class Project
     end
   end
 
-  # Copies members from +project+
-  def copy_members(project)
-
-    # Copy users first, then groups to handle members with inherited and given roles
-    members_to_copy = []
-    members_to_copy += project.memberships.select { |m| m.principal.is_a?(User) }
-    members_to_copy += project.memberships.select { |m| !m.principal.is_a?(User) }
-
-    members_to_copy.each do |member|
-      new_member = Member.new
-      new_member.attributes = member.attributes.dup.except("id", "project_id", "created_on")
-      # only copy non inherited roles
-      # inherited roles will be added when copying the group membership
-      role_ids = member.member_roles.reject(&:inherited?).collect(&:role_id)
-      next if role_ids.empty?
-      new_member.role_ids = role_ids
-
-      ### TODO: Refactor this patch and use Module#prepend in order to keep untouched the original 'copy_members' method
-      ### Start
-      function_ids = member.member_functions.map(&:function_id)
-      new_member.function_ids = function_ids
-      ### End of the patch
-
-      new_member.project = self
-      self.members << new_member
-    end
-
-    ### Patch - Restart
-    self.functions = project.project_functions.map(&:function)
-
-    # Only if organization plugin is installed
-    if Redmine::Plugin.installed?(:redmine_organizations)
-      orga_functions_to_copy = project.organization_functions
-      orga_functions_to_copy.each do |orga_function|
-        new_orga_function = OrganizationFunction.new
-        new_orga_function.attributes = orga_function.attributes.dup.except("id", "project_id")
-        self.organization_functions << new_orga_function
-      end
-
-      orga_roles_to_copy = project.organization_roles
-      orga_roles_to_copy.each do |orga_role|
-        new_orga_role = OrganizationRole.new
-        new_orga_role.attributes = orga_role.attributes.dup.except("id", "project_id")
-        self.organization_roles << new_orga_role
-      end
-    end
-    ### End of the patch
-
-  end
-
 end
+
+module PluginLimitedVisibility
+  module ProjectPatch
+    # Copies members from +project+
+    def copy_functions_organizations_of_members(project)
+      self.members.each do |member|
+        m_project_origin =  Member.where(user_id: member.user_id , project_id: project.id)
+        member.function_ids = m_project_origin[0].member_functions.map(&:function_id)
+      end
+
+      # Only if organization plugin is installed
+      if Redmine::Plugin.installed?(:redmine_organizations)
+        orga_functions_to_copy = project.organization_functions
+        orga_functions_to_copy.each do |orga_function|
+          new_orga_function = OrganizationFunction.new
+          new_orga_function.attributes = orga_function.attributes.dup.except("id", "project_id")
+          self.organization_functions << new_orga_function
+        end
+      end
+    end
+
+    def copy_functions(project)
+      self.project_functions = []
+      project.project_functions.each do |pf|
+        new_pf = ProjectFunction.new
+        new_pf.attributes = pf.attributes.dup.except("id", "project_id")
+        pf.project_function_trackers.each do |pft|
+          new_pft = ProjectFunctionTracker.new
+          new_pft.attributes = pft.attributes.dup.except("id", "project_function_id")
+          new_pf.project_function_trackers << new_pft
+        end
+        self.project_functions << new_pf
+      end
+      self.autochecked_functions_mode = project.autochecked_functions_mode
+    end
+
+    def copy(project, options={})
+      super
+      project = project.is_a?(Project) ? project : Project.find(project)
+
+      to_be_copied = %w(functions functions_organizations_of_members)
+
+      to_be_copied = to_be_copied & Array.wrap(options[:only]) unless options[:only].nil?
+
+      Project.transaction do
+        if save
+          reload
+
+          to_be_copied.each do |name|
+            send "copy_#{name}", project
+          end
+
+          save
+        else
+          false
+        end
+      end
+    end
+  end
+end
+Project.prepend PluginLimitedVisibility::ProjectPatch

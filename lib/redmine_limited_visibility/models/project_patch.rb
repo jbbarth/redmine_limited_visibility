@@ -3,13 +3,18 @@ require_dependency 'project'
 class Project
 
   has_many :project_functions, :dependent => :destroy
-  has_many :functions, :through => :project_functions
+  has_many :functions, :through => :project_functions, :before_remove => :update_project_function_trackers
   has_many :project_function_trackers, :through => :project_functions
 
-  has_many :organization_functions if Redmine::Plugin.installed?(:redmine_organizations)
+  has_many :organization_functions, :dependent => :destroy if Redmine::Plugin.installed?(:redmine_organizations)
 
   after_save :remove_inherited_member_functions, :add_inherited_member_functions,
               :if => Proc.new { |project| project.saved_change_to_parent_id? }
+
+  def update_project_function_trackers(obj)
+    id = ProjectFunction.where(function_id: obj.id, project_id: self.id).map(&:id)
+    ProjectFunctionTracker.where(project_function_id: id).delete_all
+  end
 
   # Add patches to core method
   def update_inherited_members
@@ -112,6 +117,22 @@ class Project
       end
       h
     end
+  end
+
+  # Deletes all project's members
+  def delete_all_members
+    me, mr = Member.table_name, MemberRole.table_name
+    self.class.connection.delete(
+      "DELETE FROM #{mr} WHERE #{mr}.member_id IN (SELECT #{me}.id FROM #{me} " \
+        "WHERE #{me}.project_id = #{id})"
+    )
+    # start Patch
+    Member.where(:project_id => id).each do |member|
+      member.member_functions.delete_all
+      member.delete
+    end
+    #Member.where(:project_id => id).delete_all
+    # end Patch
   end
 
 end

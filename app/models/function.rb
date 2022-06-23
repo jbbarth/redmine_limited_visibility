@@ -10,6 +10,7 @@ class Function < ActiveRecord::Base
   has_many :members, :through => :member_functions
 
   has_many :project_functions, :dependent => :destroy
+  has_many :organization_functions, :dependent => :destroy  if Redmine::Plugin.installed?(:redmine_organizations)
   has_many :projects, :through => :project_functions
 
   after_create :set_own_visibility,

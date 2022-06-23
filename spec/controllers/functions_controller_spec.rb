@@ -69,6 +69,13 @@ describe FunctionsController, type: :controller do
       expect(project.reload.autochecked_functions_mode).to eq "2"
     end
 
+    it "update the table ProjectFunctionTracker" do
+      expect do
+        put :available_functions_per_project, params: { project_id: Project.find(1).id, autocheck_mode: "2", function_ids: ["1"] }
+      end.to change(ProjectFunction, :count).by(-1)
+      .and change(ProjectFunctionTracker, :count).by(-2)
+    end
+
     it "updates autocheck_mode without changing functions" do
       expect do
         put :available_functions_per_project, params: { project_id: 2, autocheck_mode: "2" }

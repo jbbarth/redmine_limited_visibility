@@ -11,13 +11,13 @@ project_function_trackers_002:
   tracker_id: 2
   visible: false
   checked: false
-project_function_trackers_001:
+project_function_trackers_003:
   id: 3
   project_function_id: 2
   tracker_id: 1
   visible: false
   checked: false
-project_function_trackers_002:
+project_function_trackers_004:
   id: 4
   project_function_id: 2
   tracker_id: 2

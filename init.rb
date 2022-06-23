@@ -21,6 +21,7 @@ ActiveSupport::Reloader.to_prepare do
   require_dependency 'redmine_limited_visibility/models/user_patch'
   require_dependency 'redmine_limited_visibility/models/role_patch'
   require_dependency 'redmine_limited_visibility/models/project_patch'
+  require_dependency 'redmine_limited_visibility/models/tracker_patch'
 
   if Redmine::Plugin.installed?(:redmine_organizations)
     require_dependency 'redmine_limited_visibility/models/organization_patch'

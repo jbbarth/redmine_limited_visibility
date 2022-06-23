@@ -53,9 +53,7 @@ describe Project do
     it "when deleting a project" do
       expect do
         project.destroy
-      end.to change { OrganizationFunction.count }.by(-2)
-      .and change { OrganizationRole.count }.by(-2)
-      .and change { MemberFunction.count }.by(-2)
+      end.to change { MemberFunction.count }.by(-2)
       .and change { ProjectFunction.count }.by(-2)
       .and change { ProjectFunctionTracker.count }.by(-4)
     end
@@ -63,8 +61,7 @@ describe Project do
     it "when deleting a function" do
       expect do
         function.destroy
-      end.to change { OrganizationFunction.count }.by(-1)
-      .and change { ProjectFunction.count }.by(-1)
+      end.to change { ProjectFunction.count }.by(-1)
       .and change { MemberFunction.count }.by(-1)
       .and change { ProjectFunctionTracker.count }.by(-2)
     end
@@ -86,6 +83,19 @@ describe Project do
     end
 
     if Redmine::Plugin.installed?(:redmine_organizations)
+      it "when deleting a project if redmine_organizations is installed" do
+        expect do
+          project.destroy
+        end.to change { OrganizationFunction.count }.by(-2)
+        .and change { OrganizationRole.count }.by(-2)
+      end
+
+      it "when deleting a function if redmine_organizations is installed" do
+        expect do
+          function.destroy
+        end.to change { OrganizationFunction.count }.by(-1)
+      end
+
       it "when deleting a organization" do
         organization =  Organization.find(1)
         expect do

@@ -191,7 +191,7 @@ module PluginLimitedVisibility
       when "mine" # only my functional roles
         sql = sql_conditions_for_functions_per_projects(field)
       when "=", "!"
-        sql = value.map { |role| "#{Issue.table_name}.#{field} #{operator == "!" ? 'NOT' : ''} LIKE '%|#{role}|%' " }.join(" OR ")
+        sql = value.map { |role| "#{Issue.table_name}.#{field} #{operator == "!" ? 'NOT' : ''} LIKE '%|#{role}|%' " }.join(operator == "!" ? " AND " : " OR ")
       else
         raise "unsupported value for authorized_viewers field: '#{operator}'"
       end

@@ -3,7 +3,7 @@ require_dependency 'issue_query'
 class IssueQuery < Query
 
   self.operators.merge!({ "mine" => :label_my_roles })
-  self.operators_by_filter_type.merge!({ :list_visibility => ["mine", "*"] })
+  self.operators_by_filter_type.merge!({ :list_visibility => ["mine", "*", "=", "!"] })
   self.available_columns << QueryColumn.new(:authorized_viewers, sortable: "#{Issue.table_name}.authorized_viewers", groupable: true) if self.available_columns.select { |c| c.name == :authorized_viewers }.empty?
   self.available_columns << QueryColumn.new(:has_been_assigned_to, :sortable => lambda { User.fields_for_order_statement }, :groupable => true) if self.available_columns.select { |c| c.name == :has_been_assigned_to }.empty?
   self.available_columns << QueryColumn.new(:has_been_visible_by, :sortable => false, :groupable => true) if self.available_columns.select { |c| c.name == :has_been_visible_by }.empty?
@@ -24,9 +24,9 @@ module PluginLimitedVisibility
       super
 
       if project.present?
-        all_functions = project.functions.map { |s| [s.name, s.id.to_s] }
+        all_functions = project.functions.sorted.map { |s| [s.name, s.id.to_s] }
       else
-        all_functions = Function.all.map { |s| [s.name, s.id.to_s] }
+        all_functions = Function.sorted.map { |s| [s.name, s.id.to_s] }
       end
 
       add_available_filter "authorized_viewers", type: :list_visibility, values: all_functions
@@ -190,8 +190,8 @@ module PluginLimitedVisibility
         sql = "" # no filter
       when "mine" # only my functional roles
         sql = sql_conditions_for_functions_per_projects(field)
-        # when "=", "!"
-        #  sql = value.map { |role| "#{Issue.table_name}.#{field} #{operator == "!" ? 'NOT' : ''} LIKE '%|#{role}|%' " }.join(" OR ")
+      when "=", "!"
+        sql = value.map { |role| "#{Issue.table_name}.#{field} #{operator == "!" ? 'NOT' : ''} LIKE '%|#{role}|%' " }.join(" OR ")
       else
         raise "unsupported value for authorized_viewers field: '#{operator}'"
       end

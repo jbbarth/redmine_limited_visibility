@@ -158,3 +158,76 @@ function updateIssueAndResetVisibilityFrom(url, el) {
     data: $($("#issue-form")[0].elements).not("#authorized_viewers").serialize()
   });
 }
+
+function buildListVisibilityFilterRow(field, operator, values) {
+    // Case filterOptions['type'] == 'list_visiblity'
+
+    var fieldId = field.replace('.', '_');
+    var filterTable = $("#filters-table");
+    var filterOptions = availableFilters[field];
+    if (!filterOptions) return;
+    var operators = operatorByType[filterOptions['type']];
+    var filterValues = filterOptions['values'];
+    var i, select;
+
+    var tr = $('<tr class="filter">').attr('id', 'tr_' + fieldId).html(
+        '<td class="field"><input checked="checked" id="cb_' + fieldId + '" name="f[]" value="' + field + '" type="checkbox"><label for="cb_' + fieldId + '"> ' + filterOptions['name'] + '</label></td>' +
+        '<td class="operator"><select id="operators_' + fieldId + '" name="op[' + field + ']"></td>' +
+        '<td class="values"></td>'
+    );
+    filterTable.append(tr);
+
+    select = tr.find('td.operator select');
+    for (i = 0; i < operators.length; i++) {
+        var option = $('<option>').val(operators[i]).text(operatorLabels[operators[i]]);
+        if (operators[i] == operator) {
+            option.prop('selected', true);
+        }
+        select.append(option);
+    }
+    select.change(function () {
+            var fieldId = field.replace('.', '_');
+            var operator = $("#operators_" + fieldId);
+            if (operator.val() == 'mine') {
+                enableValues(field, []);
+            } else {
+                toggleOperator(field);
+            }
+        }
+    );
+
+    tr.find('td.values').append(
+        '<span style="display:none;"><select class="value" id="values_' + fieldId + '_1" name="v[' + field + '][]"></select>' +
+        ' <span class="toggle-multiselect icon-only ' + (values.length > 1 ? 'icon-toggle-minus' : 'icon-toggle-plus') + '">&nbsp;</span></span>'
+    );
+    select = tr.find('td.values select');
+    if (values.length > 1) {
+        select.attr('multiple', true);
+    }
+    for (i = 0; i < filterValues.length; i++) {
+        var filterValue = filterValues[i];
+        var option = $('<option>');
+        if ($.isArray(filterValue)) {
+            option.val(filterValue[1]).text(filterValue[0]);
+            if ($.inArray(filterValue[1], values) > -1) {
+                option.prop('selected', true);
+            }
+            if (filterValue.length == 3) {
+                var optgroup = select.find('optgroup').filter(function () {
+                    return $(this).attr('label') == filterValue[2]
+                });
+                if (!optgroup.length) {
+                    optgroup = $('<optgroup>').attr('label', filterValue[2]);
+                }
+                option = optgroup.append(option);
+            }
+        } else {
+            option.val(filterValue).text(filterValue);
+            if ($.inArray(filterValue, values) > -1) {
+                option.prop('selected', true);
+            }
+        }
+        select.append(option);
+    }
+
+}

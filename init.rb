@@ -12,6 +12,7 @@ ActiveSupport::Reloader.to_prepare do
   require_dependency 'redmine_limited_visibility/helpers/issues_pdf_helper_patch'
   require_dependency 'redmine_limited_visibility/helpers/projects_helper_patch'
   require_dependency 'redmine_limited_visibility/controllers/roles_controller_patch'
+  require_dependency 'redmine_limited_visibility/controllers/users_controller_patch'
 
   require_dependency 'redmine_limited_visibility/controllers/issues_controller_patch'
 

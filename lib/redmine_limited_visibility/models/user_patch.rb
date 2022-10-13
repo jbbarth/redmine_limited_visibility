@@ -25,6 +25,16 @@ class User < Principal
       end
     end
 
+    # Organization Non Member Exceptions
+    if Redmine::Plugin.installed?(:redmine_organizations)
+      if self.organization
+        OrganizationNonMemberFunction.where(:organization => self.organization).each do |onmf|
+          hash[onmf.function] = [] unless hash.key?(onmf.function)
+          hash[onmf.function] << onmf.project
+        end
+      end
+    end
+
     hash.each do |function, projects|
       projects.uniq!
     end
@@ -48,6 +58,15 @@ class User < Principal
     members.each do |member|
       if member.functions.blank?
         @projects_without_function << member.project
+      end
+    end
+
+    # Organization Non Member Exceptions
+    if Redmine::Plugin.installed?(:redmine_organizations)
+      if self.organization
+        organizations_non_member_projects = OrganizationNonMemberRole.where(:organization => self.organization).map(&:project)
+        organizations_non_member_projects -= OrganizationNonMemberFunction.where(:organization => self.organization).map(&:project)
+        @projects_without_function |= organizations_non_member_projects
       end
     end
 

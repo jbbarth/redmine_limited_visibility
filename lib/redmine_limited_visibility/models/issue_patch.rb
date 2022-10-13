@@ -23,7 +23,7 @@ module RedmineLimitedVisibility
       base.class_eval do
 
         belongs_to :assigned_function, class_name: "Function",
-                foreign_key: "assigned_to_function_id"
+                   foreign_key: "assigned_to_function_id"
 
         safe_attributes "assigned_to_function_id"
         safe_attributes "authorized_viewers" #, :if => lambda { |issue, user| user.admin? || user.allowed_to?(:change_issues_visibility, issue.project) } TODO Complete this check: users may also set visibility when they have no permissions (using a issue-template for instance)
@@ -35,11 +35,16 @@ module RedmineLimitedVisibility
                                                            :member_functions => { :function_id => authorized_viewer_ids })
 
             members_without_functions = Member.includes(:user)
-                                            .where(:members => { :project_id => project.id })
-                                            .reject{|m| m.member_functions.present?}
+                                              .where(:members => { :project_id => project.id })
+                                              .reject { |m| m.member_functions.present? }
             users_without_functions = members_without_functions.map(&:user).reject(&:blank?)
 
-            users_involved_by_their_functions | users_without_functions
+            organization_non_members_with_authorization = OrganizationNonMemberFunction.where(function_id: authorized_viewer_ids,
+                                                                                              project_id: project.id)
+                                                                                       .map(&:organization)
+            users_non_members_but_authorized = User.where(organization: organization_non_members_with_authorization)
+
+            users_involved_by_their_functions | users_without_functions | users_non_members_but_authorized
           else
             all_members = User.joins(:members).where(:members => { :project_id => project.id })
             all_members

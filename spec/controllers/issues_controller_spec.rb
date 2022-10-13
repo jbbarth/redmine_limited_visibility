@@ -34,6 +34,8 @@ describe IssuesController, type: :controller do
            :changesets,
            :watchers, :groups_users
 
+  fixtures :organizations if Redmine::Plugin.installed?(:redmine_organizations)
+
   let(:contractor_role) { Function.where(name: "Contractors").first_or_create }
   let(:project_office_role) { Function.where(name: "Project Office").first_or_create }
 
@@ -251,6 +253,57 @@ describe IssuesController, type: :controller do
       get :new
       expect(response.body).to include("icon-only icon-help")
       assert_select "a[class='icon-only icon-help']"
+    end
+  end
+
+  if Redmine::Plugin.installed?(:redmine_organizations)
+    describe 'issues visibility through OrganizationNonMemberFunctions' do
+
+      # User 7 does not belongs to any project
+      let!(:query) { IssueQuery.create!(name: "new-query",
+                                        user: User.find(7),
+                                        visibility: 2,
+                                        project: nil) }
+      let!(:issue4) { Issue.find(4) }
+      let!(:issue7) { Issue.find(7) }
+
+      before do
+        @request.session[:user_id] = 7
+        User.current = User.find(7)
+
+        issue4.project.enable_module!("limited_visibility")
+        issue4.update_attribute(:authorized_viewers, "|#{project_office_role.id}|")
+
+        issue7.project.enable_module!("limited_visibility")
+        issue7.update_attribute(:authorized_viewers, "|#{contractor_role.id}|")
+
+        query.filters.merge!({ "authorized_viewers" => { :operator => "mine", :values => [""] } })
+        query.save!
+      end
+
+      it 'does not show issues when user has not the right function' do
+        get :index, params: { query_id: query.id }
+        expect(assigns(:issues)).to_not be_nil
+        expect(assigns(:issues)).to_not be_empty
+        expect(assigns(:issues)).to_not include issue4
+        expect(assigns(:issues)).to_not include issue7
+      end
+
+      it 'shows issues when user is non member with correct function' do
+        User.current.update_attribute(:organization_id, 1)
+        OrganizationNonMemberRole.create!(organization_id: 1,
+                                          role_id: contractor_role.id,
+                                          project_id: issue7.project_id)
+        OrganizationNonMemberFunction.create!(organization_id: 1,
+                                              function_id: contractor_role.id,
+                                              project_id: issue7.project_id)
+
+        get :index, params: { query_id: query.id }
+        expect(assigns(:issues)).to_not be_nil
+        expect(assigns(:issues)).to_not be_empty
+        expect(assigns(:issues)).to_not include issue4
+        expect(assigns(:issues)).to include issue7
+      end
     end
   end
 

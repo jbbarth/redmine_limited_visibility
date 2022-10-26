@@ -10,12 +10,12 @@ class User < Principal
 
     group_class = anonymous? ? GroupAnonymous : GroupNonMember
     members = Member.joins(:project, :principal).
-        where("#{Project.table_name}.status <> 9").
-        where("#{Member.table_name}.user_id = ? OR (#{Project.table_name}.is_public = ? AND #{Principal.table_name}.type = ?)", self.id, true, group_class.name).
-        preload(:project, :functions).
-        to_a
+      where("#{Project.table_name}.status <> 9").
+      where("#{Member.table_name}.user_id = ? OR (#{Project.table_name}.is_public = ? AND #{Principal.table_name}.type = ?)", self.id, true, group_class.name).
+      preload(:project, :functions).
+      to_a
 
-    members.reject! {|member| member.user_id != id && project_ids.include?(member.project_id)}
+    members.reject! { |member| member.user_id != id && project_ids.include?(member.project_id) }
     members.each do |member|
       if member.project
         member.functions.each do |function|
@@ -49,12 +49,12 @@ class User < Principal
 
     group_class = anonymous? ? GroupAnonymous : GroupNonMember
     members = Member.joins(:project, :principal).
-        where("#{Project.table_name}.status <> 9").
-        where("#{Member.table_name}.user_id = ? OR (#{Project.table_name}.is_public = ? AND #{Principal.table_name}.type = ?)", self.id, true, group_class.name).
-        preload(:project, :functions).
-        to_a
+      where("#{Project.table_name}.status <> 9").
+      where("#{Member.table_name}.user_id = ? OR (#{Project.table_name}.is_public = ? AND #{Principal.table_name}.type = ?)", self.id, true, group_class.name).
+      preload(:project, :functions).
+      to_a
 
-    members.reject! {|member| member.user_id != id && project_ids.include?(member.project_id)}
+    members.reject! { |member| member.user_id != id && project_ids.include?(member.project_id) }
     members.each do |member|
       if member.functions.blank?
         @projects_without_function << member.project
@@ -70,6 +70,7 @@ class User < Principal
       end
     end
 
+    @projects_without_function.reject!(&:blank?)
     @projects_without_function.uniq!
 
     return @projects_without_function

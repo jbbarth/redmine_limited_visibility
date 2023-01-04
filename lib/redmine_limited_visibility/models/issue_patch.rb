@@ -30,21 +30,27 @@ module RedmineLimitedVisibility
 
         def involved_users(project)
           if project.module_enabled?("limited_visibility")
+            # Members involved by their functions
             users_involved_by_their_functions = User.joins(:members => :member_functions)
                                                     .where(:members => { :project_id => project.id },
                                                            :member_functions => { :function_id => authorized_viewer_ids })
 
+            # Members without functions
             members_without_functions = Member.includes(:user)
                                               .where(:members => { :project_id => project.id })
                                               .reject { |m| m.member_functions.present? }
             users_without_functions = members_without_functions.map(&:user).reject(&:blank?)
 
-            organization_non_members_with_authorization = OrganizationNonMemberFunction.where(function_id: authorized_viewer_ids,
-                                                                                              project_id: project.id)
-                                                                                       .map(&:organization)
-            users_non_members_but_authorized = User.where(organization: organization_non_members_with_authorization)
+            if Redmine::Plugin.installed?(:redmine_organizations)
+              # NonMembers in an Organization which has an exception for this project
+              organization_non_members_with_authorization = Organization.joins(:organization_non_member_functions)
+                                                                        .where("organization_non_member_functions.function_id IN (?)", authorized_viewer_ids)
+                                                                        .where("organization_non_member_functions.project_id = ?", project.id)
+                                                                        .uniq.map(&:self_and_descendants).flatten
+              users_non_members_but_authorized = User.where(organization: organization_non_members_with_authorization)
+            end
 
-            users_involved_by_their_functions | users_without_functions | users_non_members_but_authorized
+            users_involved_by_their_functions | users_without_functions | users_non_members_but_authorized.to_a
           else
             all_members = User.joins(:members).where(:members => { :project_id => project.id })
             all_members

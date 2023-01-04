@@ -3,6 +3,7 @@ require_dependency 'organization'
 class Organization < ActiveRecord::Base
 
   has_many :organization_functions, :dependent => :destroy
+  has_many :organization_non_member_functions, :dependent => :destroy
 
   def functions
     Function.joins(:member_functions => {:member => :project})

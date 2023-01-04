@@ -54,7 +54,7 @@ describe ProjectsController, :type => :controller do
   describe "GET /projects" do
     it "should project#show show icon View all functions activated description" do
       @request.session[:user_id] = 1
-      #set a description in the first two functions 
+      # set a description in the first two functions
       Function.find(1).update_attribute :description, 'desforfunction1'
       Function.find(2).update_attribute :description, 'desforfunction2'
 
@@ -107,7 +107,7 @@ describe ProjectsController, :type => :controller do
 
     it "copy all functions and organizations of members" do
       @request.session[:user_id] = 1 # admin
-      pft = source_project.project_function_trackers.first
+      pft = source_project.project_function_trackers.where(tracker_id: 1).first
       pft.visible = true
       pft.save
       post :copy, :params => {
@@ -119,15 +119,14 @@ describe ProjectsController, :type => :controller do
         :only => %w(members functions functions_organizations_of_members)
       }
 
-      new_pro = Project.last
-
-      expect(new_pro.project_function_trackers.first.visible).to eq(true)
-      expect(new_pro.members.count).to eq(source_project.members.count)
-      expect(new_pro.project_functions.count).to eq(source_project.project_functions.count)
-      expect(new_pro.project_functions.first.authorized_viewers).to eq('|1|2|')
-      expect(new_pro.project_functions.second.authorized_viewers).to eq('|2|')
+      new_project = Project.last
+      expect(new_project.project_function_trackers.where(tracker_id: 1).first.visible).to eq(true)
+      expect(new_project.members.count).to eq(source_project.members.count)
+      expect(new_project.project_functions.count).to eq(source_project.project_functions.count)
+      expect(new_project.project_functions.first.authorized_viewers).to eq('|1|2|')
+      expect(new_project.project_functions.second.authorized_viewers).to eq('|2|')
       if Redmine::Plugin.installed?(:redmine_organizations)
-        expect(new_pro.organization_functions.count).to eq(source_project.organization_functions.count)
+        expect(new_project.organization_functions.count).to eq(source_project.organization_functions.count)
       end
     end
   end

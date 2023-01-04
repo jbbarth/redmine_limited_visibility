@@ -71,9 +71,9 @@ module LimitedVisibilityHelper
     s = ''
     if @issue.project.present?
       if @issue.project.module_enabled?("limited_visibility")
-        functional_roles_ids = Function.available_functions_for(issue.project).sorted.pluck(:id)
-        functional_roles_ids.each do |function_id|
-          s << content_tag('option', "#{Function.find(function_id).name}", :value => "function-#{function_id}", :selected => (option_value_selected?(function_id, selected) || function_id == selected))
+        functional_roles = Function.available_functions_for(issue.project).sorted
+        functional_roles.each do |function|
+          s << content_tag('option', "#{function.name}", :value => "function-#{function.id}", :selected => (option_value_selected?(function.id, selected) || function.id == selected))
         end
         s << "<option disabled>──────────────</option>"
       end

@@ -205,6 +205,7 @@ module PluginLimitedVisibility
                                       Member.maximum(:id),
                                       MemberFunction.maximum(:id),
                                       Project.maximum(:updated_on),
+                                      OrganizationNonMemberFunction.maximum(:id),
                                       (Time.now.strftime("%Y%m%d%H").to_i)].join('/') do
 
         projects_by_function = User.current.projects_by_function

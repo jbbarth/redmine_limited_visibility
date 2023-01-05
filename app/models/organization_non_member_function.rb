@@ -10,6 +10,6 @@ class OrganizationNonMemberFunction < ActiveRecord::Base
 
   safe_attributes :function_id, :project_id, :organization_id
 
-  scope :for_project, ->(project) { where("organization_non_member_functions.project_id = ?", project.id) if project.present? }
+  scope :for_project, ->(project) { where("organization_non_member_functions.project_id IN (?)", project.self_and_ancestors.ids) if project.present? }
 
 end

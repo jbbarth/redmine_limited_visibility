@@ -5,6 +5,7 @@ class Project
   has_many :project_functions, :dependent => :destroy
   has_many :functions, :through => :project_functions, :before_remove => :update_project_function_trackers
   has_many :project_function_trackers, :through => :project_functions
+  has_many :organization_non_member_functions, :dependent => :destroy
 
   has_many :organization_functions, :dependent => :destroy if Redmine::Plugin.installed?(:redmine_organizations)
 

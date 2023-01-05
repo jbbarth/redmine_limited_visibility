@@ -36,8 +36,8 @@ describe IssuesController, type: :controller do
 
   fixtures :organizations if Redmine::Plugin.installed?(:redmine_organizations)
 
-  let(:contractor_role) { Function.where(name: "Contractors").first_or_create }
-  let(:project_office_role) { Function.where(name: "Project Office").first_or_create }
+  let(:contractor_function) { Function.where(name: "Contractors").first_or_create }
+  let(:project_office_function) { Function.where(name: "Project Office").first_or_create }
 
   before do
     @request.session[:user_id] = 1
@@ -48,11 +48,11 @@ describe IssuesController, type: :controller do
     @project2.enable_module!("limited_visibility")
     @membership = Member.new(user_id: User.current.id, project_id: @project.id)
     @membership.roles << Role.first
-    @membership.functions << contractor_role
+    @membership.functions << contractor_function
     @membership.save!
     @membership2 = Member.new(user_id: User.current.id, project_id: @project2.id)
     @membership2.roles << Role.first
-    @membership2.functions << project_office_role
+    @membership2.functions << project_office_function
     @membership2.save!
     expect(User.current.member_of?(@project)).to be true
     expect(User.current.member_of?(@project2)).to be true
@@ -101,8 +101,8 @@ describe IssuesController, type: :controller do
     expect(issue2).to_not be_nil
 
     # check if authorized_viewers match user visibility
-    issue1.update_attribute(:authorized_viewers, "|#{contractor_role.id}|") # User visibility role
-    issue2.update_attribute(:authorized_viewers, "|#{project_office_role.id}|") # Current user does not match this role
+    issue1.update_attribute(:authorized_viewers, "|#{contractor_function.id}|") # User visibility role
+    issue2.update_attribute(:authorized_viewers, "|#{project_office_function.id}|") # Current user does not match this role
     q.filters.merge!({ "authorized_viewers" => { :operator => "mine", :values => [""] } })
     q.save!
     get :index, params: { query_id: q.id }
@@ -133,10 +133,10 @@ describe IssuesController, type: :controller do
   it 'assigned the issue to a functional role' do
     issue = Issue.first
 
-    put :update, params: { id: issue.id, issue: { assigned_to_id: "function-#{contractor_role.id}" } }
+    put :update, params: { id: issue.id, issue: { assigned_to_id: "function-#{contractor_function.id}" } }
 
     issue.reload
-    expect(issue.assigned_to_function_id).to eq contractor_role.id
+    expect(issue.assigned_to_function_id).to eq contractor_function.id
     expect(issue.assigned_to_id).to be_nil
   end
 
@@ -145,7 +145,7 @@ describe IssuesController, type: :controller do
     @project.enabled_module_names -= ['limited_visibility']
     expect(issue.assigned_to_id).to be_nil
 
-    put :update, params: { id: issue.id, issue: { assigned_to_id: "function-#{contractor_role.id}" } }
+    put :update, params: { id: issue.id, issue: { assigned_to_id: "function-#{contractor_function.id}" } }
 
     issue.reload
     expect(issue.assigned_to_function_id).to be_nil
@@ -184,10 +184,10 @@ describe IssuesController, type: :controller do
 
     expect(User.current.reload.allowed_to?(:change_issues_visibility, project)).to be_truthy
     expect {
-      put :update, params: { id: issue.id, issue: { authorized_viewers: "|#{contractor_role.id}|" } }
+      put :update, params: { id: issue.id, issue: { authorized_viewers: "|#{contractor_function.id}|" } }
     }.to change {
       issue.reload.authorized_viewer_ids
-    }.from([]).to([contractor_role.id])
+    }.from([]).to([contractor_function.id])
   end
 
   # Test compatibility with the redmine multiprojects_issue plugin
@@ -206,8 +206,8 @@ describe IssuesController, type: :controller do
         @issue2.projects = [@project2] # issue2 becomes multi-project
 
         # check if authorized_viewers match user visibility
-        @issue1.update_attribute(:authorized_viewers, "|#{contractor_role.id}|") # User visibility role
-        @issue2.update_attribute(:authorized_viewers, "|#{project_office_role.id}|") # Current user does not match this role
+        @issue1.update_attribute(:authorized_viewers, "|#{contractor_function.id}|") # User visibility role
+        @issue2.update_attribute(:authorized_viewers, "|#{project_office_function.id}|") # Current user does not match this role
         @query.filters.merge!({ "authorized_viewers" => { :operator => "mine", :values => [""] } })
         @query.save!
       end
@@ -220,7 +220,7 @@ describe IssuesController, type: :controller do
       end
 
       it 'displays no issue when the user has NOT the specific function' do
-        @membership2.functions = [contractor_role]
+        @membership2.functions = [contractor_function]
         get :index, params: { query_id: @query.id }
         expect(assigns(:issues)).to_not be_nil
         expect(assigns(:issues)).to include @issue1
@@ -272,10 +272,10 @@ describe IssuesController, type: :controller do
         User.current = User.find(7)
 
         issue4.project.enable_module!("limited_visibility")
-        issue4.update_attribute(:authorized_viewers, "|#{project_office_role.id}|")
+        issue4.update_attribute(:authorized_viewers, "|#{project_office_function.id}|")
 
         issue7.project.enable_module!("limited_visibility")
-        issue7.update_attribute(:authorized_viewers, "|#{contractor_role.id}|")
+        issue7.update_attribute(:authorized_viewers, "|#{contractor_function.id}|")
 
         query.filters.merge!({ "authorized_viewers" => { :operator => "mine", :values => [""] } })
         query.save!
@@ -292,10 +292,10 @@ describe IssuesController, type: :controller do
       it 'shows issues when user is non member with correct function' do
         User.current.update_attribute(:organization_id, 1)
         OrganizationNonMemberRole.create!(organization_id: 1,
-                                          role_id: contractor_role.id,
+                                          role_id: Role.first.id,
                                           project_id: issue7.project_id)
         OrganizationNonMemberFunction.create!(organization_id: 1,
-                                              function_id: contractor_role.id,
+                                              function_id: contractor_function.id,
                                               project_id: issue7.project_id)
 
         get :index, params: { query_id: query.id }
@@ -303,6 +303,85 @@ describe IssuesController, type: :controller do
         expect(assigns(:issues)).to_not be_empty
         expect(assigns(:issues)).to_not include issue4
         expect(assigns(:issues)).to include issue7
+      end
+
+      it 'does not shows issues when user has permissions on project but not the right function' do
+        User.current.update_attribute(:organization_id, 1)
+        OrganizationNonMemberRole.create!(organization_id: 1,
+                                          role_id: Role.first.id,
+                                          project_id: issue4.project_id)
+        OrganizationNonMemberFunction.create!(organization_id: 1,
+                                              function_id: project_office_function.id,
+                                              project_id: issue7.project_id)
+
+        get :index, params: { query_id: query.id }
+        expect(assigns(:issues)).to_not be_nil
+        expect(assigns(:issues)).to_not include issue4
+        expect(assigns(:issues)).to_not include issue7
+      end
+
+      context "non-member exception has a specific function" do
+
+        let!(:function_1) { Function.find_or_create_by!(name: "function_1") }
+        let!(:function_2) { Function.find_or_create_by!(name: "function_2") }
+        let!(:issue_4) { Issue.find(4) }
+        let!(:non_member_user) {
+          user = User.new(login: 'non-member.user',
+                          firstname: 'non-member',
+                          lastname: "user")
+          user.mail = "non-member.user@somenet.foo"
+          user.organization_id = 3
+          user.save!
+          user
+        }
+        let!(:project_onlinestore) { Project.find('onlinestore') }
+        let!(:role_reporter) { Role.find(3) }
+        let!(:orga_a) { Organization.find(1) }
+        let!(:orga_a_team_b) { Organization.find(3) }
+        let!(:project_ecookbook) { Project.find(1) }
+
+        before do
+          @request.session[:user_id] = non_member_user.id
+          User.current = non_member_user
+          OrganizationNonMemberRole.find_or_create_by!(organization: orga_a, role: role_reporter, project: project_onlinestore)
+          Role.where(id: 4).each { |r| r.permissions.each { |p| r.permissions.delete(p.to_sym) }; r.save!; }
+
+          expect(OrganizationNonMemberRole.count).to eq(1)
+          OrganizationNonMemberFunction.find_or_create_by!(organization_id: 3, function: function_1, project: project_onlinestore)
+          expect(OrganizationNonMemberRole.count).to eq(1)
+          expect(User.current.organization_id).to eq 3
+
+          @query = IssueQuery.create!(name: "new-query", user: User.current, visibility: 2, project: nil)
+          # No authorized_viewers on issues
+          get :index, params: { query_id: @query.id }
+          expect(assigns(:issues)).to_not be_nil
+          @query.filters.merge!({ "authorized_viewers" => { :operator => "mine", :values => ["#{function_1.id}"] } })
+          @query.save!
+        end
+
+        it "displays issues which has no specified functions" do
+          issue_4.update_attribute(:authorized_viewers, "||")
+          get :index, params: { query_id: @query.id }
+          expect(assigns(:issues)).to_not be_nil
+          expect(assigns(:issues)).to_not be_empty
+          expect(assigns(:issues)).to include issue_4
+        end
+
+        it "displays a list of issues visible by the specified function" do
+          issue_4.update_attribute(:authorized_viewers, "|#{function_1.id}|")
+          get :index, params: { query_id: @query.id }
+          expect(assigns(:issues)).to_not be_nil
+          expect(assigns(:issues)).to_not be_empty
+          expect(assigns(:issues)).to include issue_4
+        end
+
+        it "DOES NOT display a list of issues not visible by the specified function" do
+          issue_4.update_attribute(:authorized_viewers, "|#{function_2.id}|")
+          get :index, params: { query_id: @query.id }
+          expect(assigns(:issues)).to_not be_nil
+          expect(assigns(:issues)).to_not include issue_4
+        end
+
       end
     end
   end

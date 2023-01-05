@@ -28,9 +28,14 @@ class User < Principal
     # Organization Non Member Exceptions
     if Redmine::Plugin.installed?(:redmine_organizations)
       if self.organization
-        OrganizationNonMemberFunction.where(:organization => self.organization).each do |onmf|
-          hash[onmf.function] = [] unless hash.key?(onmf.function)
-          hash[onmf.function] << onmf.project
+        functions = Function.distinct.joins(:organization_non_member_functions)
+                            .where("organization_non_member_functions.organization_id IN (?)", self.organization.self_and_ancestors_ids)
+        functions.each do |function|
+          hash[function] ||= []
+          projects = Project.joins(:organization_non_member_functions)
+                            .where("organization_non_member_functions.organization_id IN (?)", self.organization.self_and_ancestors_ids)
+                            .where("organization_non_member_functions.function_id = ?", function.id)
+          hash[function] |= projects.map(&:self_and_descendants).flatten
         end
       end
     end
@@ -64,16 +69,13 @@ class User < Principal
     # Organization Non Member Exceptions
     if Redmine::Plugin.installed?(:redmine_organizations)
       if self.organization
-        organizations_non_member_projects = OrganizationNonMemberRole.where(:organization => self.organization).map(&:project)
-        organizations_non_member_projects -= OrganizationNonMemberFunction.where(:organization => self.organization).map(&:project)
-        @projects_without_function |= organizations_non_member_projects
+        @projects_without_function -= Project.joins(:organization_non_member_functions)
+                                             .where("organization_non_member_functions.organization_id IN (?)", self.organization.self_and_ancestors_ids)
+                                             .map(&:self_and_descendants).flatten
       end
     end
 
-    @projects_without_function.reject!(&:blank?)
-    @projects_without_function.uniq!
-
-    return @projects_without_function
+    @projects_without_function.reject(&:blank?).uniq
   end
 
   # Returns the functions that the user is allowed to manage for the given project
@@ -85,7 +87,7 @@ class User < Principal
     end
   end
 
-  # Return user's roles for project
+  # Return user's functions for project
   def functions_for_project(project)
     # No function on archived projects
     return [] if project.nil? || project.archived?

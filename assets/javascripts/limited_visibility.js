@@ -38,10 +38,11 @@ $(function() {
     $("#cb_authorized_viewers").removeAttr("disabled");
   });
 
-
   //when clicking visibility roles in issues/show, move to issue edition
   $('#list_of_involved_roles_per_issue .role').on('click', function() {
-    showAndScrollTo("update", "issue_notes")
+    if ($('#issue-form').length >= 1){
+      showAndScrollTo("update", "issue_notes")
+    }
   })
 });
 

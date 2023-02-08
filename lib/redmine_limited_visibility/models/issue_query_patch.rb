@@ -195,7 +195,7 @@ module PluginLimitedVisibility
       else
         raise "unsupported value for authorized_viewers field: '#{operator}'"
       end
-      sql
+      sql.present? ? "(#{sql})" : ""
     end
 
     def sql_conditions_for_functions_per_projects(field)

@@ -116,8 +116,8 @@ module PluginLimitedVisibility
 
         sw = operator == "!" ? 'NOT' : ''
         nl = operator == "!" ? "#{Issue.table_name}.assigned_to_id IS NULL OR" : ''
-        "(#{nl} #{Issue.table_name}.assigned_to_id #{sw} IN (SELECT DISTINCT #{Member.table_name}.user_id FROM #{Member.table_name}, #{MemberFunction.table_name}" +
-          " WHERE #{Member.table_name}.project_id = #{Issue.table_name}.project_id AND #{Member.table_name}.id = #{MemberFunction.table_name}.member_id AND #{function_cond}))"
+        "(#{nl} (#{Issue.table_name}.assigned_to_id, #{Issue.table_name}.project_id) #{sw} IN (SELECT DISTINCT #{Member.table_name}.user_id, #{Member.table_name}.project_id FROM #{Member.table_name}, #{MemberFunction.table_name}" +
+          " WHERE #{Member.table_name}.id = #{MemberFunction.table_name}.member_id AND #{function_cond}))"
       end
     end
 

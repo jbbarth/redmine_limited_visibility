@@ -3,6 +3,7 @@ en:
   text_visibility_notice: "Members of the project can still see this issue if one of his/her roles allows it and he/she knows the ticket number. (/!\\ TODO /!\\)"
   text_involvement_explanation: "Default configuration for new issues (these persons will see the issue and be notified) :"
   field_limit_visibility: "Limit issues visibility"
+  label_functional_role: "Functional role"
   label_functional_roles: "Functional roles"
   see_everything: "Everything"
   field_authorized_viewers: "Involved members"

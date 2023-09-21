@@ -386,4 +386,36 @@ describe IssuesController, type: :controller do
     end
   end
 
+  describe "form/issue" do
+
+    before do
+      @request.session[:user_id] = 2
+    end
+
+    it 'should issue#new show functions when assigned_to_id is not required' do
+      get :new, params: {:project_id => 1, :tracker_id => 1, :status_id => 1}
+      expect(response.body).to include('function-1')
+    end
+
+    it 'should issue#edit show functions when assigned_to_id is not required' do
+      get :edit, params: {:id => 1}
+      expect(response.body).to include('function-1')
+    end
+
+    it 'should not issue#new show functions when assigned_to_id is required' do
+      WorkflowPermission.delete_all
+      WorkflowPermission.create!(:old_status_id => 1, :tracker_id => 1, :role_id => 1, :field_name => 'assigned_to_id', :rule => 'required')
+
+      get :new, params: {:project_id => 1, :tracker_id => 1, :status_id => 1}
+      expect(response.body).to_not include('function-1')
+    end
+
+    it 'should not issue#edit show functions when assigned_to_id is required' do
+      WorkflowPermission.delete_all
+      WorkflowPermission.create!(:old_status_id => 1, :tracker_id => 1, :role_id => 1, :field_name => 'assigned_to_id', :rule => 'required')
+
+      get :edit, params: {:id => 1}
+      expect(response.body).to_not include('function-1')
+    end
+  end
 end

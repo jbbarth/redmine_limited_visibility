@@ -43,10 +43,8 @@ module PluginLimitedVisibility
                            :type => :list_optional, :values => all_functions
       ) unless all_functions.empty?
 
-      assigned_to_values = @available_filters["assigned_to_id"][:values]
-      add_available_filter("has_been_assigned_to_id",
-                           :type => :list_optional, :values => assigned_to_values
-      ) unless assigned_to_values.empty?
+      add_available_filter "has_been_assigned_to_id",
+                           :type => :list_optional, :values => lambda { assigned_to_values }
 
       add_available_filter("has_been_assigned_to_function_id",
                            :type => :list_optional, :values => all_functions
@@ -226,12 +224,12 @@ module PluginLimitedVisibility
         sql = sql_by_function.join(" OR ")
 
         # potentially very long query #TODO Find a way to optimize it
-        "(#{sql.present? ? '(' + sql + ') OR ' : ''} #{Issue.table_name}.#{field} IS NULL"\
-      " OR #{Issue.table_name}.#{field} = '||' "\
-      " OR #{Issue.table_name}.#{field} = '' "\
-      " OR #{Issue.table_name}.assigned_to_id = #{User.current.id} "\
-      " OR #{Issue.table_name}.author_id = #{User.current.id} "\
-      " OR #{Project.table_name}.id IN ( #{projects_without_functions_ids.present? ? projects_without_functions_ids.join(',') : 0} ) ) "
+        "(#{sql.present? ? '(' + sql + ') OR ' : ''} #{Issue.table_name}.#{field} IS NULL" \
+          " OR #{Issue.table_name}.#{field} = '||' " \
+          " OR #{Issue.table_name}.#{field} = '' " \
+          " OR #{Issue.table_name}.assigned_to_id = #{User.current.id} " \
+          " OR #{Issue.table_name}.author_id = #{User.current.id} " \
+          " OR #{Project.table_name}.id IN ( #{projects_without_functions_ids.present? ? projects_without_functions_ids.join(',') : 0} ) ) "
       end
       conditions
     end

@@ -12,4 +12,38 @@ module RedmineLimitedVisibility
     end
 
   end
+
+  class ModelHook < Redmine::Hook::Listener
+    def after_plugins_loaded(_context = {})
+
+      unless Rails.env.test? #Avoid breaking core tests (specially csv core tests including ALL columns)
+        require_relative 'helpers/queries_helper_patch'
+        require_relative 'controllers/my_controller_patch'
+        require_relative 'models/issue_query_patch'
+      end
+
+      require_relative 'helpers/issues_helper_patch'
+      require_relative 'helpers/issues_pdf_helper_patch'
+      require_relative 'helpers/projects_helper_patch'
+
+      require_relative 'controllers/roles_controller_patch'
+      require_relative 'controllers/users_controller_patch'
+      require_relative 'controllers/issues_controller_patch'
+      require_relative 'controllers/members_controller_patch'
+
+      require_relative 'models/member_patch'
+      require_relative 'models/user_patch'
+      require_relative 'models/role_patch'
+      require_relative 'models/project_patch'
+      require_relative 'models/tracker_patch'
+      require_relative 'models/issue_patch'
+
+      if Redmine::Plugin.installed?(:redmine_organizations)
+        require_relative 'models/organization_patch'
+        require_relative 'controllers/organizations_memberships_controller_patch'
+      end
+
+    end
+  end
+
 end

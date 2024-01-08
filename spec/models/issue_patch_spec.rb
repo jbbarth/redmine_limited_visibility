@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe RedmineLimitedVisibility::IssuePatch do
+describe RedmineLimitedVisibility::Models::IssuePatch do
 
   fixtures :users, :roles, :projects, :members, :member_roles, :issues, :issue_statuses, :trackers, :enumerations, :custom_fields, :enabled_modules
 

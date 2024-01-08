@@ -10,7 +10,7 @@ class Project
   has_many :organization_functions, :dependent => :destroy if Redmine::Plugin.installed?(:redmine_organizations)
 
   after_save :remove_inherited_member_functions, :add_inherited_member_functions,
-              :if => Proc.new { |project| project.saved_change_to_parent_id? }
+             :if => Proc.new { |project| project.saved_change_to_parent_id? }
 
   def update_project_function_trackers(obj)
     id = ProjectFunction.where(function_id: obj.id, project_id: self.id).map(&:id)
@@ -64,16 +64,16 @@ class Project
       dummy_org = Organization.new(:name => l(:label_others))
       self.members.map do |member|
         member.functions.sorted.map do |function|
-          {:user => member.user, :function => function, :organization => member.user.organization}
+          { :user => member.user, :function => function, :organization => member.user.organization }
         end
       end.flatten.group_by do |hsh|
         hsh[:function]
       end.inject({}) do |memo, (function, users)|
         if function.hidden_on_overview?
-          #do nothing
+          # do nothing
           memo
         else
-          #build a hash for that function
+          # build a hash for that function
           hsh = users.group_by do |user|
             user[:organization] || dummy_org
           end
@@ -132,18 +132,18 @@ class Project
       member.member_functions.delete_all
       member.delete
     end
-    #Member.where(:project_id => id).delete_all
+    # Member.where(:project_id => id).delete_all
     # end Patch
   end
 
 end
 
-module PluginLimitedVisibility
+module RedmineLimitedVisibility::Models
   module ProjectPatch
     # Copies members from +project+
     def copy_functions_organizations_of_members(project)
       self.members.each do |member|
-        m_project_origin =  Member.where(user_id: member.user_id , project_id: project.id)
+        m_project_origin = Member.where(user_id: member.user_id, project_id: project.id)
         member.function_ids = m_project_origin[0].member_functions.map(&:function_id)
       end
 
@@ -173,7 +173,7 @@ module PluginLimitedVisibility
       self.autochecked_functions_mode = project.autochecked_functions_mode
     end
 
-    def copy(project, options={})
+    def copy(project, options = {})
       super
       project = project.is_a?(Project) ? project : Project.find(project)
 
@@ -197,4 +197,5 @@ module PluginLimitedVisibility
     end
   end
 end
-Project.prepend PluginLimitedVisibility::ProjectPatch
+
+Project.prepend RedmineLimitedVisibility::Models::ProjectPatch

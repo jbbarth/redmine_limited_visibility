@@ -1,7 +1,7 @@
 require_dependency 'issues_helper'
 include ERB::Util
 
-module PluginLimitedVisibility
+module RedmineLimitedVisibility::Helpers
   module IssuesHelperPatch
 
     # Returns the textual representation of a single journal detail
@@ -79,5 +79,5 @@ module PluginLimitedVisibility
   end
 end
 
-IssuesHelper.prepend PluginLimitedVisibility::IssuesHelperPatch
+IssuesHelper.prepend RedmineLimitedVisibility::Helpers::IssuesHelperPatch
 ActionView::Base.prepend IssuesHelper

@@ -1,8 +1,5 @@
 require 'spec_helper'
 
-require 'redmine_limited_visibility/models/issue_query_patch'
-require 'redmine_limited_visibility/helpers/queries_helper_patch'
-
 describe IssuesController, type: :controller do
   render_views
 

@@ -1,12 +1,17 @@
 include CustomFieldsHelper
 
-module Redmine
-  module Export
-    module PDF
-      module IssuesPdfHelper
+module RedmineLimitedVisibility
+  module Helpers
+    module IssuesPdfHelperPatch
 
-        alias_method :fetch_row_values_without_limited_visibility_plugin, :fetch_row_values
+      def self.included(base)
+        base.send(:include, InstanceMethods)
+        base.class_eval do
+          alias_method :fetch_row_values_without_limited_visibility_plugin, :fetch_row_values
+        end
+      end
 
+      module InstanceMethods
         # fetch row values
         def fetch_row_values(object, query, level)
           if object.is_a? Issue
@@ -17,7 +22,7 @@ module Redmine
               else
                 # core method
                 s = if column.is_a?(QueryCustomFieldColumn)
-                      cv = object.visible_custom_field_values.detect {|v| v.custom_field_id == column.custom_field.id}
+                      cv = object.visible_custom_field_values.detect { |v| v.custom_field_id == column.custom_field.id }
                       show_value(cv, false)
                     else
                       value = column.value_object(object)
@@ -25,7 +30,7 @@ module Redmine
                       when :subject
                         value = "  " * level + value
                       when :attachments
-                        value = value.to_a.map {|a| a.filename}.join("\n")
+                        value = value.to_a.map { |a| a.filename }.join("\n")
                       end
                       if value.is_a?(Date)
                         format_date(value)
@@ -44,8 +49,10 @@ module Redmine
             fetch_row_values_without_limited_visibility_plugin(object, query, level)
           end
         end
-
       end
+
     end
   end
 end
+
+Redmine::Export::PDF::IssuesPdfHelper.include RedmineLimitedVisibility::Helpers::IssuesPdfHelperPatch

@@ -1,6 +1,6 @@
 require_dependency 'queries_helper'
 
-module PluginLimitedVisibility
+module RedmineLimitedVisibility::Helpers
   module QueriesHelperPatch
 
     def column_value(column, item, value)
@@ -168,6 +168,6 @@ module QueriesHelper
   end
 end
 
-QueriesHelper.prepend PluginLimitedVisibility::QueriesHelperPatch
+QueriesHelper.prepend RedmineLimitedVisibility::Helpers::QueriesHelperPatch
 ActionView::Base.prepend QueriesHelper
 IssuesController.prepend QueriesHelper

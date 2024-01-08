@@ -17,7 +17,7 @@ class IssueQuery < Query
   end
 end
 
-module PluginLimitedVisibility
+module RedmineLimitedVisibility::Models
   module IssueQueryPatch
 
     def initialize_available_filters
@@ -239,4 +239,4 @@ module PluginLimitedVisibility
   end
 end
 
-IssueQuery.prepend PluginLimitedVisibility::IssueQueryPatch
+IssueQuery.prepend RedmineLimitedVisibility::Models::IssueQueryPatch

@@ -1,6 +1,14 @@
 require_dependency 'role'
 
+module RedmineLimitedVisibility::Models
+  module RolePatch
+
+  end
+end
+
 class Role < ActiveRecord::Base
+
+  prepend RedmineLimitedVisibility::Models::RolePatch
 
   has_and_belongs_to_many :managed_functions, :class_name => 'Function',
                           :join_table => "#{table_name_prefix}roles_managed_functions#{table_name_suffix}",

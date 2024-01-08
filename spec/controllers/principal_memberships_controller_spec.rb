@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-require 'redmine_limited_visibility/models/member_patch'
+# require 'redmine_limited_visibility/models/member_patch'
 
 describe PrincipalMembershipsController, type: :controller do
 

@@ -1,8 +1,8 @@
-name: Tests 4.1.7
+name: Tests 5.1.1
 
 env:
   PLUGIN_NAME: redmine_limited_visibility
-  REDMINE_VERSION: 4.1.7
+  REDMINE_VERSION: 5.1.1
 
 on:
   push:
@@ -15,7 +15,7 @@ jobs:
 
     strategy:
       matrix:
-        ruby: ['2.6']
+        ruby: ['3.1']
         db: ['postgres']
       fail-fast: false
 

@@ -1,5 +1,5 @@
 require 'spec_helper'
-require 'redmine_limited_visibility/models/issue_query_patch'
+# require 'redmine_limited_visibility/models/issue_query_patch'
 
 def assert_query_result(expected, query)
   expect {

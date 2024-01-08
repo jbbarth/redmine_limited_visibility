@@ -1,7 +1,7 @@
 require 'spec_helper'
 
-require 'redmine_limited_visibility/controllers/roles_controller_patch'
-require 'redmine_limited_visibility/models/role_patch'
+#require 'redmine_limited_visibility/controllers/roles_controller_patch'
+#require 'redmine_limited_visibility/models/role_patch'
 
 describe RolesController, type: :controller do
   fixtures :users, :roles, :functions

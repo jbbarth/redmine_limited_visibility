@@ -1,6 +1,6 @@
 require_dependency 'issue'
 
-module RedmineLimitedVisibility
+module RedmineLimitedVisibility::Models
   module PrependedIssuePatch
     def notified_users
       if authorized_viewer_ids.present?
@@ -12,9 +12,9 @@ module RedmineLimitedVisibility
     end
   end
 end
-Issue.prepend RedmineLimitedVisibility::PrependedIssuePatch
+Issue.prepend RedmineLimitedVisibility::Models::PrependedIssuePatch
 
-module RedmineLimitedVisibility
+module RedmineLimitedVisibility::Models
   module IssuePatch
 
     include Redmine::SafeAttributes
@@ -65,6 +65,6 @@ module RedmineLimitedVisibility
   end
 end
 
-unless Issue.included_modules.include? RedmineLimitedVisibility::IssuePatch
-  Issue.include RedmineLimitedVisibility::IssuePatch
+unless Issue.included_modules.include? RedmineLimitedVisibility::Models::IssuePatch
+  Issue.include RedmineLimitedVisibility::Models::IssuePatch
 end

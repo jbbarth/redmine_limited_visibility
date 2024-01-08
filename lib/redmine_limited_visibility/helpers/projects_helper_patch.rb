@@ -1,8 +1,8 @@
 require_dependency 'projects_helper'
 
-module PluginLimitedVisibility
+module RedmineLimitedVisibility::Helpers
 
-  module ProjectsHelper
+  module ProjectsHelperPatch
 
     def project_settings_tabs
       tabs = super
@@ -15,5 +15,5 @@ module PluginLimitedVisibility
 
 end
 
-ProjectsHelper.prepend PluginLimitedVisibility::ProjectsHelper
+ProjectsHelper.prepend RedmineLimitedVisibility::Helpers::ProjectsHelperPatch
 ActionView::Base.send(:include, ProjectsHelper)

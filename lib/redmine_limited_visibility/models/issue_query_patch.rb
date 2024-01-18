@@ -1,22 +1,5 @@
 require_dependency 'issue_query'
 
-class IssueQuery < Query
-
-  self.operators.merge!({ "mine" => :label_my_roles })
-  self.operators_by_filter_type.merge!({ :list_visibility => ["mine", "*", "=", "!"] })
-  self.available_columns << QueryColumn.new(:authorized_viewers, sortable: "#{Issue.table_name}.authorized_viewers", groupable: true) if self.available_columns.select { |c| c.name == :authorized_viewers }.empty?
-  self.available_columns << QueryColumn.new(:has_been_assigned_to, :sortable => lambda { User.fields_for_order_statement }, :groupable => true) if self.available_columns.select { |c| c.name == :has_been_assigned_to }.empty?
-  self.available_columns << QueryColumn.new(:has_been_visible_by, :sortable => false, :groupable => true) if self.available_columns.select { |c| c.name == :has_been_visible_by }.empty?
-
-  # use standard method to validate filters form,
-  # but ignore "can't be blank" error on authorized_viewers filter because it doesn't require any value
-  def validate_query_filters
-    super
-    m = label_for('authorized_viewers') + " " + l(:blank, scope: 'activerecord.errors.messages')
-    errors.messages[:base] = errors.messages[:base] - [m] if errors.messages[:base].present? && errors.messages[:base].include?(m)
-  end
-end
-
 module RedmineLimitedVisibility::Models
   module IssueQueryPatch
 
@@ -237,4 +220,21 @@ module RedmineLimitedVisibility::Models
   end
 end
 
-IssueQuery.prepend RedmineLimitedVisibility::Models::IssueQueryPatch
+class IssueQuery < Query
+
+  prepend RedmineLimitedVisibility::Models::IssueQueryPatch
+
+  self.operators.merge!({ "mine" => :label_my_roles })
+  self.operators_by_filter_type.merge!({ :list_visibility => ["mine", "*", "=", "!"] })
+  self.available_columns << QueryColumn.new(:authorized_viewers, sortable: "#{Issue.table_name}.authorized_viewers", groupable: true) if self.available_columns.select { |c| c.name == :authorized_viewers }.empty?
+  self.available_columns << QueryColumn.new(:has_been_assigned_to, :sortable => lambda { User.fields_for_order_statement }, :groupable => true) if self.available_columns.select { |c| c.name == :has_been_assigned_to }.empty?
+  self.available_columns << QueryColumn.new(:has_been_visible_by, :sortable => false, :groupable => true) if self.available_columns.select { |c| c.name == :has_been_visible_by }.empty?
+
+  # use standard method to validate filters form,
+  # but ignore "can't be blank" error on authorized_viewers filter because it doesn't require any value
+  def validate_query_filters
+    super
+    m = label_for('authorized_viewers') + " " + l(:blank, scope: 'activerecord.errors.messages')
+    errors.messages[:base] = errors.messages[:base] - [m] if errors.messages[:base].present? && errors.messages[:base].include?(m)
+  end
+end

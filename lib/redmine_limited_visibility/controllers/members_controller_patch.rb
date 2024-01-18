@@ -77,6 +77,6 @@ end
 
 class MembersController
 
-  include RedmineLimitedVisibility::Controllers::MembersControllerPatch
+  prepend RedmineLimitedVisibility::Controllers::MembersControllerPatch
 
 end

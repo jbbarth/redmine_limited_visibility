@@ -16,11 +16,11 @@ module RedmineLimitedVisibility
   class ModelHook < Redmine::Hook::Listener
     def after_plugins_loaded(_context = {})
 
-      unless Rails.env.test? #Avoid breaking core tests (specially csv core tests including ALL columns)
+      # unless Rails.env.test? #Avoid breaking core tests (specially csv core tests including ALL columns)
         require_relative 'helpers/queries_helper_patch'
         require_relative 'controllers/my_controller_patch'
         require_relative 'models/issue_query_patch'
-      end
+      # end
 
       require_relative 'helpers/issues_helper_patch'
       require_relative 'helpers/issues_pdf_helper_patch'

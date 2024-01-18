@@ -26,5 +26,5 @@ module RedmineLimitedVisibility
 end
 
 class MyController < ApplicationController
-  include RedmineLimitedVisibility::Controllers::MyControllerPatch
+  prepend RedmineLimitedVisibility::Controllers::MyControllerPatch
 end

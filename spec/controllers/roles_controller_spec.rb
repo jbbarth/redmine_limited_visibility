@@ -12,8 +12,8 @@ describe RolesController, type: :controller do
     it "should be successful" do
       get 'index'
       expect(response).to be_successful
-      expect(assigns(:functional_roles)).to_not be_nil
       expect(assigns(:roles)).to_not be_nil
+      expect(assigns(:functional_roles)).to_not be_nil
     end
   end
 

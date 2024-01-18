@@ -23,6 +23,6 @@ end
 
 class RolesController < ApplicationController
 
-  include RedmineLimitedVisibility::Controllers::RolesControllerPatch
+  prepend RedmineLimitedVisibility::Controllers::RolesControllerPatch
 
 end

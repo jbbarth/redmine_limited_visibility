@@ -43,6 +43,6 @@ end
 
 class UsersController < ApplicationController
 
-  include RedmineLimitedVisibility::Controllers::UsersControllerPatch
+  prepend RedmineLimitedVisibility::Controllers::UsersControllerPatch
 
 end

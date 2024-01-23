@@ -5,12 +5,11 @@ describe "ProjectMembersInheritance" do
   fixtures :functions, :users, :roles,
            :projects, :trackers, :issue_statuses
 
-
-  let(:parent_project) { Project.generate! }
-  let(:parent_member) { Member.create!(principal: User.find(2),
-                                       project: parent_project,
-                                       role_ids: [1, 2],
-                                       function_ids: [1, 2]) }
+  let!(:parent_project) { Project.generate! }
+  let!(:parent_member) { Member.create!(principal: User.find(2),
+                                        project: parent_project,
+                                        role_ids: [1, 2],
+                                        function_ids: [1, 2]).reload }
 
   before do
     User.current = nil
@@ -50,8 +49,10 @@ describe "ProjectMembersInheritance" do
   it "propagate when adding a member" do
     project = Project.generate_with_parent!(parent_project, :inherit_members => true)
     expect {
-      member = Member.create!(:principal => User.find(4), :project => parent_project,
-                              :role_ids => [1, 3], :function_ids => [1, 3])
+      member = Member.create(:principal => User.find(4),
+                             :project => parent_project,
+                             :role_ids => [1, 3],
+                             :function_ids => [1, 3])
       member.reload
 
       inherited_member = project.memberships.order('id desc').first
@@ -69,7 +70,7 @@ describe "ProjectMembersInheritance" do
 
     expect {
       Member.create!(:principal => User.find(4), :project => parent_project.reload,
-                     :role_ids => [1, 2], :function_ids => [1, 3] )
+                     :role_ids => [1, 2], :function_ids => [1, 3])
 
       member = project.reload.memberships.detect { |m| m.principal == user }
       expect(member).to_not be_nil

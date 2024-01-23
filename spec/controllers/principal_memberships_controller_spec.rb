@@ -22,7 +22,7 @@ describe PrincipalMembershipsController, type: :controller do
       post :create, params: { :user_id => 7, :membership => { :project_ids => [3, 4], :role_ids => [2, 3], :function_ids => [contractor_role.id, project_office_role.id] }, :format => 'js' }, xhr: true
       expect(response).to be_successful
       assert_template 'create'
-      assert_equal 'text/javascript', response.content_type
+      expect(response.content_type).to include 'text/javascript'
     end
     memberships = Member.order('id DESC').limit(2)
     expect(memberships[0].principal).to eq User.find(7)
@@ -38,7 +38,7 @@ describe PrincipalMembershipsController, type: :controller do
       post :create, params: { :user_id => 7, :membership => { :project_ids => [3, 4], :role_ids => ["2"], :function_ids => [contractor_role.id.to_s] }, :format => 'js' }, xhr: true
       expect(response).to be_successful
       assert_template 'create'
-      assert_equal 'text/javascript', response.content_type
+      expect(response.content_type).to include 'text/javascript'
     end
     memberships = Member.order('id DESC').limit(2)
     expect(memberships[0].principal).to eq User.find(7)
@@ -53,7 +53,7 @@ describe PrincipalMembershipsController, type: :controller do
       post :create, params: { :user_id => 7, :membership => { :project_ids => [3] }, :format => 'js' }, xhr: true
       expect(response).to be_successful
       assert_template 'create'
-      assert_equal 'text/javascript', response.content_type
+      expect(response.content_type).to include 'text/javascript'
     end
     expect(response.body).to include('alert')
     expect(response.body).to include('Role cannot be empty')

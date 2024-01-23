@@ -9,7 +9,7 @@ describe "FileChecksums" do
 
   it "should core blocks checksums" do
     # tbody in index view is overridden and should be reviewed each time it changes (copy/paste from core file in override)
-    assert_checksum %w(c5bbcca4fa2ed57299032384413f1db6), "app/views/roles/index.html.erb"
+    assert_checksum %w(c5bbcca4fa2ed57299032384413f1db6 a6f615004d7bc9f35a9ac7671329e181), "app/views/roles/index.html.erb"
   end
 
   it "should repeat any change in my/page" do
@@ -19,10 +19,10 @@ describe "FileChecksums" do
 
   it "should break if issues and projects api are updated" do
     # issues & projects API are completely overridden, and any future change should be copied to the plugin
-    assert_checksum %w(7ffc3d91fd7a41532030ffa477e9e018), "app/views/projects/index.api.rsb"
+    assert_checksum %w(7ffc3d91fd7a41532030ffa477e9e018 af0bf4c2e7ef1b9f9be182b805d914c3), "app/views/projects/index.api.rsb"
     assert_checksum %w(793015fe562e10cd3c8922e49366b90c), "app/views/projects/show.api.rsb"
-    assert_checksum %w(143e12b99ab1796616f17c740d50724c), "app/views/issues/index.api.rsb"
-    assert_checksum %w(015cf9545f9d4078106b30311ded7f9b), "app/views/issues/show.api.rsb"
+    assert_checksum %w(143e12b99ab1796616f17c740d50724c febf44762ccab7791a41390634b3d541), "app/views/issues/index.api.rsb"
+    assert_checksum %w(015cf9545f9d4078106b30311ded7f9b b0bd5d52f496b2b43265cb4d2e49951e), "app/views/issues/show.api.rsb"
   end
 
 end

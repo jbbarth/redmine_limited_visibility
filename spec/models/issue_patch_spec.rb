@@ -4,12 +4,12 @@ describe RedmineLimitedVisibility::Models::IssuePatch do
 
   fixtures :users, :roles, :projects, :members, :member_roles, :issues, :issue_statuses, :trackers, :enumerations, :custom_fields, :enabled_modules
 
-  let(:issue) {Issue.new}
-  let(:issue_4) {Issue.find(4)}
-  let(:contractor_role) {Function.where(name: "Contractors").first_or_create}
-  let(:project_office_role) {Function.where(name: "Project Office").first_or_create}
-  let(:issue_with_authorized_viewers) {issue_4.update_attributes!(:authorized_viewers => "|#{contractor_role.id}|"); issue_4}
-  let(:issue_without_authorized_viewers) {issue_4.update_attributes!(:authorized_viewers => "||"); issue_4}
+  let(:issue) { Issue.new }
+  let(:issue_4) { Issue.find(4) }
+  let(:contractor_role) { Function.where(name: "Contractors").first_or_create }
+  let(:project_office_role) { Function.where(name: "Project Office").first_or_create }
+  let(:issue_with_authorized_viewers) { issue_4.update(:authorized_viewers => "|#{contractor_role.id}|"); issue_4 }
+  let(:issue_without_authorized_viewers) { issue_4.update(:authorized_viewers => "||"); issue_4 }
 
   describe "#authorized_viewers" do
     it "has a authorized_viewers column" do
@@ -19,7 +19,7 @@ describe RedmineLimitedVisibility::Models::IssuePatch do
     it "is a safe attribute" do
       # avoid loading too many dependencies
       allow(issue).to receive(:new_statuses_allowed_to).and_return(IssueStatus.all)
-      issue.safe_attributes = {"authorized_viewers" => "All of them"}
+      issue.safe_attributes = { "authorized_viewers" => "All of them" }
       expect(issue.authorized_viewers).to eq "All of them"
     end
   end
@@ -48,11 +48,11 @@ describe RedmineLimitedVisibility::Models::IssuePatch do
       issue.project.enable_module!('limited_visibility')
       not_involved_function = project_office_role
 
-      member2 = Member.find_or_new(issue.project, User.find(2))
+      member2 = Member.find_or_initialize_by(project: issue.project, user: User.find(2))
       member2.functions << not_involved_function
       member2.save!
 
-      member3 = Member.find_or_new(issue.project, User.find(3))
+      member3 = Member.find_or_initialize_by(project: issue.project, user: User.find(3))
       member3.roles << Role.find(2)
       member3.functions << not_involved_function
       member3.save!
@@ -109,9 +109,9 @@ describe RedmineLimitedVisibility::Models::IssuePatch do
         Project.find(2).enable_module!('limited_visibility')
         Project.find(5).enable_module!('limited_visibility')
         multiproject_issue = issue_with_authorized_viewers # issue_id: 4 & project_id: 2 & authorized_viewers: "|#{contractor_role.id}|"
-        multiproject_issue.projects = [multiproject_issue.project, Project.find(5)] #other project id = 5
+        multiproject_issue.projects = [multiproject_issue.project, Project.find(5)] # other project id = 5
         multiproject_issue.save!
-        new_member = Member.new(:project_id => 5, :user_id => 4) #only member of secondary project
+        new_member = Member.new(:project_id => 5, :user_id => 4) # only member of secondary project
         new_member.roles = [Role.find(2)]
         new_member.save!
 
@@ -141,8 +141,8 @@ describe RedmineLimitedVisibility::Models::IssuePatch do
   end
 
   describe "#involved_users" do
-    let(:issue) {Issue.new}
-    let(:project) {Project.find(1)}
+    let(:issue) { Issue.new }
+    let(:project) { Project.find(1) }
 
     it "returns users 'involved' in this issue, who have at least one function in the authorized_viewer_ids functions" do
       allow(issue).to receive(:authorized_viewer_ids).and_return([contractor_role.id, project_office_role.id])
@@ -159,7 +159,7 @@ describe RedmineLimitedVisibility::Models::IssuePatch do
   end
 
   describe "#authorized_viewer_ids" do
-    let(:issue) {Issue.new}
+    let(:issue) { Issue.new }
 
     it "transforms the #authorized_viewers string into an array of ids" do
       allow(issue).to receive(:authorized_viewers).and_return("|3|5|99|")

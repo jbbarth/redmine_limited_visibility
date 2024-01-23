@@ -9,7 +9,11 @@ Deface::Override.new :virtual_path  => 'roles/index',
     <td>
       <% unless role.builtin? || role.workflow_rules.exists? %>
         <span class="icon icon-warning">
-          <%= l(:text_role_no_workflow) %> (<%= link_to l(:button_edit), workflows_edit_path(:role_id => role) %>)
+          <% if Redmine::VERSION::MAJOR < 5 %>
+            <%= l(:text_role_no_workflow) %> (<%= link_to l(:button_edit), workflows_edit_path(:role_id => role) %>)
+          <% else %>
+            <%= l(:text_role_no_workflow) %> (<%= link_to l(:button_edit), edit_workflows_path(:role_id => role) %>)
+          <% end %>
         </span>
       <% end %>
     </td>

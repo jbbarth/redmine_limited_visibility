@@ -35,11 +35,11 @@ describe FunctionsController, type: :controller do
     it "should save or update a new function" do
       post :create, params: { function: { name: "NewFunction", description: "NewDescription", authorized_viewers: "|17|18|", hidden_on_overview: false } }
       created_function = Function.find_by_name("NewFunction")
-      #test put method
+      # test put method
       put :update, params: { id: created_function.id, function: { name: "UpdatedFunction", description: "UpdatedDescription", authorized_viewers: "|17|18|" } }
       expect(created_function.reload.name).to eq "UpdatedFunction"
       expect(created_function.reload.description).to eq "UpdatedDescription"
-      #test patch method (new default method used by Rails to update)
+      # test patch method (new default method used by Rails to update)
       patch :update, params: { id: created_function.id, function: { name: "UpdatedFunctionViaPatchMethod", description: "UpdatedDesViaPatchMethod", hidden_on_overview: true, active_by_default: false } }
       expect(created_function.reload.name).to eq "UpdatedFunctionViaPatchMethod"
       expect(created_function.reload.description).to eq "UpdatedDesViaPatchMethod"
@@ -51,7 +51,7 @@ describe FunctionsController, type: :controller do
   describe "modify the available functions per project" do
 
     let!(:project) { Project.find(2) }
-    before { project.update_attributes(autochecked_functions_mode: "1", function_ids: ["1", "2", "3"]) }
+    before { project.update(autochecked_functions_mode: "1", function_ids: ["1", "2", "3"]) }
 
     it "adds project_function relations" do
       expect do
@@ -73,7 +73,7 @@ describe FunctionsController, type: :controller do
       expect do
         put :available_functions_per_project, params: { project_id: Project.find(1).id, autocheck_mode: "2", function_ids: ["1"] }
       end.to change(ProjectFunction, :count).by(-1)
-      .and change(ProjectFunctionTracker, :count).by(-2)
+                                            .and change(ProjectFunctionTracker, :count).by(-2)
     end
 
     it "updates autocheck_mode without changing functions" do
@@ -118,18 +118,18 @@ describe FunctionsController, type: :controller do
 
   describe "popup modal of all roles fonctionnels for show issue" do
     let!(:issue) { Issue.find(1) }
-    before { issue.update_attributes(authorized_viewers: '|1|') }
+    before { issue.update(authorized_viewers: '|1|') }
 
-    it "should return content_type javascript" do    
+    it "should return content_type javascript" do
       get :index_issue, params: { project_id: issue.project.id, viewers: issue.authorized_viewer_ids.join(',') }, :xhr => true
       assert_response :success
       expect(response).to render_template("functions/index_issue")
-      expect(response.content_type).to eq("text/javascript")
+      expect(response.content_type).to include("text/javascript")
       assert_match /ajax-modal/, response.body
     end
 
     it "should listing all the descriptions of the roles" do
-      #set a description in the first two functions 
+      # set a description in the first two functions
       Function.find(1).update_attribute :description, 'desforfunction1'
       Function.find(2).update_attribute :description, 'desforfunction2'
 
@@ -152,10 +152,10 @@ describe FunctionsController, type: :controller do
       expect(response.body).to include(l(:label_roles_not_selected_for_issue_without_members))
     end
 
-    it "should appear functions with the appropriate color" do      
-     get :index_issue, params: { project_id: issue.project.id, viewers: issue.authorized_viewer_ids.join(',') }, :xhr => true
+    it "should appear functions with the appropriate color" do
+      get :index_issue, params: { project_id: issue.project.id, viewers: issue.authorized_viewer_ids.join(',') }, :xhr => true
       assert_response :success
-      #here, we use data-role-id, To avoid confusion between style of the color codes and style span of function
+      # here, we use data-role-id, To avoid confusion between style of the color codes and style span of function
       expect(response.body).to include('class=\"role involved no-member\" data-role-id=')
       expect(response.body).to include('class=\"role  no-member\" data-role-id=')
     end
@@ -172,7 +172,7 @@ describe FunctionsController, type: :controller do
 
       get :index_issue, params: { project_id: issue.project.id, viewers: issue.authorized_viewer_ids.join(',') }, :xhr => true
       assert_response :success
-      #here, we use data-role-id, To avoid confusion between style of the color codes and style span of function
+      # here, we use data-role-id, To avoid confusion between style of the color codes and style span of function
       expect(response.body).not_to include('class=\"role involved no-member\" data-role-id=')
     end
 
@@ -190,7 +190,7 @@ describe FunctionsController, type: :controller do
 
       get :index_issue, params: { project_id: issue.project.id, viewers: issue.authorized_viewer_ids.join(',') }, :xhr => true
       assert_response :success
-      
+
       expect(response.body).not_to include('class=\"role  \" data-role-id=')
     end
 
@@ -219,8 +219,8 @@ describe FunctionsController, type: :controller do
       issue.tracker = Tracker.find(1)
     end
 
-    it "When all functions do not have a member" do     
-      viewers = function_ids_for_current_viewers(issue) 
+    it "When all functions do not have a member" do
+      viewers = function_ids_for_current_viewers(issue)
       get :index_issue, params: { project_id: project.id, viewers: viewers.join(',') }, :xhr => true
 
       expect(response.body).to include('class=\"role involved no-member\" data-role-id=')
@@ -235,12 +235,12 @@ describe FunctionsController, type: :controller do
       fun_mem.function = Project.find(1).functions.first
       fun_mem.save
 
-      viewers = function_ids_for_current_viewers(issue) 
+      viewers = function_ids_for_current_viewers(issue)
       get :index_issue, params: { project_id: project.id, viewers: viewers.join(',') }, :xhr => true
-      
+
       expect(response.body).to include('class=\"role involved no-member\" data-role-id=')
       expect(response.body).to include('class=\"role involved \" data-role-id')
-      expect(response.body).not_to include('class=\"role  \" data-role-id=')     
+      expect(response.body).not_to include('class=\"role  \" data-role-id=')
 
     end
 
@@ -251,10 +251,10 @@ describe FunctionsController, type: :controller do
       fun_mem.function = Project.find(1).functions.first
       fun_mem.save
       ProjectFunction.first.update_attribute(:authorized_viewers, '|1|')
-      
+
       viewers = function_ids_for_current_viewers(issue)
       get :index_issue, params: { project_id: project.id, viewers: viewers.join(',') }, :xhr => true
-      
+
       expect(response.body).to include('class=\"role involved \" data-role-id=')
       expect(response.body).to include('class=\"role  no-member\" data-role-id=')
       expect(response.body).not_to include('class=\"role involved no-member\" data-role-id=')
@@ -274,20 +274,20 @@ describe FunctionsController, type: :controller do
     end
 
     it "When no function selected for the tracker" do
-      viewers = function_ids_for_current_tracker(issue, 1) 
+      viewers = function_ids_for_current_tracker(issue, 1)
       get :index_issue, params: { project_id: project.id, viewers: viewers.join(',') }, :xhr => true
-      
+
       expect(response.body).to include('class=\"role  no-member\" data-role-id')
       expect(response.body).not_to include('class=\"role involved no-member\" data-role-id=')
       expect(response.body).not_to include('class=\"role  \" data-role-id=')
-      
+
     end
 
-    it "When one function selected for the tracker" do      
+    it "When one function selected for the tracker" do
       ProjectFunctionTracker.first.update_attribute(:checked, 't')
       viewers = function_ids_for_current_tracker(issue, 1)
       get :index_issue, params: { project_id: project.id, viewers: viewers.join(',') }, :xhr => true
-      
+
       expect(response.body).to include('class=\"role  no-member\" data-role-id')
       expect(response.body).to include('class=\"role involved no-member\" data-role-id=')
       expect(response.body).not_to include('class=\"role  \" data-role-id=')

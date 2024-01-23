@@ -45,7 +45,7 @@ class Project
   def add_inherited_member_functions
     if inherit_members? && parent
       parent.memberships.each do |parent_member|
-        member = Member.find_or_new(self.id, parent_member.user_id)
+        member = Member.find_or_initialize_by(project_id: self.id, user_id: parent_member.user_id)
         parent_member.member_functions.each do |parent_member_function|
           member.member_functions << MemberFunction.new(:function => parent_member_function.function, :inherited_from => parent_member_function.id)
         end

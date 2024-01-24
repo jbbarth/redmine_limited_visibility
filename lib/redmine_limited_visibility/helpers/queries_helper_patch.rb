@@ -28,14 +28,14 @@ module RedmineLimitedVisibility::Helpers
     def column_content(column, issue)
       if column.name == :has_been_assigned_to
         get_assigned_users_and_functions(column, issue, true)
-      elsif  column.name == :has_been_visible_by
+      elsif column.name == :has_been_visible_by
         get_has_been_authorized_viewers(column, issue, true)
       else
         super
       end
     end
 
-    def get_assigned_users_and_functions(column, issue, html=true)
+    def get_assigned_users_and_functions(column, issue, html = true)
       list_of_users = get_has_been_assigned_users(column, issue, html)
       list_of_functions = get_has_been_assigned_functions(issue)
       [list_of_functions, list_of_users].reject(&:blank?).join(', ').html_safe
@@ -60,8 +60,8 @@ module RedmineLimitedVisibility::Helpers
     def get_has_been_authorized_viewers(column, issue, html)
       functions_ids = issue.authorized_viewer_ids
       issue.journals.each do |journal|
-        functions_ids << journal.details.select { |i| i.prop_key == 'authorized_viewers' && i.old_value.present? }.map{ |journal_detail| journal_detail.old_value.split('|').reject(&:blank?).map(&:to_i) }
-        functions_ids << journal.details.select { |i| i.prop_key == 'authorized_viewers' && i.value.present? }.map{ |journal_detail| journal_detail.value.split('|').reject(&:blank?).map(&:to_i) }
+        functions_ids << journal.details.select { |i| i.prop_key == 'authorized_viewers' && i.old_value.present? }.map { |journal_detail| journal_detail.old_value.split('|').reject(&:blank?).map(&:to_i) }
+        functions_ids << journal.details.select { |i| i.prop_key == 'authorized_viewers' && i.value.present? }.map { |journal_detail| journal_detail.value.split('|').reject(&:blank?).map(&:to_i) }
       end
       functions_ids.flatten!
       if functions_ids.present?
@@ -82,7 +82,7 @@ module RedmineLimitedVisibility::Helpers
       users_ids.flatten!
       if users_ids.present?
         users_ids.uniq!
-        users = User.where('id' => users_ids) #would be great to keep the order : ORDER BY FIELD('users'.'id', users_ids)
+        users = User.where('id' => users_ids) # would be great to keep the order : ORDER BY FIELD('users'.'id', users_ids)
         users.collect { |v| html ? column_value(column, issue, v) : v.to_s }.compact.join(', ').html_safe if users
       else
         nil
@@ -130,7 +130,7 @@ module RedmineLimitedVisibility::Helpers
       end
       s = options_for_select([[]] + ungrouped)
       if grouped.present?
-        localized_grouped = grouped.map {|k,v| [k.is_a?(Symbol) ? l(k) : k.to_s, v]}
+        localized_grouped = grouped.map { |k, v| [k.is_a?(Symbol) ? l(k) : k.to_s, v] }
         s << grouped_options_for_select(localized_grouped)
       end
       s
@@ -142,7 +142,7 @@ end
 module QueriesHelper
   unless instance_methods.include?(:retrieve_query_with_limited_visibility)
     # Add 'authorized_viewers' filter if not present
-    def retrieve_query_with_limited_visibility(klass=IssueQuery, use_session=true, options={})
+    def retrieve_query_with_limited_visibility(klass = IssueQuery, use_session = true, options = {})
       retrieve_query_without_limited_visibility(klass, use_session, options)
 
       if @project.blank? || @project.module_enabled?("limited_visibility")
@@ -159,9 +159,10 @@ module QueriesHelper
 
         see_all_issues = true if User.current.admin? || should_see_all
         @query.filters.merge!({ 'authorized_viewers' => { :operator => (see_all_issues ? "*" : "mine"), :values => [""] } }) if @query.is_a?(IssueQuery) && !@query.filters.include?('authorized_viewers')
+        @query
       end
-      @query
     end
+
     alias_method :retrieve_query_without_limited_visibility, :retrieve_query
     alias_method :retrieve_query, :retrieve_query_with_limited_visibility
     # we don't use prepend here because the helper is included in many controllers

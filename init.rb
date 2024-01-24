@@ -12,12 +12,12 @@ Redmine::Plugin.register :redmine_limited_visibility do
   author_url 'jeanbaptiste.barth@gmail.com'
   requires_redmine_plugin :redmine_base_rspec, :version_or_higher => '0.0.4' if Rails.env.test?
   requires_redmine_plugin :redmine_base_deface, :version_or_higher => '0.0.1'
-  permission :manage_functional_roles_by_project, {:functions => [:available_functions_per_project]}
+  permission :manage_functional_roles_by_project, { :functions => [:available_functions_per_project] }
   project_module :limited_visibility do
-    permission :change_issues_visibility, {  }
-    permission :see_issues_visibility, {  }
-    permission :use_issues_visibility_filter, {  }
+    permission :change_issues_visibility, {}
+    permission :see_issues_visibility, {}
+    permission :use_issues_visibility_filter, {}
   end
-  settings :default => { 'must_have_at_least_one_visible_function' => false},
+  settings :default => { 'must_have_at_least_one_visible_function' => false },
            :partial => 'settings/redmine_plugin_limited_visibility'
 end

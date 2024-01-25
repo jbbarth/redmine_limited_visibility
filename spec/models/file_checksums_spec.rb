@@ -23,6 +23,7 @@ describe "FileChecksums" do
     assert_checksum %w(793015fe562e10cd3c8922e49366b90c), "app/views/projects/show.api.rsb"
     assert_checksum %w(143e12b99ab1796616f17c740d50724c febf44762ccab7791a41390634b3d541), "app/views/issues/index.api.rsb"
     assert_checksum %w(015cf9545f9d4078106b30311ded7f9b b0bd5d52f496b2b43265cb4d2e49951e), "app/views/issues/show.api.rsb"
+    assert_checksum %w(5a39fb497ffc11649bd11e7b5d62b25e 41537d1ac617502a3d7770e7567a494c), "app/views/users/show.api.rsb"
   end
 
 end

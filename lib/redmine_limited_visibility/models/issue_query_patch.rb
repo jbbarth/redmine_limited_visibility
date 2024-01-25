@@ -235,6 +235,12 @@ class IssueQuery < Query
   def validate_query_filters
     super
     m = "#{label_for('authorized_viewers')} #{l(:blank, scope: 'activerecord.errors.messages')}"
-    errors.delete(:base, m) if errors.messages[:base].present? && errors.messages[:base].include?(m)
+    if errors.messages[:base].present? && errors.messages[:base].include?(m)
+      if Redmine::VERSION::MAJOR >= 5
+        errors.delete(:base, m)
+      else
+        errors.messages[:base].delete(m)
+      end
+    end
   end
 end

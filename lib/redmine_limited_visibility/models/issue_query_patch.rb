@@ -209,12 +209,12 @@ module RedmineLimitedVisibility::Models
         sql = sql_by_function.join(" OR ")
 
         # potentially very long query #TODO Find a way to optimize it
-        "(#{sql.present? ? '(' + sql + ') OR ' : ''} #{Issue.table_name}.#{field} IS NULL"\
-      " OR #{Issue.table_name}.#{field} = '||' "\
-      " OR #{Issue.table_name}.#{field} = '' "\
-      " OR #{Issue.table_name}.assigned_to_id = #{User.current.id} "\
-      " OR #{Issue.table_name}.author_id = #{User.current.id} "\
-      " OR #{Project.table_name}.id IN ( #{projects_without_functions_ids.present? ? projects_without_functions_ids.join(',') : 0} ) ) "
+        "(#{sql.present? ? '(' + sql + ') OR ' : ''} #{Issue.table_name}.#{field} IS NULL" \
+          " OR #{Issue.table_name}.#{field} = '||' " \
+          " OR #{Issue.table_name}.#{field} = '' " \
+          " OR #{Issue.table_name}.assigned_to_id = #{User.current.id} " \
+          " OR #{Issue.table_name}.author_id = #{User.current.id} " \
+          " OR #{Project.table_name}.id IN ( #{projects_without_functions_ids.present? ? projects_without_functions_ids.join(',') : 0} ) ) "
       end
       conditions
     end
@@ -237,6 +237,12 @@ class IssueQuery < Query
   def validate_query_filters
     super
     m = "#{label_for('authorized_viewers')} #{l(:blank, scope: 'activerecord.errors.messages')}"
-    errors.delete(:base, m) if errors.messages[:base].present? && errors.messages[:base].include?(m)
+    if errors.messages[:base].present? && errors.messages[:base].include?(m)
+      if Redmine::VERSION::MAJOR >= 5
+        errors.delete(:base, m)
+      else
+        errors.messages[:base].delete(m)
+      end
+    end
   end
 end

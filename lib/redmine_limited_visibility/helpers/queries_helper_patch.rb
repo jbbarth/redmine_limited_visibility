@@ -16,7 +16,14 @@ module RedmineLimitedVisibility::Helpers
     end
 
     def csv_content(column, issue)
-      if column.name == :has_been_assigned_to
+      if column.name == :assigned_to
+        value = super
+        # Check if issue is assigned to a function
+        if value == ""
+          value = issue.assigned_function.name if issue.assigned_function.present?
+        end
+        value
+      elsif column.name == :has_been_assigned_to
         get_assigned_users_and_functions(column, issue, false)
       elsif column.name == :has_been_visible_by
         get_has_been_authorized_viewers(column, issue, false)

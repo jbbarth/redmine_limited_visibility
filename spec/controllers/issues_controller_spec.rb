@@ -101,7 +101,7 @@ describe IssuesController, type: :controller do
     # check if authorized_viewers match user visibility
     issue1.update_attribute(:authorized_viewers, "|#{contractor_function.id}|") # User visibility role
     issue2.update_attribute(:authorized_viewers, "|#{project_office_function.id}|") # Current user does not match this role
-    q.filters["authorized_viewers"] = { :operator => "mine", :values => [""] }
+    q.filters.merge!({ "authorized_viewers" => { :operator => "mine", :values => [""] } })
     q.save!
     get :index, params: { query_id: q.id }
     expect(assigns(:issues)).to_not be_nil
@@ -159,9 +159,9 @@ describe IssuesController, type: :controller do
     issue.update!(authorized_viewers: "|10|12|")
 
     expect(user.allowed_to?(:change_issues_visibility, project)).to be_falsey
-    expect do
+    expect {
       put :update, params: { id: issue.id, issue: { authorized_viewers: "|12|13|" } }
-    end.not_to change {
+    }.not_to change {
       issue.reload.authorized_viewer_ids
     }
 
@@ -256,12 +256,10 @@ describe IssuesController, type: :controller do
   if Redmine::Plugin.installed?(:redmine_organizations)
     describe 'issues visibility through OrganizationNonMemberFunctions' do
       # User 7 does not belongs to any project
-      let!(:query) do
-        IssueQuery.create!(name: "new-query",
+      let!(:query) { IssueQuery.create!(name: "new-query",
                                         user: User.find(7),
                                         visibility: 2,
-                                        project: nil)
-      end
+                                        project: nil) }
       let!(:issue4) { Issue.find(4) }
       let!(:issue7) { Issue.find(7) }
 

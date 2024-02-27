@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe IssuesController, type: :controller do
@@ -29,7 +31,7 @@ describe IssuesController, type: :controller do
            :queries,
            :repositories,
            :changesets,
-           :watchers, :groups_users
+           :watchers, :groups_users, :functions
 
   fixtures :organizations if Redmine::Plugin.installed?(:redmine_organizations)
 
@@ -148,7 +150,7 @@ describe IssuesController, type: :controller do
     expect(issue.assigned_to_id).to be_nil
   end
 
-  # TODO Activate this spec when users permissions are validated before updating visibility
+  # TODO: Activate this spec when users permissions are validated before updating visibility
   pending 'requires :change_issue_visibility permission when changing issue visibility' do
     @request.session[:user_id] = 2 # jsmith - Manager (no change_issue_visibility permission)
     user = User.current = User.find(2)
@@ -179,9 +181,9 @@ describe IssuesController, type: :controller do
     project = issue.project
 
     expect(User.current.reload.allowed_to?(:change_issues_visibility, project)).to be_truthy
-    expect {
+    expect do
       put :update, params: { id: issue.id, issue: { authorized_viewers: "|#{contractor_function.id}|" } }
-    }.to change {
+    end.to change {
       issue.reload.authorized_viewer_ids
     }.from([]).to([contractor_function.id])
   end
@@ -189,7 +191,6 @@ describe IssuesController, type: :controller do
   # Test compatibility with the redmine multiprojects_issue plugin
   if Redmine::Plugin.installed?(:redmine_multiprojects_issue)
     describe 'multiprojects_issues' do
-
       before do
         @query = IssueQuery.create!(name: "new-query", user: User.current, visibility: 2, project: nil)
 
@@ -204,7 +205,7 @@ describe IssuesController, type: :controller do
         # check if authorized_viewers match user visibility
         @issue1.update_attribute(:authorized_viewers, "|#{contractor_function.id}|") # User visibility role
         @issue2.update_attribute(:authorized_viewers, "|#{project_office_function.id}|") # Current user does not match this role
-        @query.filters.merge!({ "authorized_viewers" => { :operator => "mine", :values => [""] } })
+        @query.filters["authorized_viewers"] = { :operator => "mine", :values => [""] }
         @query.save!
       end
 
@@ -254,7 +255,6 @@ describe IssuesController, type: :controller do
 
   if Redmine::Plugin.installed?(:redmine_organizations)
     describe 'issues visibility through OrganizationNonMemberFunctions' do
-
       # User 7 does not belongs to any project
       let!(:query) { IssueQuery.create!(name: "new-query",
                                         user: User.find(7),
@@ -273,7 +273,7 @@ describe IssuesController, type: :controller do
         issue7.project.enable_module!("limited_visibility")
         issue7.update_attribute(:authorized_viewers, "|#{contractor_function.id}|")
 
-        query.filters.merge!({ "authorized_viewers" => { :operator => "mine", :values => [""] } })
+        query.filters["authorized_viewers"] = { :operator => "mine", :values => [""] }
         query.save!
       end
 
@@ -317,11 +317,10 @@ describe IssuesController, type: :controller do
       end
 
       context "non-member exception has a specific function" do
-
         let!(:function_1) { Function.find_or_create_by!(name: "function_1") }
         let!(:function_2) { Function.find_or_create_by!(name: "function_2") }
         let!(:issue_4) { Issue.find(4) }
-        let!(:non_member_user) {
+        let!(:non_member_user) do
           user = User.new(login: 'non-member.user',
                           firstname: 'non-member',
                           lastname: "user")
@@ -329,7 +328,7 @@ describe IssuesController, type: :controller do
           user.organization_id = 3
           user.save!
           user
-        }
+        end
         let!(:project_onlinestore) { Project.find('onlinestore') }
         let!(:role_reporter) { Role.find(3) }
         let!(:orga_a) { Organization.find(1) }
@@ -351,7 +350,7 @@ describe IssuesController, type: :controller do
           # No authorized_viewers on issues
           get :index, params: { query_id: @query.id }
           expect(assigns(:issues)).to_not be_nil
-          @query.filters.merge!({ "authorized_viewers" => { :operator => "mine", :values => ["#{function_1.id}"] } })
+          @query.filters["authorized_viewers"] = { :operator => "mine", :values => [function_1.id.to_s] }
           @query.save!
         end
 
@@ -377,24 +376,22 @@ describe IssuesController, type: :controller do
           expect(assigns(:issues)).to_not be_nil
           expect(assigns(:issues)).to_not include issue_4
         end
-
       end
     end
   end
 
   describe "form/issue" do
-
     before do
       @request.session[:user_id] = 2
     end
 
     it 'should issue#new show functions when assigned_to_id is not required' do
-      get :new, params: {:project_id => 1, :tracker_id => 1, :status_id => 1}
+      get :new, params: { :project_id => 1, :tracker_id => 1, :status_id => 1 }
       expect(response.body).to include('function-1')
     end
 
     it 'should issue#edit show functions when assigned_to_id is not required' do
-      get :edit, params: {:id => 1}
+      get :edit, params: { :id => 1 }
       expect(response.body).to include('function-1')
     end
 
@@ -402,7 +399,7 @@ describe IssuesController, type: :controller do
       WorkflowPermission.delete_all
       WorkflowPermission.create!(:old_status_id => 1, :tracker_id => 1, :role_id => 1, :field_name => 'assigned_to_id', :rule => 'required')
 
-      get :new, params: {:project_id => 1, :tracker_id => 1, :status_id => 1}
+      get :new, params: { :project_id => 1, :tracker_id => 1, :status_id => 1 }
       expect(response.body).to_not include('function-1')
     end
 
@@ -410,8 +407,48 @@ describe IssuesController, type: :controller do
       WorkflowPermission.delete_all
       WorkflowPermission.create!(:old_status_id => 1, :tracker_id => 1, :role_id => 1, :field_name => 'assigned_to_id', :rule => 'required')
 
-      get :edit, params: {:id => 1}
+      get :edit, params: { :id => 1 }
       expect(response.body).to_not include('function-1')
+    end
+  end
+
+  describe "Export/csv" do
+
+    let(:issue) { Issue.find(2) }
+
+    it "displays the full name of the user if assigned to a user" do
+      columns = ["subject", "assigned_to"]
+      get :index, params: { :project_id => 1,
+                            :tracker_id => 2,
+                            :set_filter => "1",
+                            :c => columns,
+                            :format => 'csv' }
+
+      expect(response).to be_successful
+      expect(response.content_type).to eq 'text/csv; header=present'
+
+      lines = response.body.chomp.split("\n")
+      expect(lines[1].split(',')[2]).to eq issue.assigned_to.name.to_s
+    end
+
+    it "displays the name of the function if assigned to a function" do
+      function = Function.find(1)
+      issue.assigned_to = nil
+      issue.assigned_function = Function.find(1)
+      issue.save
+      columns = ["subject", "assigned_to"]
+
+      get :index, params: { :project_id => 1,
+                            :tracker_id => 2,
+                            :set_filter => "1",
+                            :c => columns,
+                            :format => 'csv' }
+
+      expect(response).to be_successful
+      expect(response.content_type).to eq 'text/csv; header=present'
+
+      lines = response.body.chomp.split("\n")
+      expect(lines[1].split(',')[2]).to eq function.name.to_s
     end
   end
 end

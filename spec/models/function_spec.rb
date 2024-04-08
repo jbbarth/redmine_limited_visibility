@@ -56,4 +56,23 @@ describe Function do
     end
   end
 
+  if Redmine::Plugin.installed?(:redmine_comments)
+    it "Update the PrivateNotesGroup table, when update_private_notes_group" do
+      function = Function.first
+      group1 = Function.find(2)
+      group2 = Function.find(3)
+      group3 = Function.find(4)
+
+      PrivateNotesGroup.create(group_id: group1.id, function_id: function.id)
+      PrivateNotesGroup.create(group_id: group2.id, function_id: function.id)
+      PrivateNotesGroup.create(group_id: function.id, function_id: group1.id)
+      PrivateNotesGroup.create(group_id: group2.id, function_id: group1.id)
+      PrivateNotesGroup.create(group_id: function.id, function_id: group2.id)
+      PrivateNotesGroup.create(group_id: group1.id, function_id: group2.id)
+
+      expect do
+        function.update_private_notes_group([group3.id, group2.id])
+      end.not_to change { PrivateNotesGroup.count }
+    end
+  end
 end

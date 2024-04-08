@@ -21,7 +21,7 @@ if Redmine::Plugin.installed?(:redmine_organizations)
   # require "#{Rails.root}/plugins/models/project.rb"
   # require "#{Rails.root}/plugins/models/project.rb"
 
-  class Organizations::MembershipsController
+  class Organizations::MembershipsController < ApplicationController
     prepend RedmineLimitedVisibility::Controllers::OrganizationsMembershipsControllerPatch
   end
 end

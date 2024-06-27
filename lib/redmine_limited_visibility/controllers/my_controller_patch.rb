@@ -19,8 +19,10 @@ module RedmineLimitedVisibility
         end
         @my_team = @user.organization if Redmine::Plugin.installed?(:redmine_organizations)
         @my_team_user_ids = @my_team.present? ? @my_team.users.pluck(:id) : []
-      end
 
+        render 'custom_page' if Redmine::Plugin.installed?(:redmine_scn)
+
+      end
     end
   end
 end

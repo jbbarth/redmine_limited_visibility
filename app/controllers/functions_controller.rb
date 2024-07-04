@@ -145,27 +145,29 @@ class FunctionsController < ApplicationController
   def set_function_params_per_project_and_tracker(context, project, params)
     tracker_ids = project.tracker_ids
     function_ids = project.function_ids
-    tracker_ids.each do |tracker_id|
-      function_ids.each do |function_id|
-        project_function = ProjectFunction.where(function_id: function_id, project_id: project.id).first
+    function_ids.each do |function_id|
+      project_function = ProjectFunction.where(function_id: function_id, project_id: project.id).first
+
+      tracker_ids.each do |tracker_id|
         if project_function.present?
           project_function_tracker = ProjectFunctionTracker.find_or_create_by(tracker_id: tracker_id, project_function_id: project_function.id)
           project_function_tracker.visible = true if project_function_tracker.visible.nil? # Set default value
           if context == :visibility
             project_function_tracker.visible = params["function_visibility"].present? && params["function_visibility"][tracker_id.to_s].present? && params["function_visibility"][tracker_id.to_s].include?(function_id.to_s)
           end
-
           if context == :autochecked
             project_function_tracker.checked = params["function_activation_per_tracker"].present? && params["function_activation_per_tracker"][tracker_id.to_s].present? && params["function_activation_per_tracker"][tracker_id.to_s].include?(function_id.to_s)
           end
           project_function_tracker.save
-
-          if context == :autochecked
-            project_function.authorized_viewers = '|' + params["function_activation_per_user_function"][function_id.to_s].join('|') + '|'
-            project_function.save
-          end
         end
       end
+
+      if context == :autochecked && project_function.present?
+        checked_functions_ids = params["function_activation_per_user_function"][function_id.to_s] || []
+        project_function.authorized_viewers = '|' + checked_functions_ids.join('|') + '|'
+        project_function.save
+      end
+
     end
   end
 

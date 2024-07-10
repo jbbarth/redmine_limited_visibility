@@ -14,7 +14,9 @@ module RedmineLimitedVisibility
         # show projects based on current user visibility
         # #### START PATCH ####
         # Preload functions to avoid N+1 queries
-        @memberships = @user.memberships.preload(:roles, :project, :functions).where(Project.visible_condition(User.current, { :skip_pre_condition => true })).to_a
+        @memberships = @user.memberships
+                            .preload(:project, :functions, :member_roles => :role)
+                            .where(Project.visible_condition(User.current, { :skip_pre_condition => true })).to_a
         # #### END PATCH ####
 
         @issue_counts = {}

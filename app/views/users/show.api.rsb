@@ -38,9 +38,9 @@ api.user do
         end
         # BEGIN - Custom data
         api.array :functions do
-          membership.member_functions.each do |member_function|
-            if member_function.function
-              attrs = {:id => member_function.function.id, :name => member_function.function.name}
+          membership.functions.each do |function|
+            if function.present?
+              attrs = {:id => function.id, :name => function.name}
               api.role attrs
             end
           end

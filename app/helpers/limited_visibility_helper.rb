@@ -83,11 +83,12 @@ module LimitedVisibilityHelper
       end
       groups = ''
 
-      users.sort.each do |element|
-        selected_attribute = ' selected="selected"' if option_value_selected?(element, selected) || element.id.to_s == selected
-        functional_roles_ids = issue.project.functions_per_user[element.id]
+      functions_per_user = issue.project.functions_per_user
+      users.sort.each do |user|
+        selected_attribute = ' selected="selected"' if option_value_selected?(user, selected) || user.id.to_s == selected
+        functional_roles_ids = functions_per_user[user.id]
         functional_roles_attribute = functional_roles_ids.present? ? " functional_roles='#{functional_roles_ids.join(',')}'" : ""
-        (element.is_a?(Group) ? groups : s) << %(<option value="#{element.id}"#{selected_attribute}#{functional_roles_attribute}>#{h element.name}</option>)
+        (user.is_a?(Group) ? groups : s) << %(<option value="#{user.id}"#{selected_attribute}#{functional_roles_attribute}>#{h user.name}</option>)
       end
       unless groups.empty?
         s << %(<optgroup label="#{h(l(:label_group_plural))}">#{groups}</optgroup>)

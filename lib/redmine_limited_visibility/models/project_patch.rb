@@ -89,11 +89,9 @@ class Project
 
   # Builds a nested hash of functions sorted by user
   def functions_per_user
-    # TODO: Use cache strategy instead
-    return @functions_per_user if @functions_per_user
     @functions_per_user = {}
-    self.members.map do |member|
-      @functions_per_user[member.user_id] = member.functions.map(&:id)
+    self.members.preload(:member_functions).each do |member|
+      @functions_per_user[member.user_id] = member.member_functions.map(&:function_id)
     end
     @functions_per_user
   end

@@ -1,5 +1,5 @@
-<% if @project.present?
-     users_by_function = function.users_by_project(@project)
+<% if @project.present? && @users_by_function.present?
+     users_by_function = @users_by_function[function]
      users_names = users_by_function.blank? ? l(:label_no_member_has_this_role_in_this_project) : users_by_function.map(&:name).join(", ")
    end %>
 <span class="role <%= styles %> <%= 'no-member' if @project.present? && users_by_function.blank? %>" data-role-id="<%= function.id %>" title="<%= users_names %>">

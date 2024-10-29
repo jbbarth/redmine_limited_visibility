@@ -112,12 +112,11 @@ class Project
 
   # Returns a hash of project users grouped by function
   def users_by_function
-    members.includes(:user, :functions).inject({}) do |h, m|
-      m.functions.each do |r|
-        h[r] ||= []
-        h[r] << m.user
+    members.includes(:user, :functions).each_with_object({}) do |member, result_hash|
+      member.functions.each do |function|
+        result_hash[function] ||= []
+        result_hash[function] << member.user unless result_hash[function].include?(member.user)
       end
-      h
     end
   end
 

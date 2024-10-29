@@ -13,6 +13,7 @@ class FunctionsController < ApplicationController
     @project = Project.find(params[:project_id])
     @viewers = params[:viewers].present? ? params[:viewers].split(',') : []
     @functions = Function.available_functions_for(@project).sorted
+    @users_by_function = @project.users_by_function
   end
 
   def new

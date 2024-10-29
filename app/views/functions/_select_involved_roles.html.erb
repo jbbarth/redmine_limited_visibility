@@ -6,6 +6,7 @@
      @functions = Function.sorted
    end
    hidden_functions ||= []
+   @users_by_function = @project.users_by_function
 %>
 
 <p id=involved-roles-form class=involved-roles>
@@ -22,7 +23,7 @@
   </label>
   <% (@functions-hidden_functions).each do |function| %>
     <% styles = viewers.include?(function.id) ? 'involved ' : '' %>
-    <% styles << (current_user_visibility_roles.include?(function) ? ' mine' : '') %>
+    <% styles << ' mine' if current_user_visibility_roles.include?(function) %>
     <%= render "functions/visibility_role", :function => function, :styles => styles %>
   <% end %>
   <% hidden_functions.each_with_index do |function, index| %>
@@ -32,7 +33,7 @@
                          :style => ''  if index==0  %>
     <%= '<BR>'.html_safe if index==0 %>
     <% styles = viewers.include?(function.id) ? 'involved ' : '' %>
-    <% styles << (current_user_visibility_roles.include?(function) ? ' mine' : '') %>
+    <% styles << ' mine' if current_user_visibility_roles.include?(function) %>
     <% styles << ' hidden_function' %>
     <%= render "functions/visibility_role", :function => function, :styles => styles %>
   <% end %>

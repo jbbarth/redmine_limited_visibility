@@ -6,7 +6,7 @@
      @functions = Function.sorted
    end
    hidden_functions ||= []
-   @users_by_function = @project.users_by_function
+   @users_by_function = @project.users_by_function if @project.present?
 %>
 
 <p id=involved-roles-form class=involved-roles>

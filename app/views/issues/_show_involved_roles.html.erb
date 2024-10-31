@@ -2,7 +2,7 @@
 
   <% viewers = function_ids_for_current_viewers(@issue) %>
   <% @functions = Function.available_functions_for(@project).sorted %>
-  <% @users_by_function = @project.users_by_function %>
+  <% @users_by_function = @project.users_by_function if @project.present? %>
 
   <% hidden_functions = hidden_functions_for_tracker(@issue.project, @issue.tracker) %>
 

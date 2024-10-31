@@ -63,7 +63,7 @@ module LimitedVisibilityHelper
   end
 
   def functional_roles_for_current_user(project)
-    Function.joins(:members).where(:members => {:user_id => User.current.id, :project_id => project.id}).sorted
+    Function.joins(:members).where(:members => {:user_id => User.current.id, :project_id => project.id}).sorted.to_a
   end
 
   # Returns a string for users/groups option tags

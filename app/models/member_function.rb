@@ -22,8 +22,10 @@ class MemberFunction < ActiveRecord::Base
     member.project.children.each do |subproject|
       if subproject.inherit_members?
         child_member = Member.find_or_initialize_by(project: subproject, user_id: member.user_id)
-        child_member.member_functions << MemberFunction.new(:function => function, :inherited_from => id)
-        child_member.save!
+        if child_member.roles.any? # only add the function if the user is already a member of the subproject
+          child_member.member_functions << MemberFunction.new(:function => function, :inherited_from => id)
+          child_member.save!
+        end
       end
     end
   end

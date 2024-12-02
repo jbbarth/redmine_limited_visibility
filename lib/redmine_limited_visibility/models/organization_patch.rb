@@ -38,7 +38,7 @@ module RedmineLimitedVisibility::Models
   end
 end
 
-class Organization < ActiveRecord::Base
+class Organization < ApplicationRecord
 
   prepend RedmineLimitedVisibility::Models::OrganizationPatch
 

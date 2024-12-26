@@ -23,6 +23,8 @@ module RedmineLimitedVisibility
                     value = "  " * level + value
                   when :attachments
                     value = value.to_a.map { |a| a.filename }.join("\n")
+                  when :watcher_users
+                    value = value.to_a.join("\n")
                     # Start patch, Check if issue is assigned to a function
                   when :assigned_to
                     if value.blank?
@@ -35,7 +37,12 @@ module RedmineLimitedVisibility
                   elsif value.is_a?(Time)
                     format_time(value)
                   elsif value.is_a?(Float)
-                    sprintf "%.2f", value
+                    # Support for Redmine 5
+                    if Redmine::VERSION::MAJOR < 6
+                      sprintf('%.2f', value)
+                    else
+                      number_with_delimiter(sprintf('%.2f', value), delimiter: nil)
+                    end
                   else
                     value
                   end

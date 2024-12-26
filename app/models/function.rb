@@ -1,7 +1,6 @@
-class Function < ActiveRecord::Base
+class Function < ApplicationRecord
   include Redmine::SafeAttributes
 
-  unloadable
   acts_as_positioned
 
   safe_attributes :name, :position, :authorized_viewers, :move_to, :hidden_on_overview, :active_by_default, :see_all_issues, :description

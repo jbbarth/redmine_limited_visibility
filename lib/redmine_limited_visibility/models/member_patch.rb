@@ -9,7 +9,7 @@ module RedmineLimitedVisibility::Models::MemberPatch
 
 end
 
-class Member < ActiveRecord::Base
+class Member
 
   prepend RedmineLimitedVisibility::Models::MemberPatch
 

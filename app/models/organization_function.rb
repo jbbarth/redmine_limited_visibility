@@ -1,4 +1,4 @@
-class OrganizationFunction < ActiveRecord::Base
+class OrganizationFunction < ApplicationRecord
   include Redmine::SafeAttributes
 
   belongs_to :project

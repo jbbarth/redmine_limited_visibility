@@ -9,8 +9,8 @@ Deface::Override.new :virtual_path  => 'roles/index',
     <td>
       <% unless role.builtin? || role.workflow_rules.exists? %>
         <span class="icon icon-warning">
-          <% if Redmine::VERSION::MAJOR < 5 %>
-            <%= l(:text_role_no_workflow) %> (<%= link_to l(:button_edit), workflows_edit_path(:role_id => role) %>)
+          <% if Redmine::VERSION::MAJOR > 5 %>
+            <%= sprite_icon('warning', l(:text_role_no_workflow)) %> (<%= link_to l(:button_edit), edit_workflows_path(:role_id => role) %>)
           <% else %>
             <%= l(:text_role_no_workflow) %> (<%= link_to l(:button_edit), edit_workflows_path(:role_id => role) %>)
           <% end %>
@@ -19,7 +19,11 @@ Deface::Override.new :virtual_path  => 'roles/index',
     </td>
     <td class="buttons">
       <%= reorder_handle(role) unless role.builtin? %>
-      <%= link_to l(:button_copy), new_role_path(:copy => role), :class => 'icon icon-copy' %>
+      <% if Redmine::VERSION::MAJOR > 5 %>
+        <%= link_to sprite_icon('copy', l(:button_copy)), new_role_path(:copy => role), :class => 'icon icon-copy' %>
+      <% else %>
+        <%= link_to l(:button_copy), new_role_path(:copy => role), :class => 'icon icon-copy' %>
+      <% end %>
       <%= delete_link role_path(role) unless role.builtin? %>
     </td>
   </tr>

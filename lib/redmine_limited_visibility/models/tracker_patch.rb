@@ -6,7 +6,7 @@ module RedmineLimitedVisibility::Models
 	end
 end
 
-class Tracker < ActiveRecord::Base
+class Tracker
 
 	prepend RedmineLimitedVisibility::Models::TrackerPatch
 

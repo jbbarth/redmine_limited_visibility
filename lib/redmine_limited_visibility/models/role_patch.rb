@@ -6,7 +6,7 @@ module RedmineLimitedVisibility::Models
   end
 end
 
-class Role < ActiveRecord::Base
+class Role
 
   prepend RedmineLimitedVisibility::Models::RolePatch
 

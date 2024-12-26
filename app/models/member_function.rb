@@ -1,4 +1,4 @@
-class MemberFunction < ActiveRecord::Base
+class MemberFunction < ApplicationRecord
   belongs_to :member
   belongs_to :function
 

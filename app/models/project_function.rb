@@ -1,4 +1,4 @@
-class ProjectFunction < ActiveRecord::Base
+class ProjectFunction < ApplicationRecord
   include Redmine::SafeAttributes
 
   belongs_to :project

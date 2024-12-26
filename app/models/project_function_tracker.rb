@@ -1,4 +1,4 @@
-class ProjectFunctionTracker < ActiveRecord::Base
+class ProjectFunctionTracker < ApplicationRecord
   include Redmine::SafeAttributes
 
   belongs_to :project_function

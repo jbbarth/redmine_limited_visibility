@@ -21,3 +21,10 @@ Redmine::Plugin.register :redmine_limited_visibility do
   settings :default => { 'must_have_at_least_one_visible_function' => false },
            :partial => 'settings/redmine_plugin_limited_visibility'
 end
+
+# Support for Redmine 5
+if Redmine::VERSION::MAJOR < 6
+  class ApplicationRecord < ActiveRecord::Base
+    self.abstract_class = true
+  end
+end

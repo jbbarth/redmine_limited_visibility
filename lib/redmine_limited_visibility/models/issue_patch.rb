@@ -36,7 +36,7 @@ module RedmineLimitedVisibility::Models
                                                            :member_functions => { :function_id => authorized_viewer_ids })
 
             # Members without functions
-            members_without_functions = Member.includes(:user)
+            members_without_functions = Member.includes(:user, :member_functions)
                                               .where(:members => { :project_id => project.id })
                                               .reject { |m| m.member_functions.present? }
             users_without_functions = members_without_functions.map(&:user).reject(&:blank?)

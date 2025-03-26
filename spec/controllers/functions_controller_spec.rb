@@ -209,7 +209,7 @@ describe FunctionsController, type: :controller do
 
   end
 
-  describe "popup modal of all roles fonctionnels for (new issue and visibilities according to role of user) should appear functions with the appropriate color" do
+  describe "popup modal of all functions (for new issue and visibilities according to role of user) should show functions with the appropriate color" do
     let!(:project) { Project.find(1) }
     let!(:issue) { Issue.new }
 
@@ -219,47 +219,48 @@ describe FunctionsController, type: :controller do
       issue.tracker = Tracker.find(1)
     end
 
-    it "When all functions do not have a member" do
-      viewers = function_ids_for_current_viewers(issue)
-      get :index_issue, params: { project_id: project.id, viewers: viewers.join(',') }, :xhr => true
+    context "Members have NO functions" do
+      it "displays all functions with the appropriate color" do
+        get :index_issue, params: { project_id: project.id, viewers: [1, 2].join(',') }, :xhr => true
 
-      expect(response.body).to include('class=\"role involved no-member\" data-role-id=')
-      expect(response.body).not_to include('class=\"role  involved\" data-role-id=')
-      expect(response.body).not_to include('class=\"role  \" data-role-id=')
-
+        expect(response.body).to include('class=\"role involved no-member\" data-role-id=')
+        expect(response.body).not_to include('class=\"role  involved\" data-role-id=')
+        expect(response.body).not_to include('class=\"role  \" data-role-id=')
+      end
     end
 
-    it "When one function has a member" do
-      fun_mem = MemberFunction.new
-      fun_mem.member = Project.find(1).members.first
-      fun_mem.function = Project.find(1).functions.first
-      fun_mem.save
+    context "One member has one function" do
+      it "displays all functions with the appropriate color" do
+        fun_mem = MemberFunction.new
+        fun_mem.member = Project.find(1).members.first
+        fun_mem.function = Project.find(1).functions.first
+        fun_mem.save
 
-      viewers = function_ids_for_current_viewers(issue)
-      get :index_issue, params: { project_id: project.id, viewers: viewers.join(',') }, :xhr => true
+        viewers = [1, 2]
+        get :index_issue, params: { project_id: project.id, viewers: viewers.join(',') }, :xhr => true
 
-      expect(response.body).to include('class=\"role involved no-member\" data-role-id=')
-      expect(response.body).to include('class=\"role involved \" data-role-id')
-      expect(response.body).not_to include('class=\"role  \" data-role-id=')
-
+        expect(response.body).to include('class=\"role involved no-member\" data-role-id=')
+        expect(response.body).to include('class=\"role involved \" data-role-id')
+        expect(response.body).not_to include('class=\"role  \" data-role-id=')
+      end
     end
 
-    it "When one function has a member and ProjectFunction has authorized_viewers just for this function" do
-      Project.find(1).members.first.update_attribute(:user_id, 1)
-      fun_mem = MemberFunction.new
-      fun_mem.member = Project.find(1).members.first
-      fun_mem.function = Project.find(1).functions.first
-      fun_mem.save
-      ProjectFunction.first.update_attribute(:authorized_viewers, '|1|')
+    context "One member has one function and authorized_viewers are only this function, another one is not selected" do
+      it "displays all functions with the appropriate color" do
+        Project.find(1).members.first.update_attribute(:user_id, 1)
+        fun_mem = MemberFunction.new
+        fun_mem.member = Project.find(1).members.first
+        fun_mem.function = Project.find(1).functions.first
+        fun_mem.save
 
-      viewers = function_ids_for_current_viewers(issue)
-      get :index_issue, params: { project_id: project.id, viewers: viewers.join(',') }, :xhr => true
+        viewers = [1]
+        get :index_issue, params: { project_id: project.id, viewers: viewers.join(',') }, :xhr => true
 
-      expect(response.body).to include('class=\"role involved \" data-role-id=')
-      expect(response.body).to include('class=\"role  no-member\" data-role-id=')
-      expect(response.body).not_to include('class=\"role involved no-member\" data-role-id=')
-      expect(response.body).not_to include('class=\"role  \" data-role-id=')
-
+        expect(response.body).to include('class=\"role involved \" data-role-id=')
+        expect(response.body).to include('class=\"role  no-member\" data-role-id=')
+        expect(response.body).not_to include('class=\"role involved no-member\" data-role-id=')
+        expect(response.body).not_to include('class=\"role  \" data-role-id=')
+      end
     end
   end
 

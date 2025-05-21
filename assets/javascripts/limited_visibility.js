@@ -171,14 +171,14 @@ function buildListVisibilityFilterRow(field, operator, values) {
     var filterValues = filterOptions['values'];
     var i, select;
 
-    var tr = $('<tr class="filter">').attr('id', 'tr_' + fieldId).html(
-        '<td class="field"><input checked="checked" id="cb_' + fieldId + '" name="f[]" value="' + field + '" type="checkbox"><label for="cb_' + fieldId + '"> ' + filterOptions['name'] + '</label></td>' +
-        '<td class="operator"><select id="operators_' + fieldId + '" name="op[' + field + ']"></td>' +
-        '<td class="values"></td>'
+    var tr = $('<div class="filter">').attr('id', 'tr_' + fieldId).html(
+        '<div class="field"><input checked="checked" id="cb_' + fieldId + '" name="f[]" value="' + field + '" type="checkbox"><label for="cb_' + fieldId + '"> ' + filterOptions['name'] + '</label></div>' +
+        '<div class="operator"><select id="operators_' + fieldId + '" name="op[' + field + ']"></div>' +
+        '<div class="values"></div>'
     );
     filterTable.append(tr);
 
-    select = tr.find('td.operator select');
+    select = tr.find('.operator select');
     for (i = 0; i < operators.length; i++) {
         var option = $('<option>').val(operators[i]).text(operatorLabels[operators[i]]);
         if (operators[i] == operator) {
@@ -197,11 +197,11 @@ function buildListVisibilityFilterRow(field, operator, values) {
         }
     );
 
-    tr.find('td.values').append(
+    tr.find('.values').append(
         '<span style="display:none;"><select class="value" id="values_' + fieldId + '_1" name="v[' + field + '][]"></select>' +
         ' <span class="toggle-multiselect icon-only ' + (values.length > 1 ? 'icon-toggle-minus' : 'icon-toggle-plus') + '">&nbsp;</span></span>'
     );
-    select = tr.find('td.values select');
+    select = tr.find('.values select');
     if (values.length > 1) {
         select.attr('multiple', true);
     }

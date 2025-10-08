@@ -15,7 +15,8 @@
       </tr>
     </thead>
     <tbody>
-    <% for role in @functional_roles %>
+
+    <% @functional_roles&.each do |role| %>
       <tr class="item">
         <td class="name"><%= content_tag('span', link_to(h(role.name), edit_function_path(role))) %></td>
         <td class="buttons">

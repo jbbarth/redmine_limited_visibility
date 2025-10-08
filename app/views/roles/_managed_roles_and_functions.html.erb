@@ -12,6 +12,7 @@
                            :data => {:enables => '.role_managed_role input'} %>
       <%= l(:label_member_management_selected_roles_only) %>:
     </label>
+
     <% Role.givable.sorted.each do |role| %>
       <label class="block role_managed_role" style="padding-left:2em;">
         <%= check_box_tag 'role[managed_role_ids][]', role.id, @role.managed_roles.to_a.include?(role), :id => nil %>

@@ -14,13 +14,15 @@ api.array :memberships, api_meta(:total_count => @member_count, :offset => @offs
         end
       end
       # BEGIN - Custom data for limited_visibility plugin
-      api.array :functions do
-        membership.functions.each do |function|
-          if function.present?
-            attrs = {:id => function.id, :name => function.name}
-            member_function = membership.member_functions.find_by(function_id: function.id)
-            attrs.merge!(:inherited => true) if member_function && member_function.inherited?
-            api.function attrs
+      if membership.respond_to?(:functions) && membership.project.module_enabled?('limited_visibility')
+        api.array :functions do
+          membership.functions.each do |function|
+            if function.present?
+              attrs = {:id => function.id, :name => function.name}
+              member_function = membership.member_functions.find_by(function_id: function.id)
+              attrs.merge!(:inherited => true) if member_function && member_function.inherited?
+              api.function attrs
+            end
           end
         end
       end

@@ -17,6 +17,8 @@ describe MembersController, type: :controller do
     @request.session[:user_id] = user.id
     User.current = user
 
+    project.enable_module!('limited_visibility')
+
     # Add a function to the member
     if member && !member.functions.include?(function)
       member.functions << function
@@ -146,6 +148,7 @@ describe MembersController, type: :controller do
 
       # Create child project
       child_project.save!
+      child_project.enable_module!('limited_visibility')
 
       # Create or update child member with role
       child_member = Member.find_or_create_by(project: child_project, user: user)

@@ -12,13 +12,15 @@ api.membership do
     end
   end
   # BEGIN - Custom data for limited_visibility plugin
-  api.array :functions do
-    @member.functions.each do |function|
-      if function.present?
-        attrs = {:id => function.id, :name => function.name}
-        member_function = @member.member_functions.find_by(function_id: function.id)
-        attrs.merge!(:inherited => true) if member_function && member_function.inherited?
-        api.function attrs
+  if @member.respond_to?(:functions) && @member.project.module_enabled?('limited_visibility')
+    api.array :functions do
+      @member.functions.each do |function|
+        if function.present?
+          attrs = {:id => function.id, :name => function.name}
+          member_function = @member.member_functions.find_by(function_id: function.id)
+          attrs.merge!(:inherited => true) if member_function && member_function.inherited?
+          api.function attrs
+        end
       end
     end
   end

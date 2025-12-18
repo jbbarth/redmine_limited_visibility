@@ -1,5 +1,4 @@
 group :development, :test do
-  # Pin minitest to avoid compatibility issues with Rails 7.2.2.2
-  # Rails 8+ should be compatible with minitest 6.x
-  gem 'minitest', '~> 5.0', '< 6.0' if Rails::VERSION::MAJOR < 8
+  # Pin minitest for Redmine 6 (Rails 7). Redmine 7 (Rails 8) is compatible with minitest >= 6
+  gem 'minitest', '~> 5.0', '< 6.0' if File.read('lib/redmine/version.rb') =~ /MAJOR\s*=\s*(\d+)/ && $1.to_i < 7
 end

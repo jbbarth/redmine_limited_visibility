@@ -6,7 +6,13 @@ module RedmineLimitedVisibility
       extend ActiveSupport::Concern
 
       def index
-        scope = @project.memberships.active # Limit results to active users
+
+        if @project.module_enabled?('limited_visibility')
+          scope = @project.memberships.active # Limit results to active users
+        else
+          scope = @project.memberships # Standard behavior
+        end
+
         @offset, @limit = api_offset_and_limit
         @member_count = scope.count
         @member_pages = Redmine::Pagination::Paginator.new @member_count, @limit, params['page']

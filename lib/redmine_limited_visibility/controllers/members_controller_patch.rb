@@ -5,6 +5,20 @@ module RedmineLimitedVisibility
     module MembersControllerPatch
       extend ActiveSupport::Concern
 
+      def index
+        scope = @project.memberships.active # Limit results to active users
+        @offset, @limit = api_offset_and_limit
+        @member_count = scope.count
+        @member_pages = Redmine::Pagination::Paginator.new @member_count, @limit, params['page']
+        @offset ||= @member_pages.offset
+        @members = scope.includes(:principal, :roles, :functions, :member_functions).order(:id).limit(@limit).offset(@offset).to_a
+
+        respond_to do |format|
+          format.html {head :not_acceptable}
+          format.api
+        end
+      end
+
       def edit
         @roles = Role.givable.to_a
         @functions = Function.available_functions_for(@project).sorted

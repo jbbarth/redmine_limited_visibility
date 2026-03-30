@@ -1,8 +1,8 @@
-name: Tests 6.0.8
+name: Tests 6.0.9
 
 env:
   PLUGIN_NAME: redmine_limited_visibility
-  REDMINE_VERSION: 6.0.8
+  REDMINE_VERSION: 6.0.9
 
 on:
   push:

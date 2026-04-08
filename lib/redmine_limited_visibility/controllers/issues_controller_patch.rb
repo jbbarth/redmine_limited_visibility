@@ -6,17 +6,21 @@ module RedmineLimitedVisibility
       extend ActiveSupport::Concern
 
       def set_assigned_to_function_id
-        if params[:issue].present?
-          if params[:issue][:assigned_to_id]
-            if params[:issue][:assigned_to_id].to_s.include?("function")
-              params[:issue][:assigned_to_id].slice! "function-"
-              params[:issue][:assigned_to_function_id] = params[:issue][:assigned_to_id]
-              params[:issue][:assigned_to_id] = ""
-            else
-              params[:issue][:assigned_to_function_id] = nil
-            end
-          end
+        issue_params = params[:issue]
+        return unless issue_params.present?
+
+        assigned_to_id = issue_params[:assigned_to_id]
+        return unless assigned_to_id
+
+        if assigned_to_id.to_s.include?("function")
+          issue_params[:assigned_to_id].slice!("function-")
+          issue_params[:assigned_to_function_id] = issue_params[:assigned_to_id]
+          issue_params[:assigned_to_id] = ""
+        else
+          issue_params[:assigned_to_function_id] = nil
         end
+      rescue ActionDispatch::Http::Parameters::ParseError
+        # Malformed request body — let Rails handle it normally downstream
       end
 
       def forbid_assignation_to_function_if_module_is_not_enabled

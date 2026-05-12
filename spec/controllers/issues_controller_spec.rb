@@ -150,8 +150,7 @@ describe IssuesController, type: :controller do
     expect(issue.assigned_to_id).to be_nil
   end
 
-  # TODO: Activate this spec when users permissions are validated before updating visibility
-  pending 'requires :change_issue_visibility permission when changing issue visibility' do
+  it 'requires :change_issue_visibility permission when changing issue visibility' do
     @request.session[:user_id] = 2 # jsmith - Manager (no change_issue_visibility permission)
     user = User.current = User.find(2)
     issue = Issue.first

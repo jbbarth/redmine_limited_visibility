@@ -26,7 +26,11 @@ module RedmineLimitedVisibility::Models
                    foreign_key: "assigned_to_function_id"
 
         safe_attributes "assigned_to_function_id"
-        safe_attributes "authorized_viewers" #, :if => lambda { |issue, user| user.admin? || user.allowed_to?(:change_issues_visibility, issue.project) } TODO Complete this check: users may also set visibility when they have no permissions (using a issue-template for instance)
+        safe_attributes "authorized_viewers", :if => lambda { |issue, user|
+          issue.new_record? ||
+          user.admin? ||
+          user.allowed_to?(:change_issues_visibility, issue.project)
+        }
 
         def involved_users(project)
           if project.module_enabled?("limited_visibility")

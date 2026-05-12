@@ -69,6 +69,7 @@ class Function < ApplicationRecord
     grouped_functions = [self] | Function.where(id: functions_ids)
     grouped_functions.each do |group|
       PrivateNotesGroup.where(group_id: group.id).where("function_id NOT IN (?)", grouped_functions.map(&:id)).delete_all
+      PrivateNotesGroup.where(function_id: group.id).where("group_id NOT IN (?)", grouped_functions.map(&:id)).delete_all
       (grouped_functions - [group]).each do |f|
         PrivateNotesGroup.find_or_create_by(group_id: group.id, function_id: f.id)
       end

@@ -14,6 +14,11 @@ module RedmineLimitedVisibility::Models
 
       add_available_filter "authorized_viewers", type: :list_visibility, values: all_functions
 
+      add_available_filter("author.function",
+                           :type => :list, :values => all_functions,
+                           :name => l(:label_attribute_of_author, :name => l(:label_functional_role))
+      ) unless all_functions.empty?
+
       add_available_filter("assigned_to_member_with_function_id",
                            :type => :list_optional, :values => all_functions
       ) unless all_functions.empty?
@@ -32,6 +37,25 @@ module RedmineLimitedVisibility::Models
       add_available_filter("has_been_assigned_to_function_id",
                            :type => :list_optional, :values => all_functions
       ) unless all_functions.empty?
+    end
+
+    # Filters issues authored by a member who holds the given functional role(s)
+    # in the issue's project. Mirrors core's sql_for_author_role_field, using
+    # MemberFunction instead of MemberRole.
+    def sql_for_author_function_field(field, operator, value)
+      function_cond =
+        if value.any?
+          "#{MemberFunction.table_name}.function_id IN (" + value.collect { |val| "'#{self.class.connection.quote_string(val)}'" }.join(",") + ")"
+        else
+          "1=0"
+        end
+      sw = operator == "!" ? 'NOT' : ''
+      nl = operator == "!" ? "#{Issue.table_name}.author_id IS NULL OR" : ''
+      subquery =
+        "SELECT 1" +
+        " FROM #{Member.table_name} INNER JOIN #{MemberFunction.table_name} ON #{Member.table_name}.id = #{MemberFunction.table_name}.member_id" +
+        " WHERE #{Issue.table_name}.project_id = #{Member.table_name}.project_id AND #{Member.table_name}.user_id = #{Issue.table_name}.author_id AND #{function_cond}"
+      "(#{nl} #{sw} EXISTS (#{subquery}))"
     end
 
     def sql_for_has_been_assigned_to_id_field(field, operator, value)

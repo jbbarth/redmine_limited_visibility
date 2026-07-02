@@ -13,15 +13,20 @@ module RedmineLimitedVisibility
           scope = @project.memberships # Standard behavior
         end
 
-        @offset, @limit = api_offset_and_limit
-        @member_count = scope.count
-        @member_pages = Redmine::Pagination::Paginator.new @member_count, @limit, params['page']
-        @offset ||= @member_pages.offset
-        @members = scope.includes(:principal, :roles, :functions, :member_functions).order(:id).limit(@limit).offset(@offset).to_a
+        @members = scope.includes(:principal, :roles, :functions, :member_functions).order(:id)
 
         respond_to do |format|
           format.html {head :not_acceptable}
-          format.api
+          format.api do
+            @offset, @limit = api_offset_and_limit
+            @member_count = scope.count
+            @member_pages = Redmine::Pagination::Paginator.new @member_count, @limit, params['page']
+            @offset ||= @member_pages.offset
+            @members = @members.limit(@limit).offset(@offset).to_a
+          end
+          format.csv do
+            send_data(members_to_csv(@members), type: 'text/csv; header=present', filename: "#{@project.identifier}-members.csv")
+          end
         end
       end
 

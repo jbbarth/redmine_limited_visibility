@@ -30,6 +30,13 @@ form .involved-roles .role .fa-icon-lock { display:inline; }
 .involved-roles .role:not(.disabled) .fa-icon-lock { display:none; }
 
 /* my page */
+/* Base positioning for the plugin's own raster icon (removed from Redmine 7.0 core);
+   scoped to elements without an SVG icon so it never affects sprite icons. */
+.icon:not(:has(svg)) {
+  background-position: 0% 50%;
+  background-repeat: no-repeat;
+  padding-left: 20px;
+}
 a.icon-visibility  { background-image: url(../images/magnify.png); margin-right:6px; margin-left: 8px;}
 
 /* .organizations .role { width:50%; } */

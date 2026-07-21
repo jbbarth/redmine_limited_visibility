@@ -1,8 +1,8 @@
 <div style="margin-top: 25px;padding-top: 6px;">
 
   <div class="contextual">
-    <%= link_to l(:label_role_new), new_function_path, :class => 'icon icon-add' %>
-    <%= link_to l(:label_visibilities_report), visibilities_functions_path, :class => 'icon icon-summary' %>
+    <%= link_to sprite_icon('add', l(:label_role_new)), new_function_path %>
+    <%= link_to sprite_icon('summary', l(:label_visibilities_report)), visibilities_functions_path %>
   </div>
 
   <h2><%=l(:label_functional_roles)%></h2>

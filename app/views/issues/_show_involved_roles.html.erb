@@ -9,9 +9,8 @@
   <hr/>
   <div id='current_involved_roles_list' class='involved-roles' style='display: flex;'>
     <label id="label_involved_roles"><%= l("field_authorized_viewers") %>
-      <%= link_to l(:label_functional_roles),
+      <%= link_to sprite_icon('help', l(:label_functional_roles), icon_only: true),
               {:controller => 'functions', :action => 'index_issue', :project_id => @issue.project.id, :viewers => viewers.join(',')},
-              :class => 'icon-only icon-help',
               :remote => true,
               :method => 'get' %>
     </label>

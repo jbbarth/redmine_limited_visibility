@@ -62,7 +62,7 @@ describe ProjectsController, :type => :controller do
         :id => 1,
         :tab => "members"
       }
-      assert_select "a[class='icon-only icon-help']"
+      assert_select "a svg use[href$='#icon--help']"
       expect(response.body).to include('showModal')
       expect(response.body).to include("function1")
       expect(response.body).to include("function2")

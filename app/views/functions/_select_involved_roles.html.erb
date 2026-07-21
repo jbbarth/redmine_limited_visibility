@@ -13,9 +13,8 @@
   <label><%= l(:label_involved_members) %>
     <span style="margin-top:5px;margin-left:5px;">
       <% if @issue.present? %>
-        <%= link_to l(:label_functional_roles),
+        <%= link_to sprite_icon('help', l(:label_functional_roles), icon_only: true),
               {:controller => 'functions', :action => 'index_issue', :project_id => @issue.project.id, :viewers => viewers.join(',')},
-              :class => 'icon-only icon-help',
               :remote => true,
               :method => 'get' %>
       <% end %>

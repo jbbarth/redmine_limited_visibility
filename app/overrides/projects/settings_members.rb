@@ -1,11 +1,9 @@
 # TABLE HEADERS
 Deface::Override.new :virtual_path => 'projects/settings/_members',
-                     :original => 'd1b4a2c2eb5c61a65fad04c1fe810bd8006c2736',
                      :name => 'replace-technical-roles-title',
                      :replace => 'erb[loud]:contains("l(:label_role_plural)")',
                      :text => '<%= l("label_technical_role_plural") %>'
 Deface::Override.new :virtual_path => 'projects/settings/_members',
-                     :original => 'd1b4a2c2eb5c61a65fad04c1fe810bd8006c2736',
                      :name => 'add-visibility-roles-header',
                      :insert_after => 'th.roles',
                      :text => '<th class="visibility_roles"><%= l("label_functional_roles") %></th>'

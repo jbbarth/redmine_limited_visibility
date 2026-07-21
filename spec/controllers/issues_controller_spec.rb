@@ -239,16 +239,16 @@ describe IssuesController, type: :controller do
   describe "GET /issues" do
     it 'should issue#show show icon of popup modal of all roles on the project per tracker' do
       get :show, params: { id: 1 }
-      expect(response.body).to include("icon-only icon-help")
-      assert_select "a[class='icon-only icon-help']"
+      expect(response.body).to include("icon--help")
+      assert_select "a svg use[href$='#icon--help']"
     end
   end
 
   describe "GET /issues" do
     it 'should issue#new show icon of popup modal of all roles on the project per tracker' do
       get :new
-      expect(response.body).to include("icon-only icon-help")
-      assert_select "a[class='icon-only icon-help']"
+      expect(response.body).to include("icon--help")
+      assert_select "a svg use[href$='#icon--help']"
     end
   end
 

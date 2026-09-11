@@ -64,6 +64,50 @@ module RedmineLimitedVisibility::Models
         def authorized_viewer_ids
           "#{authorized_viewers}".split('|').reject(&:blank?).map(&:to_i)
         end
+
+        before_create :set_default_authorized_viewers
+
+        def default_authorized_viewer_ids(user = author)
+          if project.autochecked_functions_mode == '2'
+            default_authorized_viewer_ids_for_tracker
+          else
+            default_authorized_viewer_ids_for_user(user)
+          end
+        end
+
+        def default_authorized_viewer_ids_for_tracker
+          tracker_functions = ProjectFunctionTracker.joins(:project_function).where("project_id = ? AND tracker_id = ?", project_id, tracker_id)
+          if tracker_functions.present?
+            tracker_functions.select { |f| f.checked == true }.map { |c| c.function.id }
+          else
+            Function.available_functions_for(project).pluck(:id)
+          end
+        end
+
+        def default_authorized_viewer_ids_for_user(user)
+          user_functions = Function.of_user_in_project(user, project).to_a
+          return Function.available_functions_for(project).pluck(:id) if user_functions.empty?
+
+          activated_functions = []
+          user_functions.each do |function|
+            enabled_functions = []
+            ProjectFunction.where(project_id: project_id, function_id: function.id).each do |project_function|
+              if project_function.authorized_viewer_ids.present?
+                enabled_functions |= Function.where(id: project_function.authorized_viewer_ids).sorted.to_a
+              end
+            end
+            activated_functions |= enabled_functions.presence || Function.where(id: function.authorized_viewer_ids).sorted.to_a
+          end
+          (activated_functions & Function.available_functions_for(project).to_a).map(&:id)
+        end
+
+        def set_default_authorized_viewers
+          return unless project&.module_enabled?("limited_visibility")
+          return if authorized_viewers.present? || copy?
+
+          self.authorized_viewers = "|#{default_authorized_viewer_ids.join('|')}|"
+        end
+        private :set_default_authorized_viewers
       end
     end
   end

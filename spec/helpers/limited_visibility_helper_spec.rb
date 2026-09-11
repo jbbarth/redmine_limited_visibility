@@ -46,7 +46,7 @@ describe LimitedVisibilityHelper do
         @project.functions = [] # Override fixtures...
         function1 = contractor_role.id
         function2 = project_office_role.id
-        allow(self).to receive(:functional_roles_for_current_user).and_return([])
+        User.current = User.find(6) # not a member of @project
         expect(function_ids_for_current_viewers(issue)).to include function1
         expect(function_ids_for_current_viewers(issue)).to include function2
       end

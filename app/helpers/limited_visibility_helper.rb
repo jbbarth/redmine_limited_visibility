@@ -6,12 +6,7 @@ module LimitedVisibilityHelper
       if issue.authorized_viewer_ids.present? && previous_tracker_id.to_i == issue.tracker_id
         viewers = issue.authorized_viewer_ids
       else
-        current_functions = ProjectFunctionTracker.joins(:project_function).where("project_id = ? AND tracker_id = ?", issue.project_id, issue.tracker_id)
-        if current_functions.present? # current tracker has at least one functional role in settings
-          viewers = current_functions.select {|f| f.checked == true}.map {|c| c.function.id}
-        else # else check all functions
-          viewers = Function.available_functions_for(issue.project).sorted.pluck(:id)
-        end
+        viewers = issue.default_authorized_viewer_ids_for_tracker
       end
     else # update existing issue
       if issue && issue.authorized_viewers.present?
@@ -28,29 +23,7 @@ module LimitedVisibilityHelper
       if issue.authorized_viewer_ids.present?
         viewers = issue.authorized_viewer_ids
       else
-        current_functions = functional_roles_for_current_user(issue.project)
-        if current_functions.present? # current user has at least one functional role
-          activated_functions = []
-          current_functions.each do |f|
-            functions_per_project = ProjectFunction.where('project_id = ? AND function_id = ?', issue.project_id, f.id)
-            enabled_functions_per_project = []
-            functions_per_project.each do |pf|
-              if pf.authorized_viewer_ids.present?
-                enabled_functions_per_project |= Function.where("id in (?)", pf.authorized_viewer_ids).sorted
-              end
-            end
-            if enabled_functions_per_project.present?
-              activated_functions |= enabled_functions_per_project
-            else
-              activated_functions |= Function.where("id in (?)", f.authorized_viewer_ids).sorted
-            end
-          end
-          activated_functions = activated_functions & Function.available_functions_for(@project).sorted
-          activated_functions.sort_by {|a| a.position}
-          viewers = activated_functions.map {|f| f.id}
-        else # current user has no visibility role (can see all issues available for the current project)
-          viewers = Function.available_functions_for(issue.project).sorted.pluck(:id)
-        end
+        viewers = issue.default_authorized_viewer_ids_for_user(User.current)
       end
     else # update existing issue
       if issue && issue.authorized_viewers.present?
@@ -63,7 +36,7 @@ module LimitedVisibilityHelper
   end
 
   def functional_roles_for_current_user(project)
-    Function.joins(:members).where(:members => {:user_id => User.current.id, :project_id => project.id}).sorted.to_a
+    Function.of_user_in_project(User.current, project).to_a
   end
 
   # Returns a string for users/groups option tags

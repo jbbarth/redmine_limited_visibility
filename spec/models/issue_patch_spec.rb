@@ -176,4 +176,84 @@ describe RedmineLimitedVisibility::Models::IssuePatch do
       expect(issue.authorized_viewer_ids).to eq [1]
     end
   end
+
+  describe "default visibility on creation" do
+    fixtures :users, :email_addresses, :user_preferences, :roles, :members, :member_roles,
+             :projects, :enabled_modules, :issues, :issue_statuses, :trackers, :projects_trackers,
+             :workflows, :enumerations, :issue_categories, :versions,
+             :custom_fields, :custom_fields_projects, :custom_fields_trackers, :custom_values,
+             :functions, :project_functions, :project_function_trackers
+
+    let(:project) { Project.find(1) }
+    let(:author) { User.find(2) }
+
+    after do
+      User.current = nil
+    end
+
+    context "when the module is enabled" do
+      before do
+        project.enable_module!('limited_visibility')
+      end
+
+      context "when the project uses the tracker mode" do
+        before do
+          project.update_column(:autochecked_functions_mode, '2')
+          ProjectFunctionTracker.find(1).update_column(:checked, true)
+        end
+
+        it "applies the checked functions of the tracker" do
+          issue = Issue.generate!(project: project, tracker_id: 1, author: author)
+
+          expect(issue.tracker_id).to eq 1
+          expect(issue.reload.authorized_viewer_ids).to eq [1]
+        end
+
+        it "applies the default visibility to issues created from an email" do
+          raw_email = File.read(Rails.root.join("test/fixtures/mail_handler/ticket_on_given_project.eml"))
+
+          issue = MailHandler.receive(raw_email, issue: { project: 'ecookbook' })
+
+          expect(issue).to be_a Issue
+          expect(issue.tracker_id).to eq 1
+          expect(issue.reload.authorized_viewer_ids).to eq [1]
+        end
+      end
+
+      context "when the project uses the user mode" do
+        it "applies the visibility configured for the author's functions" do
+          Member.find_by(user_id: author.id, project_id: project.id).functions << Function.find(1)
+
+          issue = Issue.generate!(project: project, tracker_id: 1, author: author)
+
+          expect(issue.reload.authorized_viewer_ids).to eq [1, 2]
+        end
+      end
+
+      it "keeps a visibility given explicitly" do
+        issue = Issue.generate!(project: project, author: author, authorized_viewers: "|2|")
+
+        expect(issue.reload.authorized_viewers).to eq "|2|"
+      end
+
+      it "keeps the visibility of the source when copying an issue" do
+        User.current = author
+        source = Issue.find(1)
+        expect(source.authorized_viewers).to be_nil
+
+        copy = Issue.new.copy_from(source)
+        copy.save!
+
+        expect(copy.reload.authorized_viewers).to be_nil
+      end
+    end
+
+    it "does not set any visibility when the module is disabled" do
+      expect(project.module_enabled?('limited_visibility')).to be_falsey
+
+      issue = Issue.generate!(project: project, author: author)
+
+      expect(issue.reload.authorized_viewers).to be_nil
+    end
+  end
 end

@@ -33,6 +33,10 @@ class Function < ApplicationRecord
     functions
   end
 
+  def self.of_user_in_project(user, project)
+    joins(:members).where(members: { user_id: user.id, project_id: project.id }).sorted
+  end
+
   def authorized_viewer_ids
     "#{authorized_viewers}".split("|").reject(&:blank?).map(&:to_i)
   end

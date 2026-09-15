@@ -204,41 +204,28 @@ module RedmineLimitedVisibility::Models
     end
 
     def sql_conditions_for_functions_per_projects(field)
+      projects_without_functions_ids = User.current.project_ids_without_function
+      projects_ids_where_module_is_enabled = EnabledModule.where("name = ?", "limited_visibility").pluck(:project_id)
 
-      conditions = Rails.cache.fetch ['sql_conditions_for_functions_per_projects',
-                                      User.current,
-                                      Member.maximum(:id),
-                                      MemberFunction.maximum(:id),
-                                      Project.maximum(:updated_on),
-                                      OrganizationNonMemberFunction.maximum(:id),
-                                      (Time.now.strftime("%Y%m%d%H").to_i)].join('/') do
+      sql_by_function = []
+      User.current.project_ids_by_function.each do |function_id, user_projects_ids|
+        user_projects_ids_where_module_is_enabled = user_projects_ids & projects_ids_where_module_is_enabled
+        projects_without_functions_ids |= user_projects_ids - user_projects_ids_where_module_is_enabled
 
-        projects_by_function = User.current.projects_by_function
-        projects_without_functions_ids = User.current.projects_without_function.map(&:id)
-        projects_ids_where_module_is_enabled = EnabledModule.where("name = ?", "limited_visibility").pluck(:project_id)
-
-        sql_by_function = []
-        projects_by_function.each do |function, projects|
-          user_projects_ids = projects.map(&:id)
-          user_projects_ids_where_module_is_enabled = user_projects_ids & projects_ids_where_module_is_enabled
-          projects_without_functions_ids |= user_projects_ids - user_projects_ids_where_module_is_enabled
-
-          if Redmine::Plugin.installed?(:redmine_multiprojects_issue)
-            additional_statement = " OR #{Issue.table_name}.project_id IN ( SELECT project_id FROM issues_projects WHERE issue_id = #{Issue.table_name}.id AND project_id IN (#{user_projects_ids_where_module_is_enabled.join(',')}) )"
-          end
-          sql_by_function << " (#{Issue.table_name}.#{field} LIKE '%|#{function.id}|%' AND (#{Project.table_name}.id IN (#{user_projects_ids_where_module_is_enabled.join(',')}) #{additional_statement} )) " if user_projects_ids_where_module_is_enabled.present?
+        if Redmine::Plugin.installed?(:redmine_multiprojects_issue)
+          additional_statement = " OR #{Issue.table_name}.project_id IN ( SELECT project_id FROM issues_projects WHERE issue_id = #{Issue.table_name}.id AND project_id IN (#{user_projects_ids_where_module_is_enabled.join(',')}) )"
         end
-        sql = sql_by_function.join(" OR ")
-
-        # potentially very long query #TODO Find a way to optimize it
-        "(#{sql.present? ? '(' + sql + ') OR ' : ''} #{Issue.table_name}.#{field} IS NULL" \
-          " OR #{Issue.table_name}.#{field} = '||' " \
-          " OR #{Issue.table_name}.#{field} = '' " \
-          " OR #{Issue.table_name}.assigned_to_id = #{User.current.id} " \
-          " OR #{Issue.table_name}.author_id = #{User.current.id} " \
-          " OR #{Project.table_name}.id IN ( #{projects_without_functions_ids.present? ? projects_without_functions_ids.join(',') : 0} ) ) "
+        sql_by_function << " (#{Issue.table_name}.#{field} LIKE '%|#{function_id}|%' AND (#{Project.table_name}.id IN (#{user_projects_ids_where_module_is_enabled.join(',')}) #{additional_statement} )) " if user_projects_ids_where_module_is_enabled.present?
       end
-      conditions
+      sql = sql_by_function.join(" OR ")
+
+      # potentially very long query #TODO Find a way to optimize it
+      "(#{sql.present? ? '(' + sql + ') OR ' : ''} #{Issue.table_name}.#{field} IS NULL" \
+        " OR #{Issue.table_name}.#{field} = '||' " \
+        " OR #{Issue.table_name}.#{field} = '' " \
+        " OR #{Issue.table_name}.assigned_to_id = #{User.current.id} " \
+        " OR #{Issue.table_name}.author_id = #{User.current.id} " \
+        " OR #{Project.table_name}.id IN ( #{projects_without_functions_ids.present? ? projects_without_functions_ids.join(',') : 0} ) ) "
     end
 
   end

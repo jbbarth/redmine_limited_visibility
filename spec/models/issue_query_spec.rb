@@ -127,4 +127,41 @@ describe IssueQuery do
       end
     end
   end
+
+  describe 'authorized_viewers filter with the "mine" operator' do
+    let(:project) { Project.find(1) }
+    let(:contractor_role) { Function.where(name: "Contractors").first_or_create }
+    let(:project_office_role) { Function.where(name: "Project Office").first_or_create }
+    let(:first_homonym) { User.generate!(firstname: 'John', lastname: 'Doe') }
+    let(:second_homonym) { User.generate!(firstname: 'John', lastname: 'Doe') }
+    let(:issue) { Issue.find(1) }
+
+    before do
+      allow(Rails).to receive(:cache).and_return(ActiveSupport::Cache::MemoryStore.new)
+      project.enable_module!("limited_visibility")
+      { first_homonym => contractor_role, second_homonym => project_office_role }.each do |user, function|
+        membership = Member.new(user_id: user.id, project_id: project.id)
+        membership.roles << Role.first
+        membership.functions << function
+        membership.save!
+      end
+      issue.update_column(:authorized_viewers, "|#{contractor_role.id}|")
+    end
+
+    after { User.current = nil }
+
+    def issue_ids_visible_with_my_functions(user)
+      User.current = user
+      query = IssueQuery.new(name: '_', project: project)
+      query.add_filter('authorized_viewers', 'mine', [''])
+      query.issues.map(&:id)
+    end
+
+    it "computes the conditions of each user even when users share the same name" do
+      expect(first_homonym.name).to eq second_homonym.name
+
+      expect(issue_ids_visible_with_my_functions(first_homonym)).to include(issue.id)
+      expect(issue_ids_visible_with_my_functions(second_homonym)).to_not include(issue.id)
+    end
+  end
 end

@@ -3,80 +3,22 @@ require_dependency 'user'
 module RedmineLimitedVisibility::Models
   module UserPatch
 
-    # Returns a hash of user's projects grouped by functions
-    def projects_by_function
-      return @projects_by_function if @projects_by_function
-
-      hash = Hash.new([])
-
-      group_class = anonymous? ? GroupAnonymous : GroupNonMember
-      members = Member.joins(:project, :principal).
-        where("#{Project.table_name}.status <> 9").
-        where("#{Member.table_name}.user_id = ? OR (#{Project.table_name}.is_public = ? AND #{Principal.table_name}.type = ?)", self.id, true, group_class.name).
-        preload(:project, :functions).
-        to_a
-
-      members.reject! { |member| member.user_id != id && project_ids.include?(member.project_id) }
-      members.each do |member|
-        if member.project
-          member.functions.each do |function|
-            hash[function] = [] unless hash.key?(function)
-            hash[function] << member.project
-          end
-        end
-      end
-
-      # Organization Non Member Exceptions
-      if Redmine::Plugin.installed?(:redmine_organizations)
-        if self.organization
-          functions = Function.distinct.joins(:organization_non_member_functions)
-                              .where("organization_non_member_functions.organization_id IN (?)", self.organization.self_and_ancestors_ids)
-          functions.each do |function|
-            hash[function] ||= []
-            projects = Project.joins(:organization_non_member_functions)
-                              .where("organization_non_member_functions.organization_id IN (?)", self.organization.self_and_ancestors_ids)
-                              .where("organization_non_member_functions.function_id = ?", function.id)
-            hash[function] |= projects.map(&:self_and_descendants).flatten
-          end
-        end
-      end
-
-      hash.each do |function, projects|
-        projects.uniq!
-      end
-
-      @projects_by_function = hash
+    # Returns a hash of the ids of the user's projects grouped by function id
+    def project_ids_by_function
+      load_project_ids_by_function unless @project_ids_by_function
+      @project_ids_by_function
     end
 
-    def projects_without_function
-      return @projects_without_function if @projects_without_function
+    # Returns the ids of the user's projects where a membership has no function
+    def project_ids_without_function
+      load_project_ids_by_function unless @project_ids_without_function
+      @project_ids_without_function
+    end
 
-      @projects_without_function = []
-
-      group_class = anonymous? ? GroupAnonymous : GroupNonMember
-      members = Member.joins(:project, :principal).
-        where("#{Project.table_name}.status <> 9").
-        where("#{Member.table_name}.user_id = ? OR (#{Project.table_name}.is_public = ? AND #{Principal.table_name}.type = ?)", self.id, true, group_class.name).
-        preload(:project, :functions).
-        to_a
-
-      members.reject! { |member| member.user_id != id && project_ids.include?(member.project_id) }
-      members.each do |member|
-        if member.functions.blank?
-          @projects_without_function << member.project
-        end
-      end
-
-      # Organization Non Member Exceptions
-      if Redmine::Plugin.installed?(:redmine_organizations)
-        if self.organization
-          @projects_without_function -= Project.joins(:organization_non_member_functions)
-                                               .where("organization_non_member_functions.organization_id IN (?)", self.organization.self_and_ancestors_ids)
-                                               .map(&:self_and_descendants).flatten
-        end
-      end
-
-      @projects_without_function.reject(&:blank?).uniq
+    def reload(*)
+      @project_ids_by_function = nil
+      @project_ids_without_function = nil
+      super
     end
 
     # Returns the functions that the user is allowed to manage for the given project
@@ -98,7 +40,47 @@ module RedmineLimitedVisibility::Models
         []
       end
     end
-    
+
+    private
+
+    # Memberships of the user, and of the builtin group on public projects where
+    # the user is not a member, like User#project_ids_by_role
+    def load_project_ids_by_function
+      group_ids = (anonymous? ? GroupAnonymous : GroupNonMember).unscoped.pluck(:id)
+      rows = Member.joins(:project)
+                   .joins("LEFT OUTER JOIN #{MemberFunction.table_name} ON #{MemberFunction.table_name}.member_id = #{Member.table_name}.id")
+                   .joins("LEFT OUTER JOIN #{Function.table_name} ON #{Function.table_name}.id = #{MemberFunction.table_name}.function_id")
+                   .where.not(Project.table_name => { status: Project::STATUS_ARCHIVED })
+                   .where("#{Member.table_name}.user_id = ? OR (#{Project.table_name}.is_public = ? AND #{Member.table_name}.user_id IN (?))", id, true, group_ids)
+                   .pluck("#{Member.table_name}.id", "#{Member.table_name}.user_id", "#{Member.table_name}.project_id", "#{Function.table_name}.id")
+
+      own_project_ids = project_ids.to_set
+      rows.reject! { |_, user_id, project_id, _| user_id != id && own_project_ids.include?(project_id) }
+
+      by_function = Hash.new { |hash, function_id| hash[function_id] = [] }
+      without_function = []
+      rows.group_by(&:first).each_value do |member_rows|
+        project_id = member_rows.first[2]
+        function_ids = member_rows.filter_map(&:last)
+        without_function << project_id if function_ids.empty?
+        function_ids.each { |function_id| by_function[function_id] << project_id }
+      end
+
+      if Redmine::Plugin.installed?(:redmine_organizations) && organization
+        OrganizationNonMemberFunction.joins(:project).left_joins(:function)
+                                     .where(organization_id: organization.self_and_ancestors_ids)
+                                     .pluck("#{Function.table_name}.id", "#{Project.table_name}.lft", "#{Project.table_name}.rgt")
+                                     .each do |function_id, lft, rgt|
+          subproject_ids = Project.where("#{Project.table_name}.lft >= ? AND #{Project.table_name}.rgt <= ?", lft, rgt).ids
+          by_function[function_id] |= subproject_ids if function_id
+          without_function -= subproject_ids
+        end
+      end
+
+      @project_ids_by_function = by_function.transform_values(&:uniq)
+      @project_ids_without_function = without_function.uniq
+    end
+
   end
 end
 

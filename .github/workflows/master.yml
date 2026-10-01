@@ -68,6 +68,7 @@ jobs:
           libpq-dev
           ghostscript
           gsfonts
+          subversion
 
       - name: Allow imagemagick to read PDF files
         run: |

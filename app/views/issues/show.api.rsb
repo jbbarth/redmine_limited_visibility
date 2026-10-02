@@ -8,7 +8,7 @@ api.issue do
   api.assigned_to(:id => @issue.assigned_to_id, :name => @issue.assigned_to.name) unless @issue.assigned_to.nil?
   api.category(:id => @issue.category_id, :name => @issue.category.name) unless @issue.category.nil?
   api.fixed_version(:id => @issue.fixed_version_id, :name => @issue.fixed_version.name) unless @issue.fixed_version.nil?
-  api.parent(:id => @issue.parent_id) unless @issue.parent.nil?
+  api.parent(:id => @issue.parent_id) unless @issue.parent_id.nil?
 
   # custom attributes for the limited_visibility plugin
   if @issue.project.module_enabled?("limited_visibility")
@@ -43,10 +43,13 @@ api.issue do
   api.updated_on @issue.updated_on
   api.closed_on @issue.closed_on
 
+  # Reactions are not part of the API in Redmine 7.0 and earlier
+  render_api_reactions(@issue, api) if include_in_api_response?('reactions') && respond_to?(:render_api_reactions)
+
   render_api_issue_children(@issue, api) if include_in_api_response?('children')
 
   api.array :attachments do
-    @issue.attachments.each do |attachment|
+    @issue.attachments.preload(:author).each do |attachment|
       render_api_attachment(attachment, api)
     end
   end if include_in_api_response?('attachments')
@@ -76,6 +79,7 @@ api.issue do
         api.updated_on journal.updated_on
         api.updated_by(:id => journal.updated_by.id, :name => journal.updated_by.name) unless journal.updated_by.nil?
         api.private_notes journal.private_notes
+        render_api_reactions(journal, api) if include_in_api_response?('reactions') && respond_to?(:render_api_reactions)
         api.array :attachments do
           journal.attachments.each do |attachment|
             render_api_attachment(attachment, api)

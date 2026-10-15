@@ -47,11 +47,17 @@ module RedmineLimitedVisibility::Models
     # the user is not a member, like User#project_ids_by_role
     def load_project_ids_by_function
       group_ids = (anonymous? ? GroupAnonymous : GroupNonMember).unscoped.pluck(:id)
+      # redmine_organizations lets other plugins extend the public projects (e.g. restricted public projects)
+      public_projects = if Redmine::Plugin.installed?(:redmine_organizations)
+                          Project.public_projects_condition(self)
+                        else
+                          "#{Project.table_name}.is_public = #{Project.connection.quoted_true}"
+                        end
       rows = Member.joins(:project)
                    .joins("LEFT OUTER JOIN #{MemberFunction.table_name} ON #{MemberFunction.table_name}.member_id = #{Member.table_name}.id")
                    .joins("LEFT OUTER JOIN #{Function.table_name} ON #{Function.table_name}.id = #{MemberFunction.table_name}.function_id")
                    .where.not(Project.table_name => { status: Project::STATUS_ARCHIVED })
-                   .where("#{Member.table_name}.user_id = ? OR (#{Project.table_name}.is_public = ? AND #{Member.table_name}.user_id IN (?))", id, true, group_ids)
+                   .where("#{Member.table_name}.user_id = ? OR (#{public_projects} AND #{Member.table_name}.user_id IN (?))", id, group_ids)
                    .pluck("#{Member.table_name}.id", "#{Member.table_name}.user_id", "#{Member.table_name}.project_id", "#{Function.table_name}.id")
 
       own_project_ids = project_ids.to_set

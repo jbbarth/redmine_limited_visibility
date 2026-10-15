@@ -92,6 +92,40 @@ describe User do
     end
   end
 
+  describe "restricted public projects" do
+    before do
+      skip "redmine_restricted_public is not installed" unless Redmine::Plugin.installed?(:redmine_restricted_public)
+      private_project.update_columns(restricted_public: true)
+    end
+
+    let(:internal) { user.tap { |u| u.update_columns(internal: true) } }
+
+    it "gives an internal user the non-member group functions, like on a public project" do
+      add_member(Group.non_member, private_project, [4])
+
+      expect(internal.project_ids_by_function).to eq(4 => [private_project.id])
+    end
+
+    it "keeps the non-member group functions away from an external user" do
+      add_member(Group.non_member, private_project, [4])
+      add_member(Group.non_member, public_project, [3])
+
+      expect(user.project_ids_by_function).to eq(3 => [public_project.id])
+    end
+
+    it "gives an internal user the non-member group memberships without function" do
+      add_member(Group.non_member, private_project)
+
+      expect(internal.project_ids_without_function).to eq [private_project.id]
+    end
+
+    it "keeps the project closed to the anonymous user" do
+      add_member(Group.anonymous, private_project, [4])
+
+      expect(User.anonymous.project_ids_by_function).to eq({})
+    end
+  end
+
   describe "organization non-member functions" do
     before do
       skip "requires redmine_organizations" unless Redmine::Plugin.installed?(:redmine_organizations)

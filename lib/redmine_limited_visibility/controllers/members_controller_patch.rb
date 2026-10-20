@@ -6,6 +6,8 @@ module RedmineLimitedVisibility
       extend ActiveSupport::Concern
 
       def index
+        # Let core render the html members page when it provides one
+        return super if request.format.html?
 
         if @project.module_enabled?('limited_visibility')
           scope = @project.memberships.active # Limit results to active users
@@ -16,7 +18,6 @@ module RedmineLimitedVisibility
         @members = scope.includes(:principal, :roles, :functions, :member_functions).order(:id)
 
         respond_to do |format|
-          format.html {head :not_acceptable}
           format.api do
             @offset, @limit = api_offset_and_limit
             @member_count = scope.count
@@ -25,7 +26,11 @@ module RedmineLimitedVisibility
             @members = @members.limit(@limit).offset(@offset).to_a
           end
           format.csv do
-            send_data(members_to_csv(@members), type: 'text/csv; header=present', filename: "#{@project.identifier}-members.csv")
+            if User.current.allowed_to?(:manage_members, @project)
+              send_data(members_to_csv(@members), type: 'text/csv; header=present', filename: "#{@project.identifier}-members.csv")
+            else
+              head :forbidden
+            end
           end
         end
       end

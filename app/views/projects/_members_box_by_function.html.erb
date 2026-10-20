@@ -38,6 +38,10 @@
       <% end %>
     <% end %>
 
+    <% if respond_to?(:project_members_path) && User.current.allowed_to?(:view_members, @project) %>
+      <p><%= link_to l(:label_member_view_all), project_members_path(@project) %></p>
+    <% end %>
+
   </div>
 
 <% end %>

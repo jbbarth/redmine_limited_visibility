@@ -83,6 +83,23 @@ describe MembersController, type: :controller do
     end
   end
 
+  describe 'GET index with CSV format' do
+    it 'exports memberships to a member who can manage members' do
+      get :index, params: { project_id: project.id, format: 'csv' }
+
+      expect(response).to be_successful
+      expect(response.media_type).to start_with('text/csv')
+    end
+
+    it 'denies the export to a member who can only view members' do
+      Role.find(1).remove_permission!(:manage_members)
+
+      get :index, params: { project_id: project.id, format: 'csv' }
+
+      expect(response).to have_http_status(:forbidden)
+    end
+  end
+
   describe 'GET show with JSON format' do
     it 'returns a single membership with functions in JSON' do
       get :show, params: { id: member.id, format: 'json' }

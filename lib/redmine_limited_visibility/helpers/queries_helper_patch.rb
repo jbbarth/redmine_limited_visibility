@@ -8,7 +8,7 @@ module RedmineLimitedVisibility::Helpers
         Function.functions_from_authorized_viewers(value).join(", ")
       elsif column.name == :assigned_to && value.blank?
         if item.assigned_function.present?
-          "&#10148; #{item.assigned_function.name}".html_safe
+          safe_join(['&#10148; '.html_safe, item.assigned_function.name])
         end
       else
         super
@@ -43,11 +43,11 @@ module RedmineLimitedVisibility::Helpers
 
     def get_assigned_users_and_functions(column, issue, html = true)
       list_of_users = get_has_been_assigned_users(column, issue, html)
-      list_of_functions = get_has_been_assigned_functions(issue)
-      [list_of_functions, list_of_users].reject(&:blank?).join(', ').html_safe
+      list_of_functions = get_has_been_assigned_functions(issue, html)
+      join_values([list_of_functions, list_of_users].reject(&:blank?), html)
     end
 
-    def get_has_been_assigned_functions(issue)
+    def get_has_been_assigned_functions(issue, html = true)
       functions_ids = [issue.assigned_to_function_id]
       issue.journals.each do |journal|
         functions_ids << journal.details.select { |i| i.prop_key == 'assigned_to_function_id' }.map(&:old_value)
@@ -56,8 +56,7 @@ module RedmineLimitedVisibility::Helpers
       functions_ids.flatten!
       if functions_ids.present?
         functions_ids.uniq!
-        functions = Function.where('id' => functions_ids)
-        functions.collect { |v| v.name }.compact.join(', ').html_safe if functions
+        join_values(Function.where('id' => functions_ids).map(&:name).compact, html)
       else
         nil
       end
@@ -72,8 +71,7 @@ module RedmineLimitedVisibility::Helpers
       functions_ids.flatten!
       if functions_ids.present?
         functions_ids.uniq!
-        functions = Function.where('id' => functions_ids).sorted
-        functions.collect { |v| v.name }.compact.join(', ').html_safe if functions
+        join_values(Function.where('id' => functions_ids).sorted.map(&:name).compact, html)
       else
         nil
       end
@@ -89,10 +87,14 @@ module RedmineLimitedVisibility::Helpers
       if users_ids.present?
         users_ids.uniq!
         users = User.where('id' => users_ids) # would be great to keep the order : ORDER BY FIELD('users'.'id', users_ids)
-        users.collect { |v| html ? column_value(column, issue, v) : v.to_s }.compact.join(', ').html_safe if users
+        join_values(users.collect { |v| html ? column_value(column, issue, v) : v.to_s }.compact, html)
       else
         nil
       end
+    end
+
+    def join_values(values, html)
+      html ? safe_join(values, ', ') : values.join(', ')
     end
 
   end

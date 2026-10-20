@@ -30,4 +30,39 @@ describe QueriesHelper, type: :helper do
       expect(value).to eq contractor_role.name
     end
   end
+
+  describe "functional role names" do
+    let(:malicious_role) { Function.create!(name: '<img src=x onerror=alert(1)>') }
+    let(:issue) { Issue.find(1) }
+    let(:escaped_name) { '&lt;img src=x onerror=alert(1)&gt;' }
+
+    before do
+      issue.update_columns(assigned_to_id: nil, assigned_to_function_id: malicious_role.id,
+                           authorized_viewers: "|#{malicious_role.id}|")
+    end
+
+    after { malicious_role.destroy }
+
+    it "escapes the function assigned to an issue" do
+      value = column_value(QueryColumn.new(:assigned_to), issue, nil)
+      expect(value).to eq "&#10148; #{escaped_name}"
+    end
+
+    it "escapes the functions an issue has been assigned to" do
+      value = column_content(QueryColumn.new(:has_been_assigned_to), issue)
+      expect(value).to include escaped_name
+      expect(value).not_to include '<img'
+    end
+
+    it "escapes the functions an issue has been visible by" do
+      value = column_content(QueryColumn.new(:has_been_visible_by), issue)
+      expect(value).to include escaped_name
+      expect(value).not_to include '<img'
+    end
+
+    it "keeps raw function names in the csv export" do
+      expect(csv_content(QueryColumn.new(:has_been_assigned_to), issue)).to include malicious_role.name
+      expect(csv_content(QueryColumn.new(:has_been_visible_by), issue)).to include malicious_role.name
+    end
+  end
 end

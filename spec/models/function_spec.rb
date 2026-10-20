@@ -56,4 +56,25 @@ describe Function do
     end
   end
 
+  describe "#update_private_notes_group" do
+    fixtures :functions
+
+    before do
+      skip "requires redmine_comments" unless Redmine::Plugin.installed?(:redmine_comments)
+    end
+
+    it "removes every link of a function taken out of the group" do
+      function = Function.find(1)
+      [[1, 2], [1, 3], [2, 1], [2, 3], [3, 1], [3, 2]].each do |group_id, function_id|
+        PrivateNotesGroup.create!(group_id: group_id, function_id: function_id)
+      end
+
+      function.update_private_notes_group([3, 4])
+
+      expect(PrivateNotesGroup.pluck(:group_id, :function_id)).to match_array(
+        [[1, 3], [1, 4], [3, 1], [3, 4], [4, 1], [4, 3]]
+      )
+    end
+  end
+
 end

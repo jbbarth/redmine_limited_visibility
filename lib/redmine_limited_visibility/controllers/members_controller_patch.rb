@@ -25,11 +25,13 @@ module RedmineLimitedVisibility
             @offset ||= @member_pages.offset
             @members = @members.limit(@limit).offset(@offset).to_a
           end
-          format.csv do
-            if User.current.allowed_to?(:manage_members, @project)
-              send_data(members_to_csv(@members), type: 'text/csv; header=present', filename: "#{@project.identifier}-members.csv")
-            else
-              head :forbidden
+          if respond_to?(:members_to_csv, true)
+            format.csv do
+              if User.current.allowed_to?(:manage_members, @project)
+                send_data(members_to_csv(@members), type: 'text/csv; header=present', filename: "#{@project.identifier}-members.csv")
+              else
+                head :forbidden
+              end
             end
           end
         end

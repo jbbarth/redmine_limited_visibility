@@ -84,7 +84,11 @@ describe MembersController, type: :controller do
   end
 
   describe 'GET index with CSV format' do
+    let(:core_exports_csv) { MembersController.method_defined?(:members_to_csv) }
+
     it 'exports memberships to a member who can manage members' do
+      skip 'core has no members CSV export' unless core_exports_csv
+
       get :index, params: { project_id: project.id, format: 'csv' }
 
       expect(response).to be_successful
@@ -92,11 +96,20 @@ describe MembersController, type: :controller do
     end
 
     it 'denies the export to a member who can only view members' do
+      skip 'core has no members CSV export' unless core_exports_csv
+
       Role.find(1).remove_permission!(:manage_members)
 
       get :index, params: { project_id: project.id, format: 'csv' }
 
       expect(response).to have_http_status(:forbidden)
+    end
+
+    it 'rejects the format when core has no members CSV export' do
+      skip 'core has a members CSV export' if core_exports_csv
+
+      expect { get :index, params: { project_id: project.id, format: 'csv' } }
+        .to raise_error(ActionController::UnknownFormat)
     end
   end
 
